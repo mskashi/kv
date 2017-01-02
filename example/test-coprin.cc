@@ -14,6 +14,9 @@ int main()
 	boost::timer t;
 	ub::vector< kv::interval<double> > I;
 
+	std::cout.precision(17);
+
+
 	Bellido().range(I);
 	std::cout << "Bellido\n";
 	t.restart();
@@ -139,6 +142,26 @@ int main()
 	allsol(I, Rump_univariate());
 	cout << t.elapsed() << " sec\n";
 
+	#if 0
+	// too difficult for our system
+	AOL_cosh1().range(I);
+	std::cout << "AOL_cosh1\n";
+	t.restart();
+	allsol(I, AOL_cosh1(), 2);
+	cout << t.elapsed() << " sec\n";
+	#endif
+
+	AOL_log1().range(I);
+	std::cout << "AOL_log1\n";
+	t.restart();
+	allsol(I, AOL_log1());
+	cout << t.elapsed() << " sec\n";
+
+	DiGregorio().range(I);
+	std::cout << "DiGregorio\n";
+	t.restart();
+	allsol(I, DiGregorio());
+	cout << t.elapsed() << " sec\n";
 
 	// Bellido().range(I);
 	// allsol(I, Bellido());

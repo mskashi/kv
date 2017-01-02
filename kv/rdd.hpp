@@ -339,7 +339,7 @@ template <> struct rop <dd> {
 				format = 'g';
 			}
 		}
-		s << dd::ddtostring(x, s.precision(), format, 1);
+		s << conv_dd::ddtostring(x.a1, x.a2, s.precision(), format, 1);
 	}
 
 	static void print_down(const dd& x, std::ostream& s) {
@@ -357,15 +357,19 @@ template <> struct rop <dd> {
 				format = 'g';
 			}
 		}
-		s << dd::ddtostring(x, s.precision(), format, -1);
+		s << conv_dd::ddtostring(x.a1, x.a2, s.precision(), format, -1);
 	}
 
 	static dd fromstring_up(const std::string& s) {
-		return dd::stringtodd(s, 1);
+		double x1, x2;
+		conv_dd::stringtodd(s, x1, x2, 1);
+		return dd(x1, x2);
 	}
 
 	static dd fromstring_down(const std::string& s) {
-		return dd::stringtodd(s, -1);
+		double x1, x2;
+		conv_dd::stringtodd(s, x1, x2, -1);
+		return dd(x1, x2);
 	}
 };
 

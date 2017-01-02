@@ -8,7 +8,7 @@
 // Affine Arithmetic
 
 #include <iostream>
-#include <exception>
+#include <stdexcept>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>

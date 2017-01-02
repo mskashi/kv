@@ -5,7 +5,7 @@
 #ifndef STROBOMAP_HPP
 #define STROBOMAP_HPP
 
-#include <exception>
+#include <stdexcept>
 #include <kv/ode-nv.hpp>
 #include <kv/ode-autodif-nv.hpp>
 #include <kv/ode-maffine.hpp>

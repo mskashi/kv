@@ -619,3 +619,68 @@ class Rump_univariate {
 		x(0).assign(-1e8, 1e8);
 	}
 };
+
+class AOL_cosh1 {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		ub::vector<T> y(3);
+
+		y(0) = x(0) * cosh(1. / x(0) + x(1)) + x(2) - 1.;
+		y(1) = x(0) * cosh(2. / x(0) + x(1)) + x(2) - 4.;
+		y(2) = x(0) * cosh(3. / x(0) + x(1)) + x(2) - 9.;
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(3);
+		for (i=0; i<3; i++) {
+			x(i).assign(-100., 100.);
+		}
+	}
+};
+
+class AOL_log1 {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		ub::vector<T> y(1);
+
+		y(0) = x(0) - 8. * log(x(0)) / log(T(2.)); 
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(1);
+		x(i).assign(1., 1000.);
+	}
+};
+
+class DiGregorio {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		ub::vector<T> y(3);
+
+		y(0) = -1000. + pow(10. - 40. * cos(x(0)) + x(1), 2) + pow(-40. + 40. * sin(x(0)), 2);
+		y(1) = pow(20. - 40. * cos(x(0)), 2) + 1600. * pow(sin(x(0)), 2) - pow(20. - 35. * cos(x(2)), 2) - 1225. * pow(sin(x(2)), 2);
+		y(2) = 1600. + pow(10. - x(1), 2) - pow(-10. - 35. * cos(x(2)), 2) - 1225. * pow(sin(x(2)), 2);
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(3);
+		x(0).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
+		x(1).assign(-1000., 1000.);
+		x(2).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
+	}
+};

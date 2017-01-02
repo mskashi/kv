@@ -5,7 +5,7 @@
 #ifndef LP_HPP
 #define LP_HPP
 
-#include <exception>
+#include <stdexcept>
 #include <list>
 #include <limits>
 #include <boost/numeric/ublas/vector.hpp>
