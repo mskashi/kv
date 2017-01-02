@@ -13,7 +13,8 @@
 
 namespace kv {
 
-// calculate \int_start^end x^power * f(x) dx
+// calculate \int_start^end (x-start)^power * f(x) dx
+// (start < end) is needed.
 
 template <class T, class F>
 interval<T>
@@ -147,10 +148,15 @@ defint_singular(F f, interval<T> start, interval<T> end, int order) {
 	return result;
 }
 
+// calculate \int_start_end log(f(x)) dx
+// (start < end) needed
+// n = singularity order
+// lim_{x->start} f(x)/(x-start)^i = 0 (0 \le i < n)
+// lim_{x->start} f(x)/(x-start)^n != 0
 
 template <class T, class F>
 interval<T>
-defint_log(F f, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
+defint_log_singular(F f, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
 	int i;
 	interval<T> step, c, z, result;
 	psa< interval<T> > x, y;
@@ -166,7 +172,7 @@ defint_log(F f, interval<T> start, interval<T> end, int order, int singularity_o
 	psa< interval<T> >::record_history() = false;
 
 
-	psa< interval<T> >::domain() = interval<T>(0, step.upper());
+	psa< interval<T> >::domain() = interval<T>::hull(0, step);
 
 
 	c = start;
@@ -177,7 +183,7 @@ defint_log(F f, interval<T> start, interval<T> end, int order, int singularity_o
 
 	y = f(x);
 	for (i=0; i<singularity_order; i++) {
-		if (! zero_in(x.v(i))) {
+		if (! zero_in(y.v(i))) {
 			std::cout << "defint_log: something wrong\n";
 		}
 	}
@@ -190,6 +196,54 @@ defint_log(F f, interval<T> start, interval<T> end, int order, int singularity_o
 
 	y = integrate(log(y));
 	result = eval(y, step) + (T)singularity_order * step * (log(step) - 1.);
+
+	psa< interval<T> >::mode() = save_mode;
+	psa< interval<T> >::use_history() = save_uh;
+	psa< interval<T> >::record_history() = save_rh;
+
+	return result;
+}
+
+
+// calculate \int_start_end log(x)f(x) dx
+// (start < end) needed
+
+template <class T, class F>
+interval<T>
+defint_log(F f, interval<T> start, interval<T> end, int order) {
+	int i;
+	interval<T> step, c, result;
+	interval<T> xn, logx;
+	psa< interval<T> > x, y;
+	bool save_mode, save_uh, save_rh;
+
+	step = end - start;
+
+	save_mode = psa< interval<T> >::mode();
+	save_uh = psa< interval<T> >::use_history();
+	save_rh = psa< interval<T> >::record_history();
+	psa< interval<T> >::mode() = 2;
+	psa< interval<T> >::use_history() = false;
+	psa< interval<T> >::record_history() = false;
+
+
+	psa< interval<T> >::domain() = interval<T>::hull(0, step);
+
+	c = start;
+	x.v.resize(2);
+	x.v(0) = c;
+	x.v(1) = 1;
+	x = setorder(x, order);
+
+	y = f(x);
+
+	result = 0;
+	logx = log(step);
+	xn = step;
+	for (i=0; i<y.v.size(); i++) {
+		result += y.v(i) * xn * ((i+1) * logx - 1) / ((i+1) * (i+1));
+		xn *= step;
+	}
 
 	psa< interval<T> >::mode() = save_mode;
 	psa< interval<T> >::use_history() = save_uh;

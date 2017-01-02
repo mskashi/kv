@@ -78,7 +78,7 @@ template <class T> interval<T> digamma_zero(T x);
 template <class T>
 interval<T> gamma(const interval<T>& x) {
 	interval<T> tmp, m;
-	// blow is from http://oeis.org/A030169
+	// below is from http://oeis.org/A030169
 	static const interval<T> m2 = constants< interval<T> >::str("1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337255", "1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337256");
 
 	if (x.lower() > 0.) {
@@ -108,6 +108,69 @@ interval<T> gamma(const interval<T>& x) {
 	tmp = interval<T>::hull(gamma_point(interval<T>(x.lower())), gamma_point(interval<T>(x.upper())));
 	if (overlap(x, m)) {
 		return interval<T>::hull(tmp, gamma_point(m));
+	} else {
+		return tmp;
+	} 
+}
+
+template <class T>
+interval<T> lgamma_point(const interval<T>& x) {
+	T y;
+	int i;
+	interval<T> r;
+
+	y = floor(x.lower());
+
+	if (y >= 2.) {
+		r = log(gamma_r(x - (y - 1.)));
+		for (i=y-1; i>=1; i--) {
+			r += log(x - i);
+		}
+		return r;
+	} else if (y <= 0.) {
+		r = log(gamma_r(x - (y - 1.)));
+		for (i=0.; i>=y; i--) {
+			r -= log(abs(x - i));
+		}
+		return r;
+	} else {
+		return log(gamma_r(x));
+	}
+}
+
+template <class T>
+interval<T> lgamma(const interval<T>& x) {
+	interval<T> tmp, m;
+	// below is from http://oeis.org/A030169
+	static const interval<T> m2 = constants< interval<T> >::str("1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337255", "1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337256");
+
+	if (x.lower() > 0.) {
+		m = digamma_zero(x.lower());
+		if (zero_in(m)) { // error
+			m = m2;
+		}
+		tmp = interval<T>::hull(lgamma_point(interval<T>(x.lower())), lgamma_point(interval<T>(x.upper())));
+		if (overlap(x, m)) {
+			return interval<T>::hull(tmp, lgamma_point(m));
+		} else {
+			return tmp;
+		} 
+	}
+
+	if (floor(x.lower()) != floor(x.upper())) {
+		return interval<T>::whole();
+	}
+	if (floor(x.lower()) == x.lower()) {
+		return interval<T>::whole();
+	}
+
+	m = digamma_zero(x.lower());
+	if (zero_in(m)) { // error
+		return lgamma_point(x);
+	}
+	tmp = interval<T>::hull(lgamma_point(interval<T>(x.lower())), lgamma_point(interval<T>(x.upper())));
+	if (overlap(x, m)) {
+		return interval<T>::hull(tmp, lgamma_point(m));
 	} else {
 		return tmp;
 	} 
@@ -146,7 +209,7 @@ template <class T> interval<T> digamma_plus(const interval<T>& x) {
 	result += defint_autostep(Digamma< interval<T> >(x), (interval<T>)DIGAMMA_TH1, (interval<T>)DIGAMMA_TH2, DIGAMMA_ORDER);
 
 	tmp = exp(- interval<T>(DIGAMMA_TH2));
-	result += interval<T>::hull(- 1. / (1. - tmp) * x * exp(- x * DIGAMMA_TH2), tmp);
+	result += interval<T>::hull(- 1. / ((1. - tmp) * x) * exp(- x * DIGAMMA_TH2), tmp / DIGAMMA_TH2);
 
 	return result;
 }
