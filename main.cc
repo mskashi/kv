@@ -48,9 +48,9 @@ int main()
 	std::cout << overlap(x, y) << "\n";
 	std::cout << overlap(z, x) << "\n";
 	std::cout << intersect(z, x) << "\n";
-	std::cout << hull(z, y) << "\n";
-	std::cout << hull(z, 1.) << "\n";
-	std::cout << hull(1., z) << "\n";
+	std::cout << itvd::hull(z, y) << "\n";
+	std::cout << itvd::hull(z, 1.) << "\n";
+	std::cout << itvd::hull(1., z) << "\n";
 	std::cout << (x < y) << "\n";
 	std::cout << (x < 1.) << "\n";
 	std::cout << (1. < x) << "\n";
@@ -63,4 +63,25 @@ int main()
 	bool parted;
 	std::cout << division_part1(itvd(1., 2.), itvd(-3., 4.), parted) << "\n";
 	if (parted) std::cout << division_part2(itvd(1., 2.), itvd(-3., 4.)) << "\n";
+	std::cout << pow(itvd(2., 3.), 2) << "\n";
+	std::cout << pow(itvd(2., 3.), -2) << "\n";
+	std::cout << pow(itvd(-2., 3.), 2) << "\n";
+	std::cout << pow(itvd(-2., 3.), 3) << "\n";
+	std::cout << exp(itvd(2.5, 3.5)) << "\n";
+	std::cout << expm1(itvd(-0.25, 0.25)) << "\n";
+	std::cout << log(itvd(0.75, 1.25)) << "\n";
+	std::cout << log1p(itvd(-0.25, 0.25)) << "\n";
+	std::cout << sin(itvd(-0.25, 0.25)) << "\n";
+	std::cout << cos(itvd(-0.25, 0.25)) << "\n";
+	std::cout << tan(itvd(-0.25, 0.25)) << "\n";
+	std::cout << atan(itvd(-0.25, 0.25)) << "\n";
+	std::cout << asin(itvd(-0.25, 0.25)) << "\n";
+	std::cout << acos(itvd(-0.25, 0.25)) << "\n";
+	std::cout << atan2(itvd(1.), itvd(1.)) << "\n";
+	std::cout << sinh(itvd(-0.25, 0.25)) << "\n";
+	std::cout << cosh(itvd(-0.25, 0.25)) << "\n";
+	std::cout << tanh(itvd(-0.25, 0.25)) << "\n";
+	std::cout << asinh(itvd(-0.25, 0.25)) << "\n";
+	std::cout << acosh(itvd(1.5, 2.)) << "\n";
+	std::cout << atanh(itvd(-0.25, 0.25)) << "\n";
 }
