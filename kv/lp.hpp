@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef LP_HPP
@@ -196,8 +196,8 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 					if (Imin.upper() < Itmp.lower()) {
 						break;
 					}
-					tmp = (a(i, 0) > 0) ? a(i, 0) : -a(i, 0);
-					a(i, 0) += tmp * std::numeric_limits<T>::epsilon();
+					// succ
+					a(i, 0) = ((interval<T>)a(i, 0) + std::numeric_limits<T>::denorm_min()).upper();
 				}
 			} else {
 				Itmp = (interval<T>)a(i, 0) / a(i, pivot_j);
@@ -205,8 +205,8 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 					if (Imin.upper() < Itmp.lower()) {
 						break;
 					}
-					tmp = (a(pivot_i, 0) > 0) ? a(pivot_i, 0) : -a(pivot_i, 0);
-					a(pivot_i, 0) -= tmp * std::numeric_limits<T>::epsilon();
+					// pred
+					a(pivot_i, 0) = ((interval<T>)a(pivot_i, 0) - std::numeric_limits<T>::denorm_min()).lower();
 
 					Imin = (interval<T>)a(pivot_i, 0) / a(pivot_i, pivot_j);
 				}

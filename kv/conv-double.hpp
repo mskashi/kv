@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DOUBLE_HPP
@@ -14,6 +14,7 @@
 #include <limits>
 #include <cmath>
 #include <cstdlib>
+#include <algorithm>
 
 namespace kv {
 

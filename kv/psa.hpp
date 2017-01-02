@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <list>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>

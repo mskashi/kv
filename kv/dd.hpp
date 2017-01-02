@@ -647,6 +647,12 @@ template <> class numeric_limits<kv::dd> {
 		return tmp2;
 	}
 
+	static kv::dd denorm_min() {
+		static const double tmp = numeric_limits<double>::denorm_min();
+		static const kv::dd tmp2(tmp, 0.);
+		return tmp2;
+	}
+
 	static const int digits = 106;
 	static const int digits10 = 31;
 	static const int radix = 2;

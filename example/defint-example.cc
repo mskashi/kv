@@ -60,6 +60,13 @@ class Rump1 {
 	}
 };
 
+class Nanbu {
+	public:
+	template <class T> T operator() (T x) {
+		return log(cos(sqrt(6. * pow(x, 4) + 2. * pow(x, 3) + 1)) + x) / exp(sin(sqrt(pow(x, 2) + 4. * x)) + pow(x, 2));
+	}
+};
+
 
 int main() {
 	std::cout.precision(17);
@@ -69,4 +76,5 @@ int main() {
 	std::cout << kv::defint_autostep(Sqrt(), (itvd)"0.0001", (itvd)2., 12) << "\n";
 	std::cout << kv::defint_autostep(Func1(), (itvd)(-1.), (itvd)1., 12) << "\n";
 	std::cout << kv::defint_autostep(Rump1(), (itvd)(0.), (itvd)8., 12) << "\n";
+	std::cout << kv::defint_autostep(Nanbu(), (itvd)(0.5), (itvd)4., 10) << "\n";
 }

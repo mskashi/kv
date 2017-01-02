@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef JOINTRANGE_HPP
 #define JOINTRANGE_HPP
 
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
-
 #include <kv/affine.hpp>
 #include <kv/gnuplot.hpp>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_HPP
@@ -131,6 +131,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order) {
 		#if DEFINT_FAST == 1
 		psa< interval<T> >::use_history() = false;
 		psa< interval<T> >::record_history() = true;
+		psa< interval<T> >::history().clear();
 		#endif
 		y = integrate(f(x));
 
