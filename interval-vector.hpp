@@ -1,5 +1,5 @@
-#ifndef IVECTOR_UTY_HPP
-#define IVECTOR_UTY_HPP
+#ifndef INTERVAL_VECTOR_HPP
+#define INTERVAL_VECTOR_HPP
 
 // utilities for interval vector/matrix
 
@@ -9,8 +9,9 @@
 
 namespace ub = boost::numeric::ublas;
 
+namespace kv {
 
-template <class T> ub::vector<T> mid (const ub::vector< kv::interval<T> >& I) {
+template <class T> inline ub::vector<T> mid (const ub::vector< interval<T> >& I) {
 	int i;
 	int s = I.size();
 	ub::vector<T> r(s);
@@ -22,7 +23,7 @@ template <class T> ub::vector<T> mid (const ub::vector< kv::interval<T> >& I) {
 	return r;
 }
 
-template <class T> ub::matrix<T> mid (const ub::matrix< kv::interval<T> >& I) {
+template <class T> inline ub::matrix<T> mid (const ub::matrix< interval<T> >& I) {
 	int i, j;
 	int s1 = I.size1();
 	int s2 = I.size2();
@@ -38,7 +39,7 @@ template <class T> ub::matrix<T> mid (const ub::matrix< kv::interval<T> >& I) {
 }
 
 
-template <class T> ub::vector<T> rad (const ub::vector< kv::interval<T> >& I) {
+template <class T> inline ub::vector<T> rad (const ub::vector< interval<T> >& I) {
 	int i;
 	int s = I.size();
 	ub::vector<T> r(s);
@@ -50,7 +51,7 @@ template <class T> ub::vector<T> rad (const ub::vector< kv::interval<T> >& I) {
 	return r;
 }
 
-template <class T> ub::matrix<T> rad (const ub::matrix< kv::interval<T> >& I) {
+template <class T> inline ub::matrix<T> rad (const ub::matrix< interval<T> >& I) {
 	int i, j;
 	int s1 = I.size1();
 	int s2 = I.size2();
@@ -66,7 +67,7 @@ template <class T> ub::matrix<T> rad (const ub::matrix< kv::interval<T> >& I) {
 }
 
 
-template <class T> ub::vector<T> mag (const ub::vector< kv::interval<T> >& I) {
+template <class T> inline ub::vector<T> mag (const ub::vector< interval<T> >& I) {
 	int i;
 	int s = I.size();
 	ub::vector<T> r(s);
@@ -78,7 +79,7 @@ template <class T> ub::vector<T> mag (const ub::vector< kv::interval<T> >& I) {
 	return r;
 }
 
-template <class T> ub::matrix<T> mag (const ub::matrix< kv::interval<T> >& I) {
+template <class T> inline ub::matrix<T> mag (const ub::matrix< interval<T> >& I) {
 	int i, j;
 	int s1 = I.size1();
 	int s2 = I.size2();
@@ -93,7 +94,7 @@ template <class T> ub::matrix<T> mag (const ub::matrix< kv::interval<T> >& I) {
 	return r;
 }
 
-template <class T> ub::vector<T> mag (const ub::vector< T >& v) {
+template <class T> inline ub::vector<T> mag (const ub::vector< T >& v) {
 	int i;
 	int s = v.size();
 	ub::vector<T> r(s);
@@ -105,7 +106,7 @@ template <class T> ub::vector<T> mag (const ub::vector< T >& v) {
 	return r;
 }
 
-template <class T> ub::matrix<T> mag (const ub::matrix< T >& m) {
+template <class T> inline ub::matrix<T> mag (const ub::matrix< T >& m) {
 	int i, j;
 	int s1 = m.size1();
 	int s2 = m.size2();
@@ -122,7 +123,7 @@ template <class T> ub::matrix<T> mag (const ub::matrix< T >& m) {
 
 
 
-template <class T> ub::vector<T> mig (const ub::vector< kv::interval<T> >& I) {
+template <class T> inline ub::vector<T> mig (const ub::vector< interval<T> >& I) {
 	int i;
 	int s = I.size();
 	ub::vector<T> r(s);
@@ -134,7 +135,7 @@ template <class T> ub::vector<T> mig (const ub::vector< kv::interval<T> >& I) {
 	return r;
 }
 
-template <class T> ub::matrix<T> mig (const ub::matrix< kv::interval<T> >& I) {
+template <class T> inline ub::matrix<T> mig (const ub::matrix< interval<T> >& I) {
 	int i, j;
 	int s1 = I.size1();
 	int s2 = I.size2();
@@ -150,7 +151,7 @@ template <class T> ub::matrix<T> mig (const ub::matrix< kv::interval<T> >& I) {
 }
 
 
-template <class T> bool zero_in (const ub::vector< kv::interval<T> >& I) {
+template <class T> inline bool zero_in (const ub::vector< interval<T> >& I) {
 	int i;
 	int s = I.size();
 
@@ -161,7 +162,7 @@ template <class T> bool zero_in (const ub::vector< kv::interval<T> >& I) {
 	return true;
 }
 
-template <class T> bool subset (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> > & J) {
+template <class T> inline bool subset (const ub::vector< interval<T> >& I, const ub::vector< interval<T> > & J) {
 	int i;
 	int s = I.size();
 
@@ -172,7 +173,7 @@ template <class T> bool subset (const ub::vector< kv::interval<T> >& I, const ub
 	return true;
 }
 
-template <class T> bool proper_subset (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> > & J) {
+template <class T> inline bool proper_subset (const ub::vector< interval<T> >& I, const ub::vector< interval<T> > & J) {
 	int i;
 	int s = I.size();
 
@@ -183,7 +184,7 @@ template <class T> bool proper_subset (const ub::vector< kv::interval<T> >& I, c
 	return true;
 }
 
-template <class T> bool overlap (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> > & J) {
+template <class T> inline bool overlap (const ub::vector< interval<T> >& I, const ub::vector< interval<T> > & J) {
 	int i;
 	int s = I.size();
 
@@ -194,10 +195,10 @@ template <class T> bool overlap (const ub::vector< kv::interval<T> >& I, const u
 	return true;
 }
 
-template <class T> ub::vector< kv::interval<T> > intersect (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> > & J) {
+template <class T> inline ub::vector< interval<T> > intersect (const ub::vector< interval<T> >& I, const ub::vector< interval<T> > & J) {
 	int i;
 	int s = I.size();
-	ub::vector< kv::interval<T> > r(s);
+	ub::vector< interval<T> > r(s);
 
 	for (i=0; i<s; i++) {
 		r(i) = intersect(I(i), J(i));
@@ -206,11 +207,11 @@ template <class T> ub::vector< kv::interval<T> > intersect (const ub::vector< kv
 	return r;
 }
 
-template <class T> ub::matrix< kv::interval<T> > intersect (const ub::matrix< kv::interval<T> >& I, const ub::matrix< kv::interval<T> > & J) {
+template <class T> inline ub::matrix< interval<T> > intersect (const ub::matrix< interval<T> >& I, const ub::matrix< interval<T> > & J) {
 	int i, j;
 	int s1 = I.size1();
 	int s2 = I.size2();
-	ub::matrix< kv::interval<T> > r(s1, s2);
+	ub::matrix< interval<T> > r(s1, s2);
 
 	for (i=0; i<s1; i++) {
 		for (j=0; j<s2; j++) {
@@ -221,7 +222,7 @@ template <class T> ub::matrix< kv::interval<T> > intersect (const ub::matrix< kv
 	return r;
 }
 
-template <class T> T max_norm (const ub::vector<T>& x) {
+template <class T> inline T max_norm (const ub::vector<T>& x) {
 	int i;
 	int s = x.size();
 	T tmp;
@@ -236,7 +237,7 @@ template <class T> T max_norm (const ub::vector<T>& x) {
 	return r;
 }
 
-template <class T> T max_norm (const ub::matrix<T>& x) {
+template <class T> inline T max_norm (const ub::matrix<T>& x) {
 	int i, j;
 	int s1 = x.size1();
 	int s2 = x.size2();
@@ -245,19 +246,19 @@ template <class T> T max_norm (const ub::matrix<T>& x) {
 
 	for (i=0; i<s1; i++) {
 		tmp = 0.;
-		kv::rop<T>::begin();
+		rop<T>::begin();
 		for (j=0; j<s2; j++) {
 			tmp2 = (x(i, j) >= 0.) ? x(i, j) : -x(i, j);
-			tmp = kv::rop<T>::add_up(tmp, tmp2);
+			tmp = rop<T>::add_up(tmp, tmp2);
 		}
-		kv::rop<T>::finish();
+		rop<T>::finish();
 		if (tmp > r) r = tmp;
 	}
 
 	return r;
 }
 
-template <class T> T max_norm (const ub::vector< kv::interval<T> >& x) {
+template <class T> inline T max_norm (const ub::vector< interval<T> >& x) {
 	int i;
 	int s = x.size();
 	T tmp;
@@ -271,7 +272,7 @@ template <class T> T max_norm (const ub::vector< kv::interval<T> >& x) {
 	return r;
 }
 
-template <class T> T max_norm (const ub::matrix< kv::interval<T> >& x) {
+template <class T> inline T max_norm (const ub::matrix< interval<T> >& x) {
 	int i, j;
 	int s1 = x.size1();
 	int s2 = x.size2();
@@ -280,15 +281,17 @@ template <class T> T max_norm (const ub::matrix< kv::interval<T> >& x) {
 
 	for (i=0; i<s1; i++) {
 		tmp = 0.;
-		kv::rop<T>::begin();
+		rop<T>::begin();
 		for (j=0; j<s2; j++) {
-			tmp = kv::rop<T>::add_up(tmp, norm(x(i, j)));
+			tmp = rop<T>::add_up(tmp, norm(x(i, j)));
 		}
-		kv::rop<T>::finish();
+		rop<T>::finish();
 		if (tmp > r) r = tmp;
 	}
 
 	return r;
 }
 
-#endif // IVECTOR_UTY_HPP
+} // namespace kv
+
+#endif // INTERVAL_VECTOR_HPP

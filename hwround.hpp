@@ -24,30 +24,37 @@ namespace kv {
 // Assuming that all bits of MXCSR control register except for rounding control
 //  is not changed throughout the program execution.
 
-struct hwround {
-	static const unsigned long int& default_register() {
-		const static unsigned long int reg = _mm_getcsr();
-		return reg;
-	}
+// hwround_regs will be initialized before main()
+static struct hwround_reg {
+	unsigned long int near;
+	unsigned long int down;
+	unsigned long int up;
+	unsigned long int chop;
 
+	hwround_reg() {
+		unsigned long int reg = _mm_getcsr();
+		near = (reg & ~0x00006000) | 0x00000000;
+		down = (reg & ~0x00006000) | 0x00002000;
+		up =   (reg & ~0x00006000) | 0x00004000;
+		chop = (reg & ~0x00006000) | 0x00006000;
+	}
+} hwround_regs;
+
+struct hwround {
 	static void roundnear() {
-		const static unsigned long int reg = (default_register() & ~0x00006000) | 0x00000000;
-		_mm_setcsr(reg);
+		_mm_setcsr(hwround_regs.near);
 	}
 
 	static void rounddown() {
-		const static unsigned long int reg = (default_register() & ~0x00006000) | 0x00002000;
-		_mm_setcsr(reg);
+		_mm_setcsr(hwround_regs.down);
 	}
 
 	static void roundup() {
-		const static unsigned long int reg = (default_register() & ~0x00006000) | 0x00004000;
-		_mm_setcsr(reg);
+		_mm_setcsr(hwround_regs.up);
 	}
 
 	static void roundchop() {
-		const static unsigned long int reg = (default_register() & ~0x00006000) | 0x00006000;
-		_mm_setcsr(reg);
+		_mm_setcsr(hwround_regs.chop);
 	}
 };
 

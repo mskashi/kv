@@ -505,6 +505,11 @@ template <class T> class interval {
 		return sup;
 	}
 
+	template <class C1, class C2> typename boost::enable_if_c< acceptable_n<C1, interval>::value && acceptable_n<C2, interval>::value, void >::type assign(const C1& x, const C2& y) {
+		inf = x;
+		sup = y;
+	}
+
 	static interval whole() {
 		return interval(-std::numeric_limits<T>::infinity(),
 		                 std::numeric_limits<T>::infinity() );
@@ -557,7 +562,7 @@ template <class T> class interval {
 		T tmp;
 
 		rop<T>::begin();
-		tmp = rop<T>::mul_up(rop<T>::sub_up(x.sup, x.inf), 0.5);
+		tmp = rop<T>::mul_up(rop<T>::sub_up(x.sup, x.inf), T(0.5));
 		rop<T>::finish();
 
 		return tmp;
@@ -716,6 +721,50 @@ template <class T> class interval {
 	}
 
 
+	friend bool operator==(const interval& x, const interval& y) {
+		return x.inf == x.sup && x.sup == y.inf && y.inf == y.sup;
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool>::type operator==(const interval& x, const C& y) {
+		return x.inf == x.sup && x.sup == T(y);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, bool>::type operator==(const interval& x, const C& y) {
+		interval ytmp(y);
+		return x.inf == x.sup && x.sup == ytmp.inf && ytmp.inf == ytmp.sup;
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool>::type operator==(const C& x, const interval& y) {
+		return y.inf == y.sup && y.sup == T(x);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, bool>::type operator==(const C& x, const interval& y) {
+		interval xtmp(x);
+		return xtmp.inf == xtmp.sup && xtmp.sup == y.inf && y.inf == y.sup;
+	}
+
+
+	friend bool operator!=(const interval& x, const interval& y) {
+		return !overlap(x, y);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool>::type operator!=(const interval& x, const C& y) {
+		return !overlap(x, interval(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, bool>::type operator!=(const interval& x, const C& y) {
+		return !overlap(x, interval(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool>::type operator!=(const C& x, const interval& y) {
+		return !overlap(interval(x), y);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, bool>::type operator!=(const C& x, const interval& y) {
+		return !overlap(interval(x), y);
+	}
+
+
 	friend interval division_part1(const interval& x, const interval& y, bool& parted) {
 		interval r;
 
@@ -725,7 +774,7 @@ template <class T> class interval {
 			return x / y;
 		}
 
-		if (y.inf == 0. || y.sup == 0.) {
+		if (y.inf == 0. && y.sup == 0.) {
 			throw std::range_error("interval: division by 0");
 		}
 
@@ -787,7 +836,7 @@ template <class T> class interval {
 			return x / y;
 		}
 
-		if (y.inf == 0. || y.sup == 0.) {
+		if (y.inf == 0. && y.sup == 0.) {
 			throw std::range_error("interval: division by 0");
 		}
 
@@ -867,6 +916,10 @@ template <class T> class interval {
 		}
 
 		return r;
+	}
+
+	friend interval pow(const interval& x, const interval& y) {
+		return exp(y * log(x));
 	}
 
 	static interval exp_point(const T& x) {

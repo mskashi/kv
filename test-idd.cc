@@ -24,6 +24,7 @@ int main()
 
 	x = itvd(1., 2.);
 	y = itvd(3., 4.);
+	y.assign(3., 4.);
 
 	std::cout << x + y << "\n";
 	std::cout << x - y << "\n";

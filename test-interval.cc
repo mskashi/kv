@@ -24,8 +24,11 @@ int main()
 	std::cout.precision(17);
 	std::cout << z << "\n";
 
+	// copy
 	x = itvd(1., 2.);
 	y = itvd(3., 4.);
+	// assign
+	y.assign(3., 4.);
 
 	// basic four operations
 	std::cout << x + y << "\n";
@@ -81,6 +84,8 @@ int main()
 	std::cout << (x < y) << "\n";
 	std::cout << (x < 1.) << "\n";
 	std::cout << (1. < x) << "\n";
+	std::cout << (itvd(1.) == 1.) << "\n";
+	std::cout << (itvd(1., 2.) != 3.) << "\n";
 
 	// division_part1, division_part2
 	// calculate X / (Y \ 0). the result may be divided into two part.
@@ -94,6 +99,8 @@ int main()
 	std::cout << pow(itvd(2., 3.), -2) << "\n";
 	std::cout << pow(itvd(-2., 3.), 2) << "\n";
 	std::cout << pow(itvd(-2., 3.), 3) << "\n";
+	// general power
+	std::cout << pow(itvd(2., 3.), itvd(2., 3)) << "\n";
 	// mathematical functions
 	std::cout << sqrt(itvd(2.5, 3.5)) << "\n";
 	std::cout << exp(itvd(2.5, 3.5)) << "\n";

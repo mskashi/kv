@@ -23,6 +23,15 @@ inline void fpu53() {
 	#endif
 }
 
+// hack for calling fpu53 before main()
+namespace {
+	struct dummy_caller {
+		dummy_caller() {
+			fpu53();
+		}
+	} dummy;
+}
+
 } // namespace kv
 
 #endif // FPU53_HPP

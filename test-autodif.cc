@@ -126,6 +126,8 @@ int main()
 	a3 = a1 - a2; std::cout << a3 << "\n";
 	a3 = a1 * a2; std::cout << a3 << "\n";
 	a3 = a1 / a2; std::cout << a3 << "\n";
+	a3 = pow(a1, 3); std::cout << a3 << "\n";
+	a3 = pow(a1, a2); std::cout << a3 << "\n";
 	a2 = sqrt(a1); std::cout << a2 << "\n";
 	a2 = exp(a1); std::cout << a2 << "\n";
 	a2 = log(a1); std::cout << a2 << "\n";

@@ -23,6 +23,7 @@ namespace bnb = boost::numeric::bindings;
 
 namespace ub = boost::numeric::ublas;
 
+namespace kv {
 
 template <class T>
 bool invert(const ub::matrix<T>& a, ub::matrix<T>& b) {
@@ -125,5 +126,7 @@ void mm_mult(const ub::matrix<double>& a, const ub::matrix<double>& b, ub::matri
 	c = cc;
 }
 #endif // defined(USE_LAPACK) || defined(USE_ATLAS)
+
+} // namespace kv
 
 #endif // MATRIX_INVERSION_HPP

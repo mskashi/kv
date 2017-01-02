@@ -4,7 +4,7 @@
 #include <iostream>
 #include <list>
 #include "interval.hpp"
-#include "ivector-uty.hpp"
+#include "interval-vector.hpp"
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -13,10 +13,12 @@
 
 namespace ub = boost::numeric::ublas;
 
+namespace kv {
+
 
 // 最大幅の成分を与える
 
-template <class T> int search_maxwidth (const ub::vector< kv::interval<T> >& I) {
+template <class T> int search_maxwidth (const ub::vector< interval<T> >& I) {
 	int s = I.size();
 	int i, mi;
 	T m, tmp;
@@ -34,7 +36,7 @@ template <class T> int search_maxwidth (const ub::vector< kv::interval<T> >& I) 
 
 // 区間ベクトルの幅の比を成分毎に計算し、その最大値
 
-template <class T> T widthratio_max (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> >& J) {
+template <class T> T widthratio_max (const ub::vector< interval<T> >& I, const ub::vector< interval<T> >& J) {
 	int s = I.size();
 	int i;
 	T tmp, r;
@@ -51,7 +53,7 @@ template <class T> T widthratio_max (const ub::vector< kv::interval<T> >& I, con
 
 // 区間ベクトルの幅の比を成分毎に計算し、その最小値
 
-template <class T> T widthratio_min (const ub::vector< kv::interval<T> >& I, const ub::vector< kv::interval<T> >& J) {
+template <class T> T widthratio_min (const ub::vector< interval<T> >& I, const ub::vector< interval<T> >& J) {
 	int s = I.size();
 	int i;
 	T tmp, r;
@@ -69,10 +71,10 @@ template <class T> T widthratio_min (const ub::vector< kv::interval<T> >& I, con
 
 // 全解探索 中身はallsol_list
 
-template <class T, class F> std::list< ub::vector< kv::interval<T> > >
-allsol (const ub::vector< kv::interval<T> >& init, F f, int verbose=1)
+template <class T, class F> std::list< ub::vector< interval<T> > >
+allsol (const ub::vector< interval<T> >& init, F f, int verbose=1)
 {
-	std::list< ub::vector < kv::interval<T> > > targets;
+	std::list< ub::vector < interval<T> > > targets;
 	targets.push_back(init);
 	return allsol_list(targets, f, verbose);
 }
@@ -80,15 +82,15 @@ allsol (const ub::vector< kv::interval<T> >& init, F f, int verbose=1)
 
 // 初期区間をリストで複数与えるallsol
 
-template <class T, class F> std::list< ub::vector< kv::interval<T> > >
-allsol_list (std::list< ub::vector< kv::interval<T> > > targets, F f, int verbose=1)
+template <class T, class F> std::list< ub::vector< interval<T> > >
+allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 {
 	int s = (targets.front()).size();
-	ub::vector< kv::interval<T> > I, fc, fi, C, CK, K, mvf, I1, I2;
-	ub::matrix< kv::interval<T> > fdi, M;
+	ub::vector< interval<T> > I, fc, fi, C, CK, K, mvf, I1, I2;
+	ub::matrix< interval<T> > fdi, M;
 	ub::matrix<T> L, R, E;
-	std::list< ub::vector< kv::interval<T> > > solutions, solutions_big;
-	typename std::list< ub::vector< kv::interval<T> > >::iterator p, p2;
+	std::list< ub::vector< interval<T> > > solutions, solutions_big;
+	typename std::list< ub::vector< interval<T> > >::iterator p, p2;
 	int i, j, k, mi;
 	T tmp;
 	bool r, flag, flag2;
@@ -128,7 +130,7 @@ allsol_list (std::list< ub::vector< kv::interval<T> > > targets, F f, int verbos
 		C = mid(I);
 		try {
 			fc = f(C);
-			kv::autodif< kv::interval<T> >::split(f(kv::autodif< kv::interval<T> >::init(I)), fi, fdi);
+			autodif< interval<T> >::split(f(autodif< interval<T> >::init(I)), fi, fdi);
 		}
 		catch (std::range_error& e) {
 			goto label;
@@ -233,8 +235,8 @@ allsol_list (std::list< ub::vector< kv::interval<T> > > targets, F f, int verbos
 		}
 
 		I1 = I; I2 = I;
-		I1(mi) = kv::interval<T>(I1(mi).lower(), tmp);
-		I2(mi) = kv::interval<T>(tmp, I2(mi).upper());
+		I1(mi).assign(I1(mi).lower(), tmp);
+		I2(mi).assign(tmp, I2(mi).upper());
 		targets.push_back(I1);
 		targets.push_back(I2);
 		count_unknown += 2;
@@ -246,5 +248,7 @@ allsol_list (std::list< ub::vector< kv::interval<T> > > targets, F f, int verbos
 
 	return solutions;
 }
+
+} // namespace kv
 
 #endif // ALLSOL_HPP

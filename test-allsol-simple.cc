@@ -3,7 +3,6 @@
 #include "rdouble.hpp"
 #include "dd.hpp"
 #include "rdd.hpp"
-#include "fpu53.hpp"
 #include <boost/timer.hpp>
 
 using namespace std;
@@ -27,8 +26,9 @@ class Func {
 
 class Yamamura {
 	template <class T> T g(T x){
-		static const T v118(11.8);
+		static const T v118("11.8");
 		return 2.5 * x*x*x - 10.5 * x*x + v118 * x;
+		// return 2.5 * x*x*x - 10.5 * x*x + "11.8" * x;
 	}
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x){
@@ -54,8 +54,6 @@ typedef kv::interval<kv::dd> itv;
 
 int main()
 {
-	kv::fpu53();
-
 	std::cout.precision(33);
 
 	int i;
@@ -68,7 +66,7 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	allsol(I, f1, 1);
+	kv::allsol(I, f1, 1);
 	cout << t.elapsed() << " sec\n";
 
 
@@ -78,6 +76,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	allsol(I, f2, 1);
+	kv::allsol(I, f2, 1);
 	cout << t.elapsed() << " sec\n";
 }

@@ -13,6 +13,7 @@
 #include <cstdlib>
 
 #include "convert.hpp"
+#include "fpu53.hpp"
 
 
 namespace kv {
@@ -92,10 +93,29 @@ class dd {
 	}
 
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
-		double a1, a2, b1, b2;
+		static const double th = ldexp(1., 996);
+		static const double c1 = ldexp(1., -28);
+		static const double c2 = ldexp(1., 28);
+
+		double na, nb, a1, a2, b1, b2;
+
 		x = a * b;
-		split(a, a1, a2);
-		split(b, b1, b2);
+		if (std::fabs(x) == std::numeric_limits<double>::infinity()) {
+			y = 0.;
+			return;
+		}
+		if (std::fabs(a) > th) {
+			na = a * c1;
+			nb = b * c2;
+		} else if (std::fabs(b) > th) {
+			na = a * c2;
+			nb = b * c1;
+		} else {
+			na = a;
+			nb = b;
+		}
+		split(na, a1, a2);
+		split(nb, b1, b2);
 		y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
 	}
 
@@ -139,14 +159,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a2 + y.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -155,14 +172,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, y, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -175,14 +189,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x, y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += y.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -210,14 +221,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, -y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a2 - y.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -226,14 +234,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, -y, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -246,14 +251,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twosum(x, -y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 -= y.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -290,6 +292,9 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twoproduct(x.a1, y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
 		#if 0
 		// boost LU successfully run on Linux -m32
@@ -301,12 +306,6 @@ class dd {
 		#endif
 		twosum(z1, z2, z3, z4);
 
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
-
 		return dd(z3, z4);
 	}
 
@@ -315,14 +314,11 @@ class dd {
 		volatile double v;
 
 		twoproduct(x.a1, y, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x.a2 * y;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -335,14 +331,11 @@ class dd {
 		double z1, z2, z3, z4;
 
 		twoproduct(x, y.a1, z1, z2);
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 		z2 += x * y.a2;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -370,17 +363,17 @@ class dd {
 		double z1, z2, z3, z4;
 
 		z1 = x.a1 / y.a1;
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
+		if (std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 
 		twoproduct(-z1, y.a1, z3, z4);
 		// z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
 		z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -389,16 +382,16 @@ class dd {
 		double z1, z2, z3, z4;
 
 		z1 = x.a1 / y;
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
+		if (std::fabs(y) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 
 		twoproduct(-z1, y, z3, z4);
 		z2 = (((z3 + x.a1) + x.a2) + z4) / y;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}
@@ -411,16 +404,16 @@ class dd {
 		double z1, z2, z3, z4;
 
 		z1 = x / y.a1;
+		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
+		if (std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(z1, 0.);
+		}
 
 		twoproduct(-z1, y.a1, z3, z4);
 		z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
 		twosum(z1, z2, z3, z4);
-
-		#if defined(DD_INFINITY)
-		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
-			return dd(z3, 0.);
-		}
-		#endif
 
 		return dd(z3, z4);
 	}

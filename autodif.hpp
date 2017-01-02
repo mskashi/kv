@@ -249,6 +249,21 @@ template <class T> class autodif {
 		return s;
 	}
 
+
+	friend autodif pow(const autodif& x, int y) {
+		autodif r;
+
+		using std::pow;
+		r.v = pow(x.v, y);
+		r.d = (y * pow(x.v, y - 1)) * x.d;
+		return r;
+	}
+
+	friend autodif pow(const autodif& x, const autodif& y) {
+		return exp(y * log(x));
+	}
+
+
 	friend autodif exp (const autodif& x) {
 		autodif r;
 

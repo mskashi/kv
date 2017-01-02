@@ -19,6 +19,7 @@ template <> struct rop <double> {
 	static double add_up(const double& x, const double& y) {
 		volatile double r, x1 = x, y1 = y;
 		r = x1 + y1;
+		if (r != r) return std::numeric_limits<double>::infinity();
 		return r;
 	}
 
@@ -26,12 +27,14 @@ template <> struct rop <double> {
 		volatile double r, x1 = -x, y1 = -y;
 		r = x1 + y1;
 		r = -r;
+		if (r != r) return -std::numeric_limits<double>::infinity();
 		return r;
 	}
 
 	static double sub_up(const double& x, const double& y) {
 		volatile double r, x1 = x, y1 = y;
 		r = x1 - y1;
+		if (r != r) return std::numeric_limits<double>::infinity();
 		return r;
 	}
 
@@ -39,12 +42,14 @@ template <> struct rop <double> {
 		volatile double r, x1 = -x, y1 = -y;
 		r = x1 - y1;
 		r = -r;
+		if (r != r) return -std::numeric_limits<double>::infinity();
 		return r;
 	}
 
 	static double mul_up(const double& x, const double& y) {
 		volatile double r, x1 = x, y1 = y;
 		r = x1 * y1;
+		if (r != r) return std::numeric_limits<double>::infinity();
 		return r;
 	}
 
@@ -52,12 +57,14 @@ template <> struct rop <double> {
 		volatile double r, x1 = -x, y1 = y;
 		r = x1 * y1;
 		r = -r;
+		if (r != r) return -std::numeric_limits<double>::infinity();
 		return r;
 	}
 
 	static double div_up(const double& x, const double& y) {
 		volatile double r, x1 = x, y1 = y;
 		r = x1 / y1;
+		if (r != r) return std::numeric_limits<double>::infinity();
 		return r;
 	}
 
@@ -65,6 +72,7 @@ template <> struct rop <double> {
 		volatile double r, x1 = -x, y1 = y;
 		r = x1 / y1;
 		r = -r;
+		if (r != r) return -std::numeric_limits<double>::infinity();
 		return r;
 	}
 
