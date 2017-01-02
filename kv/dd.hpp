@@ -40,70 +40,49 @@ class dd {
 
 
 	static void fasttwosum(const double& a, const double& b, double& x, double& y) {
-		#if defined(DD_VOLATILE)
-		volatile double v1, v2, v3;
-		v1 = a + b;
-		v2 = v1 - a;
-		v3 = b - v2;
-		x = v1;
-		y = v3;
-		#else
 		double tmp;
 		x = a + b;
 		tmp = x - a;
 		y = b - tmp;
-		#endif
 	}
 
 	static void twosum(const double& a, const double& b, double& x, double& y) {
-		#if defined(DD_VOLATILE)
-		volatile double va = a, vb = b, v1, v2, v3, v4, v5, v6;
-		v1 = va + vb;
-		v2 = v1 - va;
-		v3 = vb - v2;
-		v4 = v1 - v2;
-		v5 = va - v4;
-		v6 = v5 + v3;
-		x = v1;
-		y = v6;
-		#else
 		double tmp;
+
 		x = a + b;
-		tmp = x - a;
-		y = (a - (x - tmp)) + (b - tmp);
-		#endif
+		if (std::fabs(a) > std::fabs(b)) {
+			tmp = x - a;
+			y = b - tmp;
+		} else {
+			tmp = x - b;
+			y = a - tmp;
+		}
 	}
 
 	static void split(const double& a, double& x, double& y) {
 		static const double sigma = (double)((1L << 27) + 1);
-		#if defined(DD_VOLATILE)
-		volatile double v1, v2, v3, v4;
-		v1 = a * sigma;
-		v2 = v1 - a;
-		v3 = v1 - v2;
-		v4 = a - v3;
-		x = v3;
-		y = v4;
-		#else
 		double tmp;
+
 		tmp = a * sigma;
 		x = tmp - (tmp - a);
 		y = a - x;
-		#endif
 	}
 
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
 		static const double th = ldexp(1., 996);
 		static const double c1 = ldexp(1., -28);
 		static const double c2 = ldexp(1., 28);
+		static const double th2 = ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 
 		x = a * b;
+		#if 0
 		if (std::fabs(x) == std::numeric_limits<double>::infinity()) {
 			y = 0.;
 			return;
 		}
+		#endif
 		if (std::fabs(a) > th) {
 			na = a * c1;
 			nb = b * c2;
@@ -116,7 +95,11 @@ class dd {
 		}
 		split(na, a1, a2);
 		split(nb, b1, b2);
-		y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+		if (std::fabs(x) > th2) {
+			y = a2 * b2 - ((((x * 0.5) - (a1 * 0.5)  * b1) * 2. - a2 * b1) - a1 * b2);
+		} else {
+			y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+		}
 	}
 
 	dd() {
@@ -365,8 +348,13 @@ class dd {
 		}
 
 		twoproduct(-z1, y.a1, z3, z4);
-		// z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
-		z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			twoproduct(-z1, y.a1 * 0.5, z3, z4);
+			z2 = ((((z3 + (x.a1 * 0.5)) - z1 * (y.a2 * 0.5)) + (x.a2 * 0.5)) + z4) / (y.a1 * 0.5);
+		} else {
+			// z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
+			z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
+		}
 		twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -384,7 +372,12 @@ class dd {
 		}
 
 		twoproduct(-z1, y, z3, z4);
-		z2 = (((z3 + x.a1) + x.a2) + z4) / y;
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			twoproduct(-z1, y * 0.5, z3, z4);
+			z2 = (((z3 + (x.a1 * 0.5)) + (x.a2 * 0.5)) + z4) / (y * 0.5);
+		} else {
+			z2 = (((z3 + x.a1) + x.a2) + z4) / y;
+		}
 		twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -406,7 +399,11 @@ class dd {
 		}
 
 		twoproduct(-z1, y.a1, z3, z4);
-		z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			z2 = (((z3 + (x * 0.5)) - z1 * (y.a2 * 0.5)) + z4) / (y.a1 * 0.5);
+		} else {
+			z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
+		}
 		twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);

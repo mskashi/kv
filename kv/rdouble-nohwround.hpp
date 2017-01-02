@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #include <iostream>
@@ -21,14 +21,21 @@ template <> struct rop <double> {
 
 	static void twosum(const double& a, const double& b, double& x, double& y) {
 		double tmp;
+
 		x = a + b;
-		tmp = x - a;
-		y = (a - (x - tmp)) + (b - tmp);
+		if (std::fabs(a) > std::fabs(b)) {
+			tmp = x - a;
+			y = b - tmp;
+		} else {
+			tmp = x - b;
+			y = a - tmp;
+		}
 	}
 
 	static void split(const double& a, double& x, double& y) {
-		static const double sigma = (double)((1L << 27) + 1);
+		static const double sigma = ldexp(1., 27) + 1.;
 		double tmp;
+
 		tmp = a * sigma;
 		x = tmp - (tmp - a);
 		y = a - x;
@@ -38,14 +45,17 @@ template <> struct rop <double> {
 		static const double th = ldexp(1., 996);
 		static const double c1 = ldexp(1., -28);
 		static const double c2 = ldexp(1., 28);
+		static const double th2 = ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 
 		x = a * b;
+		#if 0
 		if (std::fabs(x) == std::numeric_limits<double>::infinity()) {
 			y = 0.;
 			return;
 		}
+		#endif
 		if (std::fabs(a) > th) {
 			na = a * c1;
 			nb = b * c2;
@@ -58,7 +68,11 @@ template <> struct rop <double> {
 		}
 		split(na, a1, a2);
 		split(nb, b1, b2);
-		y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+		if (std::fabs(x) > th2) {
+			y = a2 * b2 - ((((x * 0.5) - (a1 * 0.5)  * b1) * 2. - a2 * b1) - a1 * b2);
+		} else {
+			y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+		}
 	}
 
 	// succ and pred by Rump
@@ -73,11 +87,11 @@ template <> struct rop <double> {
 
 		double a, c, e;
 
-		a = fabs(x);
+		a = std::fabs(x);
 		if (a >= th1) return x + a * c1;
 		if (a < th2) return x + c2;
 		c = c3 * x;
-		e = c1 * fabs(c);
+		e = c1 * std::fabs(c);
 		return (c + e) * c4;
 	}
 
@@ -91,13 +105,14 @@ template <> struct rop <double> {
 
 		double a, c, e;
 
-		a = fabs(x);
+		a = std::fabs(x);
 		if (a >= th1) return x - a * c1;
 		if (a < th2) return x - c2;
 		c = c3 * x;
-		e = c1 * fabs(c);
+		e = c1 * std::fabs(c);
 		return (c - e) * c4;
 	}
+
 
 	static double add_up(const double& x, const double& y) {
 		double r, r2;
@@ -106,9 +121,12 @@ template <> struct rop <double> {
 		if (r == std::numeric_limits<double>::infinity()) {
 			return r;
 		} else if (r == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<double>::max)();
+			if (x == -std::numeric_limits<double>::infinity() || y == -std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return -(std::numeric_limits<double>::max)();
+			}
 		}
-		if (r != r) return std::numeric_limits<double>::infinity();
 
 		if (r2 > 0.) {
 			return succ(r);
@@ -122,11 +140,14 @@ template <> struct rop <double> {
 
 		twosum(x, y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<double>::max)();
+			if (x == std::numeric_limits<double>::infinity() || y == std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return (std::numeric_limits<double>::max)();
+			}
 		} else if (r == -std::numeric_limits<double>::infinity()) {
 			return r;
 		}
-		if (r != r) return -std::numeric_limits<double>::infinity();
 
 		if (r2 < 0.) {
 			return pred(r);
@@ -142,9 +163,12 @@ template <> struct rop <double> {
 		if (r == std::numeric_limits<double>::infinity()) {
 			return r;
 		} else if (r == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<double>::max)();
+			if (x == -std::numeric_limits<double>::infinity() || y == std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return -(std::numeric_limits<double>::max)();
+			}
 		}
-		if (r != r) return std::numeric_limits<double>::infinity();
 
 		if (r2 > 0.) {
 			return succ(r);
@@ -158,11 +182,14 @@ template <> struct rop <double> {
 
 		twosum(x, -y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<double>::max)();
+			if (x == std::numeric_limits<double>::infinity() || y == -std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return (std::numeric_limits<double>::max)();
+			}
 		} else if (r == -std::numeric_limits<double>::infinity()) {
 			return r;
 		}
-		if (r != r) return -std::numeric_limits<double>::infinity();
 
 		if (r2 < 0.) {
 			return pred(r);
@@ -174,28 +201,29 @@ template <> struct rop <double> {
 	static double mul_up(const double& x, const double& y) {
 		double r, r2;
 		double x1, y1;
-		int x2, y2;
 		double s, s2, t;
-		static const double th = ldexp(1., -970);
+		static const double th = ldexp(1., -969); // -1074 + 106 - 1
+		static const double c = ldexp(1., 537); // 1074 / 2
 
-		if (x == 0. || y == 0.) return 0.;
+		if (x == 0. || y == 0.) return x * y;
 
 		twoproduct(x, y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
 			return r;
 		} else if (r == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<double>::max)();
+			if (std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return -(std::numeric_limits<double>::max)();
+			}
 		}
-		if (r != r) return std::numeric_limits<double>::infinity();
 
 		if (fabs(r) >= th) {
 			if (r2 > 0.) return succ(r);
 			return r;
 		} else {
-			x1 = frexp(x, &x2);
-			y1 = frexp(y, &y2);
-			twoproduct(x1, y1, s, s2);
-			t = ldexp(r, - x2 - y2);
+			twoproduct(x * c, y * c, s, s2);
+			t = (r * c) * c;
 			if ( t < s || (t == s && s2 > 0.)) {
 				return succ(r);
 			}
@@ -206,28 +234,29 @@ template <> struct rop <double> {
 	static double mul_down(const double& x, const double& y) {
 		double r, r2;
 		double x1, y1;
-		int x2, y2;
 		double s, s2, t;
-		static const double th = ldexp(1., -970);
+		static const double th = ldexp(1., -969); // -1074 + 106 - 1
+		static const double c = ldexp(1., 537); // 1074 / 2
 
-		if (x == 0. || y == 0.) return 0.;
+		if (x == 0. || y == 0.) return x * y;
 
 		twoproduct(x, y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<double>::max)();
+			if (std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity()) {
+				return r;
+			} else {
+				return (std::numeric_limits<double>::max)();
+			}
 		} else if (r == -std::numeric_limits<double>::infinity()) {
 			return r;
 		}
-		if (r != r) return -std::numeric_limits<double>::infinity();
 
 		if (fabs(r) >= th) {
 			if (r2 < 0.) return pred(r);
 			return r;
 		} else {
-			x1 = frexp(x, &x2);
-			y1 = frexp(y, &y2);
-			twoproduct(x1, y1, s, s2);
-			t = ldexp(r, - x2 - y2);
+			twoproduct(x * c, y * c, s, s2);
+			t = (r * c) * c;
 			if ( t > s || (t == s && s2 < 0.)) {
 				return pred(r);
 			}
@@ -238,14 +267,15 @@ template <> struct rop <double> {
 	static double div_up(const double& x, const double& y) {
 		double r, r2;
 		double xn, yn, d;
-		static const double th1 = ldexp(1., -970);
-		static const double th2 = ldexp(1., 919);
-		static const double c1 = ldexp(1., 104);
+		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
+		static const double th2 = ldexp(1., 918); // 1023 - 105
+		static const double c1 = ldexp(1., 105); // -969 - (-1074)
 		static const double c2 = ldexp(1., -1074);
 		bool flag = false;
 
-		if (x == 0. ) return x / y;
-		if (x != x || y != y) return x / y;
+		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
+			return x / y;
+		}
 
 		if (y < 0.) {
 			xn = -x;
@@ -271,7 +301,6 @@ template <> struct rop <double> {
 		} else if (d == -std::numeric_limits<double>::infinity()) {
 			return -(std::numeric_limits<double>::max)();
 		}
-		if (d != d) return std::numeric_limits<double>::infinity();
 
 		if (flag) {
 			if (xn < 0.) return 0.;
@@ -288,14 +317,15 @@ template <> struct rop <double> {
 	static double div_down(const double& x, const double& y) {
 		double r, r2;
 		double xn, yn, d;
-		static const double th1 = ldexp(1., -970);
-		static const double th2 = ldexp(1., 919);
-		static const double c1 = ldexp(1., 104);
+		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
+		static const double th2 = ldexp(1., 918); // 1023 - 105
+		static const double c1 = ldexp(1., 105); // -969 - (-1074)
 		static const double c2 = ldexp(1., -1074);
 		bool flag = false;
 
-		if (x == 0. ) return x / y;
-		if (x != x || y != y) return x / y;
+		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
+			return x / y;
+		}
 
 		if (y < 0.) {
 			xn = -x;
@@ -321,7 +351,6 @@ template <> struct rop <double> {
 		} else if (d == -std::numeric_limits<double>::infinity()) {
 			return d;
 		}
-		if (d != d) return -std::numeric_limits<double>::infinity();
 
 		if (flag) {
 			if (xn < 0.) return -c2;

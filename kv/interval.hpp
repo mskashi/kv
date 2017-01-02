@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -282,41 +282,53 @@ template <class T> class interval {
 		T tmp;
 
 		rop<T>::begin();
-		if (x.inf >= 0.) {
-			if (y.inf >= 0.) {
+		if (x.inf > 0.) {
+			if (y.inf > 0.) {
 				r.inf = rop<T>::mul_down(x.inf, y.inf);
 				r.sup = rop<T>::mul_up(x.sup, y.sup);
-			} else if (y.sup <= 0.) {
+			} else if (y.sup < 0.) {
 				r.inf = rop<T>::mul_down(x.sup, y.inf);
 				r.sup = rop<T>::mul_up(x.inf, y.sup);
 			} else {
 				r.inf = rop<T>::mul_down(x.sup, y.inf);
+				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.sup, y.sup);
+				if (r.sup != r.sup) r = 0.;
 			}
-		} else if (x.sup <= 0.) {
-			if (y.inf >= 0.) {
+		} else if (x.sup < 0.) {
+			if (y.inf > 0.) {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
 				r.sup = rop<T>::mul_up(x.sup, y.inf);
-			} else if (y.sup <= 0.) {
+			} else if (y.sup < 0.) {
 				r.inf = rop<T>::mul_down(x.sup, y.sup);
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
 			} else {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
+				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
+				if (r.sup != r.sup) r = 0.;
 			}
 		} else {
-			if (y.inf >= 0.) {
+			if (y.inf > 0.) {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
+				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.sup, y.sup);
-			} else if (y.sup <= 0.) {
+				if (r.sup != r.sup) r = 0.;
+			} else if (y.sup < 0.) {
 				r.inf = rop<T>::mul_down(x.sup, y.inf);
+				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
+				if (r.sup != r.sup) r = 0.;
 			} else {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
+				if (r.inf != r.inf) r = 0.;
 				tmp = rop<T>::mul_down(x.sup, y.inf);
+				if (tmp != tmp) r = 0.;
 				if (tmp < r.inf) r.inf = tmp;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
+				if (r.sup != r.sup) r = 0.;
 				tmp = rop<T>::mul_up(x.sup, y.sup);
+				if (tmp != tmp) r = 0.;
 				if (tmp > r.sup) r.sup = tmp;
 			}
 		}
@@ -329,7 +341,7 @@ template <class T> class interval {
 		interval r;
 
 		rop<T>::begin();
-		if (y >= 0.) {
+		if (y > 0.) {
 			r.inf = rop<T>::mul_down(x.inf, T(y));
 			r.sup = rop<T>::mul_up(x.sup, T(y));
 		} else {
@@ -337,6 +349,8 @@ template <class T> class interval {
 			r.sup = rop<T>::mul_up(x.inf, T(y));
 		}
 		rop<T>::end();
+		if (r.inf != r.inf) r = 0.;
+		if (r.sup != r.sup) r = 0.;
 
 		return r;
 	}
@@ -357,6 +371,8 @@ template <class T> class interval {
 			r.sup = rop<T>::mul_up(T(x), y.inf);
 		}
 		rop<T>::end();
+		if (r.inf != r.inf) r = 0.;
+		if (r.sup != r.sup) r = 0.;
 
 		return r;
 	}
@@ -943,7 +959,7 @@ template <class T> class interval {
 		int i;
 
 		if (x == std::numeric_limits<T>::infinity()) {
-			return interval(std::numeric_limits<T>::infinity());
+			return interval((std::numeric_limits<T>::max()), std::numeric_limits<T>::infinity());
 		}
 		if (x == -std::numeric_limits<T>::infinity()) {
 			return interval(0.);
@@ -1040,10 +1056,18 @@ template <class T> class interval {
 		int i;
 
 		if (x == std::numeric_limits<T>::infinity()) {
-			return std::numeric_limits<T>::infinity();
+			if (round == 1) {
+				return std::numeric_limits<T>::infinity();
+			} else {
+				return (std::numeric_limits<T>::max)();
+			}
 		}
 		if (x == 0.) {
-			return -std::numeric_limits<T>::infinity();
+			if (round == 1) {
+				return -(std::numeric_limits<T>::max)();
+			} else {
+				return -std::numeric_limits<T>::infinity();
+			}
 		}
 
 		using std::frexp;

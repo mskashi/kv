@@ -51,6 +51,12 @@ int main()
 	std::cout << d << "\n";
 	d = abs(a);
 	std::cout << d << "\n";
+	d = sin(a); // lazy implementation
+	std::cout << d << "\n";
+	d = cos(a); // lazy implementation
+	std::cout << d << "\n";
+	d = tan(a); // lazy implementation
+	std::cout << d << "\n";
 
 	// maximin number of dummy variables
 	std::cout << afd::maxnum() << "\n";

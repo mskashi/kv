@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -1225,6 +1225,60 @@ template <class T> class affine {
 		#endif
 
 		return r;
+	}
+
+	// lazy implementation of sin
+	friend affine sin(const affine& x) {
+		// return sin((interval<T>)(x.a(0))) + cos(to_interval(x)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = sin((interval<T>)(x.a(0)));
+		r2 = cos(to_interval(x));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of cos
+	friend affine cos(const affine& x) {
+		// return cos((interval<T>)(x.a(0))) - sin(to_interval(x)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = cos((interval<T>)(x.a(0)));
+		r2 = -sin(to_interval(x));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of tan 
+	friend affine tan(const affine& x) {
+		// return tan((interval<T>)(x.a(0))) + pow(cos(to_interval(x)), -2) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = tan((interval<T>)(x.a(0)));
+		r2 = pow(cos(to_interval(x)), -2);
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
 	}
 
 	friend std::ostream& operator<<(std::ostream& s, const affine& x) {

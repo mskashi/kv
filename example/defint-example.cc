@@ -47,6 +47,19 @@ class Func1 {
 	}
 };
 
+/* 
+ * S.M. Rump: Verification methods: Rigorous results using floating-point arithmetic, Acta Numerica, 19, pp. 287-449, 2010
+ * http://www.ti3.tu-harburg.de/paper/rump/Ru10.pdf
+ * p.86
+ */
+
+class Rump1 {
+	public:
+	template <class T> T operator() (T x) {
+		return sin(x + exp(x));
+	}
+};
+
 
 int main() {
 	std::cout.precision(17);
@@ -55,4 +68,5 @@ int main() {
 	std::cout << kv::defint_autostep(DTaylor(), (itvd)0., (itvd)20., 12) << "\n";
 	std::cout << kv::defint_autostep(Sqrt(), (itvd)"0.0001", (itvd)2., 12) << "\n";
 	std::cout << kv::defint_autostep(Func1(), (itvd)(-1.), (itvd)1., 12) << "\n";
+	std::cout << kv::defint_autostep(Rump1(), (itvd)(0.), (itvd)8., 12) << "\n";
 }
