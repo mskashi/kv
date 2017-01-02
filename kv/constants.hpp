@@ -31,8 +31,7 @@ template <class T> struct constants {
 	}
 
 	static T str(const std::string& s) {
-		static const T tmp(s);
-		return tmp;
+		return T(s);
 	}
 
 	static T str(const std::string& s1, const std::string& s2) {

@@ -1422,12 +1422,10 @@ template <class T> struct constants< affine<T> > {
 		return tmp;
 	}
 	static affine<T> str(const std::string& s) {
-		static const affine<T> tmp(s, s);
-		return tmp;
+		return affine<T>(s, s);
 	}
 	static affine<T> str(const std::string& s1, const std::string& s2) {
-		static const affine<T> tmp(s1, s2);
-		return tmp;
+		return affine<T>(s1, s2);
 	}
 };
 

@@ -25,7 +25,7 @@ template <class T> inline T lp_minimize(ub::vector<T>& objfunc, std::list< ub::v
 	int lp_n = objfunc.size() - 1;
 	int n = lp_n + m;
 	int pivot_i, pivot_j;
-	T tmp, min;
+	T tmp, minmax;
 	typename std::list< ub::vector<T> >::iterator p;
 
 	ub::matrix<T> a(m+1, n+1);
@@ -62,22 +62,23 @@ template <class T> inline T lp_minimize(ub::vector<T>& objfunc, std::list< ub::v
 	
 	while (true) {
 		pivot_j = -1;
+		minmax = 0.;
 		for (i=1; i<n+1; i++) {
 			if (isbasic(i)) continue;
-			if (a(0, i) > 0.) {
+			if (a(0, i) > minmax) {
 				pivot_j = i;
-				break;
+				minmax = a(0, i);
 			}
 		}
 		if (pivot_j == -1) break;
 
 		pivot_i = -1;
-
+		minmax = std::numeric_limits<T>::max();
 		for (i=1; i<m+1; i++) {
 			if (a(i, pivot_j) <= 0.) continue;
 			tmp = a(i, 0) / a(i, pivot_j);
-			if (pivot_i == -1 || tmp < min) {
-				min = tmp;
+			if (tmp < minmax) {
+				minmax = tmp;
 				pivot_i = i;
 			}
 		}
@@ -121,7 +122,7 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 	int lp_n = objfunc.size() - 1;
 	int n = lp_n + m;
 	int pivot_i, pivot_j;
-	T tmp, min;
+	T tmp, minmax;
 	typename std::list< ub::vector<T> >::iterator p;
 	interval<T> Itmp, Imin;
 
@@ -160,22 +161,23 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 	
 	while (true) {
 		pivot_j = -1;
+		minmax = 0.;
 		for (i=1; i<n+1; i++) {
 			if (isbasic(i)) continue;
-			if (a(0, i) > 0.) {
+			if (a(0, i) > minmax) {
 				pivot_j = i;
-				break;
+				minmax = a(0, i);
 			}
 		}
 		if (pivot_j == -1) break;
 
 		pivot_i = -1;
-
+		minmax = std::numeric_limits<T>::max();
 		for (i=1; i<m+1; i++) {
 			if (a(i, pivot_j) <= 0.) continue;
 			tmp = a(i, 0) / a(i, pivot_j);
-			if (pivot_i == -1 || tmp < min) {
-				min = tmp;
+			if (tmp < minmax) {
+				minmax = tmp;
 				pivot_i = i;
 			}
 		}

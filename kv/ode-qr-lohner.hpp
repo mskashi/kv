@@ -2,8 +2,8 @@
  * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
-#ifndef ODE_QR_HPP
-#define ODE_QR_HPP
+#ifndef ODE_QR_LOHNER_HPP
+#define ODE_QR_LOHNER_HPP
 
 // ODE using QR Decomposition
 
@@ -16,8 +16,7 @@
 #include <kv/interval-vector.hpp>
 #include <kv/qr.hpp>
 #include <kv/vleq.hpp>
-#include <kv/ode.hpp>
-#include <kv/ode-autodif.hpp>
+#include <kv/ode-lohner.hpp>
 #include <kv/ode-param.hpp>
 #include <kv/ode-callback.hpp>
 
@@ -29,7 +28,7 @@ namespace kv {
 
 template <class T, class F>
 int
-odelong_qr(
+odelong_qr_lohner(
 	F f,
 	ub::vector< interval<T> >& init,
 	const interval<T>& start,
@@ -84,7 +83,7 @@ odelong_qr(
 		p2 = p;
 		p2.set_autostep(true);
 		// 自動的にautodif対応のものが呼ばれるはず
-		r = ode(f, Iad, t, t1, p2, &result_tmp);
+		r = ode_lohner(f, Iad, t, t1, p2, &result_tmp);
 		if (r == 0) break;
 
 		fc = c;
@@ -95,7 +94,7 @@ odelong_qr(
 		p2 = p;
 		p2.set_autostep(false);
 		while (1) {
-			r2 = ode(f, fc, t, t1, p2);
+			r2 = ode_lohner(f, fc, t, t1, p2);
 			if (r2 != 0) break;
 			p2.order++;
 			std::cout << "increase order: " << p2.order << "\n";
@@ -172,7 +171,7 @@ odelong_qr(
 
 template <class T, class F>
 int
-odelong_qr(
+odelong_qr_lohner(
 	F f,
 	ub::vector< autodif< interval<T> > >& init,
 	const interval<T>& start,
@@ -189,7 +188,7 @@ odelong_qr(
 	autodif< interval<T> >::split(init, x, M);
 	int s2 = M.size2();
 
-	r = odelong_qr(f, x, start, end2, p, callback, &M_tmp);
+	r = odelong_qr_lohner(f, x, start, end2, p, callback, &M_tmp);
 
 	if (r == 0) return 0;
 
@@ -210,4 +209,4 @@ odelong_qr(
 
 } // namespace kv
 
-#endif // ODE_QR_HPP
+#endif // ODE_QR_LOHNER_HPP

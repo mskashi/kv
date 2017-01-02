@@ -19,6 +19,7 @@
 #include <kv/ode.hpp>
 #include <kv/ode-autodif.hpp>
 #include <kv/ode-param.hpp>
+#include <kv/ode-callback.hpp>
 
 
 #ifndef ODE_FAST
@@ -149,7 +150,7 @@ ode_onlytype1(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>
 
 template <class T, class F>
 int
-ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
+ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::vector< psa< interval<T> > >* result_psa = NULL)
 {
 	int n = init.size();
 	int i, j;
@@ -189,6 +190,10 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 	Idummy = I;
 	r = ode(f, Idummy, start, end2, p, &psa_result);
 	if (r == 0) return 0;
+
+	if (result_psa != NULL) {
+		*result_psa = psa_result;
+	}
 
 	deltat = end2 - start;
 	deltat_n = 1.;
@@ -241,24 +246,33 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 
 template <class T, class F>
 int
-odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
-{
+odelong_maffine2(
+	F f,
+	ub::vector< affine<T> >& init,
+	const interval<T>& start,
+	interval<T>& end,
+	ode_param<T> p = ode_param<T>(),
+	const ode_callback<T>& callback = ode_callback<T>()
+) {
 	int s = init.size();
-	ub::vector< affine<T> > x;
+	ub::vector< affine<T> > x, x1;
 	interval<T> t, t1;
 	int r;
 	int ret_val = 0;
+
+	ub::vector< psa< interval<T> > > result_tmp;
 
 	x = init;
 	t = start;
 	p.set_autostep(true);
 	while (1) {
+		x1 = x;
 		t1 = end;
 
-		r = ode_maffine2(f, x, t, t1, p);
+		r = ode_maffine2(f, x1, t, t1, p, &result_tmp);
 		if (r == 0) {
 			if (ret_val == 1) {
-				init = x;
+				init = x1;
 				end = t;
 			}
 			return ret_val;
@@ -266,20 +280,30 @@ odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, i
 		ret_val = 1;
 		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
-			std::cout << to_interval(x) << "\n";
+			std::cout << to_interval(x1) << "\n";
 		}
+
+		callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
+
 		if (r == 2) {
-			init = x;
+			init = x1;
 			return 2;
 		}
 		t = t1;
+		x = x1;
 	}
 }
 
 template <class T, class F>
 int
-odelong_maffine2(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
-{
+odelong_maffine2(
+	F f,
+	ub::vector< interval<T> >& init,
+	const interval<T>& start,
+	interval<T>& end,
+	ode_param<T> p = ode_param<T>(),
+	const ode_callback<T>& callback = ode_callback<T>()
+) {
 	int s = init.size();
 	int i;
 	ub::vector< affine<T> > x;
@@ -291,7 +315,7 @@ odelong_maffine2(F f, ub::vector< interval<T> >& init, const interval<T>& start,
 	affine<T>::maxnum() = 0;
 	x = init;
 
-	r = odelong_maffine2(f, x, start, end2, p);
+	r = odelong_maffine2(f, x, start, end2, p, callback);
 
 	affine<T>::maxnum() = maxnum_save;
 

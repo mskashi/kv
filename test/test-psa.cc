@@ -43,6 +43,9 @@ int main()
 	std::cout << cos(a) << "\n";
 	std::cout << sinh(a) << "\n";
 	std::cout << cosh(a) << "\n";
+	std::cout << pow(a, 2) << "\n";
+	std::cout << pow(a, -2) << "\n";
+	std::cout << pow(a, a) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";
@@ -75,6 +78,9 @@ int main()
 	std::cout << cos(a) << "\n";
 	std::cout << sinh(a) << "\n";
 	std::cout << cosh(a) << "\n";
+	std::cout << pow(a, 2) << "\n";
+	std::cout << pow(a, -2) << "\n";
+	std::cout << pow(a, a) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";

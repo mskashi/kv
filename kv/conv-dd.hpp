@@ -54,6 +54,8 @@ struct conv_dd {
 		int sign, sign2, ex1, ex2;
 		double absx1, absx2;
 
+		if (x1 != x1 || x2 != x2) return "nan";
+
 		sign = get_sign_double(x1);
 		absx1 = fabs(x1);
 

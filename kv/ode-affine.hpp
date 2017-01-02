@@ -19,6 +19,7 @@
 #include <kv/psa.hpp>
 #include <kv/affine.hpp>
 #include <kv/ode-param.hpp>
+#include <kv/ode-callback.hpp>
 
 
 #ifndef ODE_FAST
@@ -47,7 +48,7 @@ namespace kv {
 
 template <class T, class F>
 int
-ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
+ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::vector< psa< interval<T> > >* result_psa = NULL)
 {
 	int n = init.size();
 	int i, j;
@@ -84,6 +85,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	int maxnum_save = affine<T>::maxnum();
 
 	bool save_mode, save_uh, save_rh;
+
 
 	m = p.epsilon;
 	for (i=0; i<n; i++) {
@@ -276,6 +278,17 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			}
 		}
 
+		if (result_psa != NULL) {
+			// w をintervalに変換し *result_psaに格納
+			(*result_psa).resize(n);
+			for (i=0; i<n; i++) {
+				(*result_psa)(i).v.resize(w(i).v.size());
+				for (j=0; j<w(i).v.size(); j++) {
+					(*result_psa)(i).v(j) = to_interval(w(i).v(j));
+				}
+			}
+		}
+
 		result.resize(n);
 		for (i=0; i<n; i++) {
 			result(i) = eval(w(i), (affine<T>)deltat);
@@ -310,24 +323,34 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 
 template <class T, class F>
 int
-odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
-{
+odelong_affine(
+	F f,
+	ub::vector< affine<T> >& init,
+	const interval<T>& start,
+	interval<T>& end,
+	ode_param<T> p = ode_param<T>(),
+	const ode_callback<T>& callback = ode_callback<T>()
+) {
 	int s = init.size();
-	ub::vector< affine<T> > x;
+	ub::vector< affine<T> > x, x1;
 	interval<T> t, t1;
 	int r;
 	int ret_val = 0;
+
+	ub::vector< psa< interval<T> > > result_tmp;
+
 
 	x = init;
 	t = start;
 	p.set_autostep(true);
 	while (1) {
+		x1 = x;
 		t1 = end;
 
-		r = ode_affine(f, x, t, t1, p);
+		r = ode_affine(f, x1, t, t1, p, &result_tmp);
 		if (r == 0) {
 			if (ret_val == 1) {
-				init = x;
+				init = x1;
 				end = t;
 			}
 			return ret_val;
@@ -335,30 +358,46 @@ odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, int
 		ret_val = 1;
 		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
-			std::cout << to_interval(x) << "\n";
+			std::cout << to_interval(x1) << "\n";
 		}
+
+		callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
+		
 		if (r == 2) {
-			init = x;
+			init = x1;
 			return 2;
 		}
 		t = t1;
+		x = x1;
 	}
 }
 
 template <class T, class F>
 int
-odelong_affine(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
-{
+odelong_affine(
+	F f,
+	ub::vector< interval<T> >& init,
+	const interval<T>& start,
+	interval<T>& end,
+	ode_param<T> p = ode_param<T>(),
+	const ode_callback<T>& callback = ode_callback<T>()
+) {
 	int s = init.size();
 	int i;
 	ub::vector< affine<T> > x;
+	int maxnum_save;
 	int r;
 	interval<T> end2 = end;
 
+	maxnum_save = affine<T>::maxnum();
 	affine<T>::maxnum() = 0;
+
 	x = init;
 
-	r = odelong_affine(f, x, start, end2, p);
+	r = odelong_affine(f, x, start, end2, p, callback);
+
+	affine<T>::maxnum() = maxnum_save;
+
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));

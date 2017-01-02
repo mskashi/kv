@@ -20,6 +20,7 @@
 #include <kv/ode.hpp>
 #include <kv/ode-autodif.hpp>
 #include <kv/ode-param.hpp>
+#include <kv/ode-callback.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -144,7 +145,7 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL,
+	const ode_callback<T>& callback = ode_callback<T>(),
 	ub::matrix< interval<T> >* mat = NULL
 ) {
 
@@ -157,7 +158,6 @@ odelong_maffine(
 	int ret_val = 0;
 
 	ub::vector< psa< interval<T> > > result_tmp;
-	ub::vector< psa< interval<T> > >* result_tmp_p;
 
 
 	if (mat == NULL) {
@@ -168,12 +168,6 @@ odelong_maffine(
 	}
 
 	
-	if (callback == NULL) {
-		result_tmp_p = NULL;
-	} else {
-		result_tmp_p = &result_tmp;
-	}
-
 	x = init;
 	t = start;
 	p.set_autostep(true);
@@ -181,7 +175,7 @@ odelong_maffine(
 		x1 = x;
 		t1 = end;
 
-		r = ode_maffine(f, x1, t, t1, p, M_p, result_tmp_p);
+		r = ode_maffine(f, x1, t, t1, p, M_p, &result_tmp);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x1;
@@ -201,9 +195,9 @@ odelong_maffine(
 			std::cout << "t: " << t1 << "\n";
 			std::cout << to_interval(x1) << "\n";
 		}
-		if (callback != NULL) {
-			callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
-		}
+
+		callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
+
 		if (r == 2) {
 			init = x1;
 			if (mat != NULL) *mat = M;
@@ -222,7 +216,7 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL
+	const ode_callback<T>& callback = ode_callback<T>()
 ) {
 	int s = init.size();
 	int i;
@@ -256,7 +250,7 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL
+	const ode_callback<T>& callback = ode_callback<T>()
 ) {
 	int s = init.size();
 	int i, j;

@@ -78,8 +78,8 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 
 	I = C;
 	for (i=0; i<s; i++) {
-		tmp = std::numeric_limits<T>::epsilon() * norm(I(i)) * 3.;
-		tmp2 = std::numeric_limits<T>::min() * 3.;
+		tmp = std::numeric_limits<T>::epsilon() * norm(I(i)) * s * 2;
+		tmp2 = std::numeric_limits<T>::min() * s * 2;
 		if (newton_step(i) < tmp) newton_step(i) = tmp;
 		if (newton_step(i) < tmp2) newton_step(i) = tmp2;
 		I(i) += newton_step(i) * interval<T>(-1., 1.);

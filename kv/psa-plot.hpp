@@ -26,14 +26,14 @@ void psa_plot(const psa<T1>& x, const T2& offset, const gnuplot& g, int div = 50
 	off = offset;
 
 	for (i=0; i<div; i++) {
-		p1 = off + s + (e - s) * i / div;
-		p2 = off + s + (e - s) * (i+1) / div;
+		p1 = s + (e - s) * i / div;
+		p2 = s + (e - s) * (i+1) / div;
 		l1 = eval(x, (T1)p1).lower();
 		u1 = eval(x, (T1)p1).upper();
 		l2 = eval(x, (T1)p2).lower();
 		u2 = eval(x, (T1)p2).upper();
-		g.line(p1, l1, p2, l2, t);
-		g.line(p1, u1, p2, u2, t);
+		g.line(off + p1, l1, off + p2, l2, t);
+		g.line(off + p1, u1, off + p2, u2, t);
 	}
 }
 

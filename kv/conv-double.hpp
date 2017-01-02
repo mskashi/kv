@@ -53,6 +53,8 @@ struct conv_double {
 		int sign, ex;
 		double absx;
 
+		if (x != x) return "nan";
+
 		sign = get_sign_double(x);
 		absx = fabs(x);
 

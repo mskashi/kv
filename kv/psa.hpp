@@ -789,6 +789,7 @@ template <class T> class psa {
 
 		return r;
 	}
+
 	friend psa cosh (const psa& x) {
 		T a, xn, xn2, range, fact_n, table[2], tmp;
 		psa h, hn, r;
@@ -840,6 +841,35 @@ template <class T> class psa {
 		return r;
 	}
 
+	friend psa pow(const psa& x, int y) {
+		psa r, xp;
+		int a, tmp;
+
+		if (y == 0) return psa(1.);
+
+		a = (y >= 0) ? y : -y;
+
+		tmp = a;
+		r = 1.;
+		xp = x;
+		while (tmp != 0) {
+			if (tmp % 2 != 0) {
+				r *= xp;
+			}
+			tmp /= 2;
+			xp = xp * xp;
+		}
+
+		if (y < 0) {
+			r = 1. / r;
+		}
+
+		return r;
+	}
+
+	friend psa pow(const psa& x, const psa& y) {
+		return exp(y * log(x));
+	}
 
 	friend std::ostream& operator<<(std::ostream& s, const psa& x) {
 		int i;

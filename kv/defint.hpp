@@ -20,8 +20,10 @@ namespace ub = boost::numeric::ublas;
 #define DEFINT_FAST 1
 #endif
 
+#if 0
 #ifndef TOL1
 #define TOL1 0.1
+#endif
 #endif
 
 
@@ -118,8 +120,10 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order) {
 		m = std::numeric_limits<T>::epsilon();
 		m_tmp = norm(result) * std::numeric_limits<T>::epsilon();
 		if (m_tmp > m) m = m_tmp;
+		#if 0
 		m_tmp = rad(result) * TOL1;
 		if (m_tmp > m) m = m_tmp;
+		#endif
 		tolerance = m;
 
 		x.v(0) = t;

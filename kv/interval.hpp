@@ -897,7 +897,6 @@ template <class T> class interval {
 
 	friend interval pow(const interval& x, int y) {
 		interval r, xp;
-		T r1, r2;
 		int a, tmp;
 
 		if (y == 0) return interval(1.);
@@ -1690,12 +1689,10 @@ template <class T> struct constants< interval<T> > {
 		return tmp;
 	}
 	static interval<T> str(const std::string& s) {
-		static const interval<T> tmp(s, s);
-		return tmp;
+		return interval<T>(s, s);
 	}
 	static interval<T> str(const std::string& s1, const std::string& s2) {
-		static const interval<T> tmp(s1, s2);
-		return tmp;
+		return interval<T>(s1, s2);
 	}
 };
 
