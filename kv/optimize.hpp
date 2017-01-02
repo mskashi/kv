@@ -113,7 +113,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 			rop<T>::begin();
 			tmp = rop<T>::sub_down(A.lower(), Itmp.lower());
 			tmp2 = rop<T>::sub_up(A.upper(), Itmp.upper());
-			rop<T>::finish();
+			rop<T>::end();
 			A.assign(tmp, tmp2);
 #if 0
 			// Aを真面目に計算すると遅い。

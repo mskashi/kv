@@ -2,6 +2,9 @@
  * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
+#ifndef NEWTON_HPP
+#define NEWTON_HPP
+
 #include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -57,3 +60,5 @@ rand_newton(ub::vector<T>& x, F f, T lower = -1., T upper = 1, T tol = 1e2, int 
 }
 
 } // namespace kv
+
+#endif // NEWTON_HPP

@@ -64,6 +64,7 @@ int main()
 	std::cout << width(z) << "\n";
 	std::cout << median(z) << "\n";
 	std::cout << norm(z) << "\n";
+	std::cout << mag(z) << "\n";
 	std::cout << std::boolalpha;
 	std::cout << in(3.9, z) << "\n";
 	std::cout << in(4.1, z) << "\n";

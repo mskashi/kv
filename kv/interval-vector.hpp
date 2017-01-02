@@ -255,7 +255,7 @@ template <class T> inline T max_norm (const ub::matrix<T>& x) {
 			tmp2 = (x(i, j) >= 0.) ? x(i, j) : -x(i, j);
 			tmp = rop<T>::add_up(tmp, tmp2);
 		}
-		rop<T>::finish();
+		rop<T>::end();
 		if (tmp > r) r = tmp;
 	}
 
@@ -289,7 +289,7 @@ template <class T> inline T max_norm (const ub::matrix< interval<T> >& x) {
 		for (j=0; j<s2; j++) {
 			tmp = rop<T>::add_up(tmp, norm(x(i, j)));
 		}
-		rop<T>::finish();
+		rop<T>::end();
 		if (tmp > r) r = tmp;
 	}
 

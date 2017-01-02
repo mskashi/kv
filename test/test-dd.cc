@@ -30,4 +30,17 @@ int main()
 	std::cout << kv::constants<dd>::e() << "\n";
 	std::cout << kv::constants<dd>::ln2() << "\n";
 	std::cout << kv::constants<dd>::str("0.1") << "\n";
+
+	std::cout << std::numeric_limits<kv::dd>::epsilon() << "\n";
+	std::cout << std::numeric_limits<kv::dd>::infinity() << "\n";
+	std::cout << std::numeric_limits<kv::dd>::max() << "\n";
+	std::cout << std::numeric_limits<kv::dd>::min() << "\n";
+
+	std::cout << std::numeric_limits<kv::dd>::digits << "\n";
+	std::cout << std::numeric_limits<kv::dd>::digits10 << "\n";
+	std::cout << std::numeric_limits<kv::dd>::radix << "\n";
+	std::cout << std::numeric_limits<kv::dd>::min_exponent << "\n";
+	std::cout << std::numeric_limits<kv::dd>::min_exponent10 << "\n";
+	std::cout << std::numeric_limits<kv::dd>::max_exponent << "\n";
+	std::cout << std::numeric_limits<kv::dd>::max_exponent10 << "\n";
 }

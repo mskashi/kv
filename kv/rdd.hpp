@@ -321,7 +321,7 @@ template <> struct rop <dd> {
 	static void begin() {
 	}
 
-	static void finish() {
+	static void end() {
 	}
 
 	static void print_up(const dd& x, std::ostream& s) {

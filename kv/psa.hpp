@@ -114,6 +114,9 @@ template <class T> class psa {
 			if (use_history() == true) {
 				r = history().front();
 				int old_size = r.v.size();
+				if (mode() == 2) {
+					old_size = std::min(old_size, (int)a.v.size() - 1);
+				}
 				int i;
 				r.v.resize(a.v.size(), true);
 				for (i=old_size; i<a.v.size(); i++) {
@@ -182,6 +185,9 @@ template <class T> class psa {
 			if (use_history() == true) {
 				r = history().front();
 				int old_size = r.v.size();
+				if (mode() == 2) {
+					old_size = std::min(old_size, (int)a.v.size() - 1);
+				}
 				int i;
 				r.v.resize(a.v.size(), true);
 				for (i=old_size; i<a.v.size(); i++) {
@@ -255,6 +261,9 @@ template <class T> class psa {
 			if (use_history() == true) {
 				r = history().front();
 				old_size = r.v.size();
+				if (mode() == 2) {
+					old_size = std::min(old_size, (int)b.v.size() - 1);
+				}
 				r.v.resize(b.v.size(), true);
 				for (i=old_size; i<b.v.size(); i++) {
 					r.v(i) = a.v(0) * b.v(i);
@@ -266,6 +275,9 @@ template <class T> class psa {
 			if (use_history() == true) {
 				r = history().front();
 				old_size = r.v.size();
+				if (mode() == 2) {
+					old_size = std::min(old_size, (int)a.v.size() - 1);
+				}
 				r.v.resize(a.v.size(), true);
 				for (i=old_size; i<a.v.size(); i++) {
 					r.v(i) = a.v(i) * b.v(0);
@@ -329,6 +341,9 @@ template <class T> class psa {
 		if (use_history() == true) {
 			r = history().front();
 			int old_size = r.v.size();
+			if (mode() == 2) {
+				old_size = std::min(old_size, (int)a.v.size() - 1);
+			}
 			int i;
 			r.v.resize(a.v.size(), true);
 			for (i=old_size; i<a.v.size(); i++) {
@@ -362,6 +377,9 @@ template <class T> class psa {
 		if (use_history() == true) {
 			r = history().front();
 			int old_size = r.v.size();
+			if (mode() == 2) {
+				old_size = std::min(old_size, (int)b.v.size() - 1);
+			}
 			int i;
 			r.v.resize(b.v.size(), true);
 			for (i=old_size; i<b.v.size(); i++) {
@@ -720,6 +738,108 @@ template <class T> class psa {
 
 		return r;
 	}
+
+	friend psa sinh (const psa& x) {
+		T a, xn, xn2, range, fact_n, table[2], tmp;
+		psa h, hn, r;
+		int i;
+		int old_size;
+		bool recover_uh = false;
+		bool recover_rh = false;
+
+		a = x.v(0);
+		// h = x - a;
+		h = x; h.v(0) = 0.;
+
+		table[0] = sinh(a);
+		table[1] = cosh(a);
+
+		r = table[0];
+		hn = 1.;
+		fact_n = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+				recover_uh = true;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+					recover_rh = true;
+				}
+				hn *= h;
+				fact_n /= (double)i;
+				range = evalrange(x);
+				switch (i%2) {
+				case 0: tmp = sinh(range); break;
+				case 1: tmp = cosh(range); break;
+				}
+				r += fact_n * tmp * hn;
+			} else {
+				hn *= h;
+				fact_n /= (double)i;
+				r += fact_n * table[i % 2] * hn;
+			}
+		}
+		if (recover_uh) use_history() = true;
+		if (recover_rh) record_history() = true;
+
+		return r;
+	}
+	friend psa cosh (const psa& x) {
+		T a, xn, xn2, range, fact_n, table[2], tmp;
+		psa h, hn, r;
+		int i;
+		int old_size;
+		bool recover_uh = false;
+		bool recover_rh = false;
+
+		a = x.v(0);
+		// h = x - a;
+		h = x; h.v(0) = 0.;
+
+		table[0] = cosh(a);
+		table[1] = sinh(a);
+
+		r = table[0];
+		hn = 1.;
+		fact_n = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+				recover_uh = true;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+					recover_rh = true;
+				}
+				hn *= h;
+				fact_n /= (double)i;
+				range = evalrange(x);
+				switch (i%2) {
+				case 0: tmp = cosh(range); break;
+				case 1: tmp = sinh(range); break;
+				}
+				r += fact_n * tmp * hn;
+			} else {
+				hn *= h;
+				fact_n /= (double)i;
+				r += fact_n * table[i % 2] * hn;
+			}
+		}
+		if (recover_uh) use_history() = true;
+		if (recover_rh) record_history() = true;
+
+		return r;
+	}
+
 
 	friend std::ostream& operator<<(std::ostream& s, const psa& x) {
 		int i;

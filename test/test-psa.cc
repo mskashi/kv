@@ -26,6 +26,9 @@ int main()
 	b.v(2) = 1.;
 	std::cout << b << "\n";
 
+	// Type-I PSA (default)
+	std::cout << "Type-I PSA\n";
+
 	// for basic operations
 	std::cout << a + b << "\n";
 	std::cout << a - b << "\n";
@@ -38,9 +41,21 @@ int main()
 	std::cout << log(a) << "\n";
 	std::cout << sin(a) << "\n";
 	std::cout << cos(a) << "\n";
+	std::cout << sinh(a) << "\n";
+	std::cout << cosh(a) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";
+
+	// evaluate on some point
+	std::cout << eval(a, (itvd)0.5) << "\n";
+
+	// set order
+	std::cout << setorder(a, 1) << "\n";
+	std::cout << setorder(a, 3) << "\n";
+
+	// Type-II PSA
+	std::cout << "Type-II PSA\n";
 
 	// set Type-II PSA with domain [0,1]
 	kv::psa<itvd>::mode() = 2;
@@ -58,7 +73,19 @@ int main()
 	std::cout << log(a) << "\n";
 	std::cout << sin(a) << "\n";
 	std::cout << cos(a) << "\n";
+	std::cout << sinh(a) << "\n";
+	std::cout << cosh(a) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";
+
+	// evaluate on some point
+	std::cout << eval(a, (itvd)0.5) << "\n";
+
+	// evaluate on whole range
+	std::cout << evalrange(a) << "\n";
+
+	// set order
+	std::cout << setorder(a, 1) << "\n";
+	std::cout << setorder(a, 3) << "\n";
 }

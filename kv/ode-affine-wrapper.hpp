@@ -7,8 +7,9 @@
 
 // Wrapper for ODE Affine
 
-namespace ub = boost::numeric::ublas;
+#include <kv/ode-affine.hpp>
 
+namespace ub = boost::numeric::ublas;
 
 namespace kv {
 

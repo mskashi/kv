@@ -98,7 +98,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		r = rop<T>::add_up(r, x.er);
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -110,7 +110,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		t2 = rop<T>::sub_down(x.a(0), t1);
 		t3 = rop<T>::add_up(x.a(0), t1);
-		rop<T>::finish();
+		rop<T>::end();
 		return interval<T>(t2, t3);
 	}
 
@@ -136,7 +136,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		a(0) = rop<T>::mul_up(rop<T>::add_up(I.upper(), I.lower()), T(0.5));
 		a(maxnum()) = rop<T>::sub_up(a(0), I.lower());
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<maxnum(); i++) a(i) = 0.;
 
@@ -164,7 +164,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		a(0) = rop<T>::mul_up(rop<T>::add_up(I.upper(), I.lower()), T(0.5));
 		a(maxnum()) = rop<T>::sub_up(a(0), I.lower());
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<maxnum(); i++) a(i) = 0.;
 
@@ -215,7 +215,7 @@ template <class T> class affine {
 			for (i=0; i<ys; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::add_up(x.a(i), y.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 
 			for (i=ys; i<xs; i++) {
 				r.a(i) = x.a(i);
@@ -236,7 +236,7 @@ template <class T> class affine {
 			for (i=0; i<xs; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::add_up(x.a(i), y.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 
 			for (i=xs; i<ys; i++) {
 				r.a(i) = y.a(i);
@@ -250,7 +250,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(rop<T>::add_up(x.er, y.er), err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -308,7 +308,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::add_down(x.a(0), y);
 		err = rop<T>::sub_up(rop<T>::add_up(x.a(0), y), r.a(0));
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<xs; i++) {
 			r.a(i) = x.a(i);
@@ -321,7 +321,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(x.er, err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -345,7 +345,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::add_down(x, y.a(0));
 		err = rop<T>::sub_up(rop<T>::add_up(x, y.a(0)), r.a(0));
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<ys; i++) {
 			r.a(i) = y.a(i);
@@ -358,7 +358,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(y.er, err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -411,7 +411,7 @@ template <class T> class affine {
 			for (i=0; i<ys; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::sub_up(x.a(i), y.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 
 			for (i=ys; i<xs; i++) {
 				r.a(i) = x.a(i);
@@ -432,7 +432,7 @@ template <class T> class affine {
 			for (i=0; i<xs; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::sub_up(x.a(i), y.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 
 			for (i=xs; i<ys; i++) {
 				r.a(i) = - y.a(i);
@@ -446,7 +446,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(rop<T>::add_up(x.er, y.er), err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -470,7 +470,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::sub_down(x.a(0), y);
 		err = rop<T>::sub_up(rop<T>::sub_up(x.a(0), y), r.a(0));
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<xs; i++) {
 			r.a(i) = x.a(i);
@@ -483,7 +483,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(x.er, err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -507,7 +507,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::sub_down(x, y.a(0));
 		err = rop<T>::sub_up(rop<T>::sub_up(x, y.a(0)), r.a(0));
-		rop<T>::finish();
+		rop<T>::end();
 
 		for (i=1; i<ys; i++) {
 			r.a(i) = - y.a(i);
@@ -520,7 +520,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(y.er, err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -581,7 +581,7 @@ template <class T> class affine {
 		for (i=0; i<xs; i++) {
 			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(i), y), r.a(i)));
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 0
 		for (i=xs; i<maxnum(); i++) r.a(i) = 0.;
@@ -589,7 +589,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(rop<T>::mul_up(x.er, ((y >= 0.) ? y : -y)), err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -618,7 +618,7 @@ template <class T> class affine {
 		for (i=0; i<ys; i++) {
 			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x, y.a(i)), r.a(i)));
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 0
 		for (i=ys; i<maxnum(); i++) r.a(i) = 0.;
@@ -626,7 +626,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
 		r.er = rop<T>::add_up(rop<T>::mul_up(y.er, ((x >= 0.) ? x : -x)), err);
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -662,7 +662,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::mul_down(x.a(0), y.a(0));
 		err = rop<T>::sub_up(rop<T>::mul_up(x.a(0), y.a(0)), r.a(0));
-		rop<T>::finish();
+		rop<T>::end();
 		#endif
 
 		if (xs > ys) {
@@ -682,7 +682,7 @@ template <class T> class affine {
 			for (i=ys; i<xs; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(y.a(0), x.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 			#if AFFINE_SIMPLE != 2
 			for (i=xs; i<maxnum(); i++) {
 				r.a(i) = 0.;
@@ -705,7 +705,7 @@ template <class T> class affine {
 			for (i=xs; i<ys; i++) {
 				err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(0), y.a(i)), r.a(i)));
 			}
-			rop<T>::finish();
+			rop<T>::end();
 			#if AFFINE_SIMPLE != 2
 			for (i=ys; i<maxnum(); i++) {
 				r.a(i) = 0.;
@@ -717,7 +717,7 @@ template <class T> class affine {
 		rop<T>::begin();
 		r.a(0) = rop<T>::mul_down(x.a(0), y.a(0));
 		err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(0), y.a(0)), r.a(0)));
-		rop<T>::finish();
+		rop<T>::end();
 		#endif
 
 		tmp_l = rad(x);
@@ -729,7 +729,7 @@ template <class T> class affine {
 		#else
 		err = rop<T>::add_up(err, rop<T>::mul_up(tmp_l, tmp_u));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -814,7 +814,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -857,7 +857,7 @@ template <class T> class affine {
 		for (i=0; i<xs; i++) {
 			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::div_up(x.a(i), y), r.a(i)));
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 0
 		for (i=xs; i<maxnum(); i++) r.a(i) = 0.;
@@ -866,7 +866,7 @@ template <class T> class affine {
 		// r.er = x.er / abs(y) + err;
 		rop<T>::begin();
 		r.er = rop<T>::add_up(err, rop<T>::div_up(x.er, ((y >= 0.) ? y : -y)));
-		rop<T>::finish();
+		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
 		#endif
@@ -951,7 +951,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1014,7 +1014,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1078,7 +1078,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1146,7 +1146,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1213,7 +1213,7 @@ template <class T> class affine {
 		// err += abs(a) * x.er;
 		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1382,7 +1382,7 @@ template <class T> inline void epsilon_reduce(ub::vector< affine<T> >& x, int n,
 		#if AFFINE_SIMPLE >= 1
 		tmp = rop<T>::add_up(tmp, x(i).er);
 		#endif
-		rop<T>::finish();
+		rop<T>::end();
 		for (j=n-s; j<n; j++) {
 			r(i).a(j+1) = 0.;
 		}

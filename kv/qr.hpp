@@ -2,6 +2,9 @@
  * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
+#ifndef QR_HPP
+#define QR_HPP
+
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -50,3 +53,5 @@ template <class T> bool qr(const ub::matrix<T>& in, ub::matrix<T>& q, ub::matrix
 }
 
 } // namespace kv
+
+#endif // QR_HPP

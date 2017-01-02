@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <string>
+#include <sstream>
 
 #include <kv/convert.hpp>
 #include <kv/constants.hpp>
@@ -62,7 +63,7 @@ template <class T> struct rop {
 	static void begin() {
 	}
 
-	static void finish() {
+	static void end() {
 	}
 
 	static void print_up(const T& x, std::ostream& s) {
@@ -152,7 +153,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::add_down(x.inf, y.inf);
 		r.sup = rop<T>::add_up(x.sup, y.sup);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -163,7 +164,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::add_down(x.inf, T(y));
 		r.sup = rop<T>::add_up(x.sup, T(y));
-		rop<T>::finish();
+		rop<T>::end();
 		return r;
 	}
 
@@ -177,7 +178,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::add_down(T(x), y.inf);
 		r.sup = rop<T>::add_up(T(x), y.sup);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -196,7 +197,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		x.inf = rop<T>::add_down(x.inf, T(y));
 		x.sup = rop<T>::add_up(x.sup, T(y));
-		rop<T>::finish();
+		rop<T>::end();
 
 		return x;
 	}
@@ -212,7 +213,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::sub_down(x.inf, y.sup);
 		r.sup = rop<T>::sub_up(x.sup, y.inf);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -223,7 +224,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::sub_down(x.inf, T(y));
 		r.sup = rop<T>::sub_up(x.sup, T(y));
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -238,7 +239,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		r.inf = rop<T>::sub_down(T(x), y.sup);
 		r.sup = rop<T>::sub_up(T(x), y.inf);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -257,7 +258,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		x.inf = rop<T>::sub_down(x.inf, T(y));
 		x.sup = rop<T>::sub_up(x.sup, T(y));
-		rop<T>::finish();
+		rop<T>::end();
 
 		return x;
 	}
@@ -319,7 +320,7 @@ template <class T> class interval {
 				if (tmp > r.sup) r.sup = tmp;
 			}
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -335,7 +336,7 @@ template <class T> class interval {
 			r.inf = rop<T>::mul_down(x.sup, T(y));
 			r.sup = rop<T>::mul_up(x.inf, T(y));
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -355,7 +356,7 @@ template <class T> class interval {
 			r.inf = rop<T>::mul_down(T(x), y.sup);
 			r.sup = rop<T>::mul_up(T(x), y.inf);
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -406,10 +407,10 @@ template <class T> class interval {
 				r.sup = rop<T>::div_up(x.inf, y.sup);
 			}
 		} else {
-			rop<T>::finish();
+			rop<T>::end();
 			throw std::range_error("interval: division by 0");
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -425,10 +426,10 @@ template <class T> class interval {
 			r.inf = rop<T>::div_down(x.sup, T(y));
 			r.sup = rop<T>::div_up(x.inf, T(y));
 		} else {
-			rop<T>::finish();
+			rop<T>::end();
 			throw std::range_error("interval: division by 0");
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -450,10 +451,10 @@ template <class T> class interval {
 				r.sup = rop<T>::div_up(T(x), y.sup);
 			}
 		} else {
-			rop<T>::finish();
+			rop<T>::end();
 			throw std::range_error("interval: division by 0");
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -492,7 +493,7 @@ template <class T> class interval {
 		rop<T>::begin();
 		tmp1 = rop<T>::sqrt_down(x.inf);
 		tmp2 = rop<T>::sqrt_up(x.sup);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return interval(tmp1, tmp2);
 	}
@@ -558,7 +559,7 @@ template <class T> class interval {
 
 		rop<T>::begin();
 		tmp = rop<T>::sub_up(x.sup, x.inf);
-		rop<T>::finish();
+		rop<T>::end();
 
 		return tmp;
 	}
@@ -568,7 +569,7 @@ template <class T> class interval {
 
 		rop<T>::begin();
 		tmp = rop<T>::mul_up(rop<T>::sub_up(x.sup, x.inf), T(0.5));
-		rop<T>::finish();
+		rop<T>::end();
 
 		return tmp;
 	}
@@ -829,7 +830,7 @@ template <class T> class interval {
 				r.sup = std::numeric_limits<T>::infinity();
 			}
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}
@@ -889,7 +890,7 @@ template <class T> class interval {
 				r.sup = std::numeric_limits<T>::infinity();
 			}
 		}
-		rop<T>::finish();
+		rop<T>::end();
 
 		return r;
 	}

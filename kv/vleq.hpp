@@ -47,7 +47,7 @@ bool vleq(
 	norm1 = max_norm(EmRA);
 	rop<T>::begin();
 	norm1 = rop<T>::sub_down(1., norm1);
-	rop<T>::finish();
+	rop<T>::end();
 
 	if (norm1 <= 0.) return false;
 
@@ -64,7 +64,7 @@ bool vleq(
 		norm3 = max_norm(rtmp);
 		rop<T>::begin();
 		err = rop<T>::div_up(rop<T>::mul_up(norm2, norm3), norm1);
-		rop<T>::finish();
+		rop<T>::end();
 		for (j=0; j<s1; j++) {
 			x(j, i) += interval<T>(-err, err);
 		}

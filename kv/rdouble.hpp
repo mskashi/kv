@@ -101,7 +101,7 @@ template <> struct rop <double> {
 		hwround::roundup();
 	}
 
-	static void finish() {
+	static void end() {
 		hwround::roundnear();
 	}
 

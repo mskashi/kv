@@ -218,11 +218,11 @@ allsol_list_affine(std::list< ub::vector< interval<T> > > targets, F f, int verb
 				if (tmp < 0.) tmp = -tmp;
 				lp_tmp = rop<T>::add_up(lp_tmp, tmp);
 			}
-			rop<T>::finish();
+			rop<T>::end();
 			I_tmp -= lp_tmp;
 			rop<T>::begin();
 			lp_tmp = rop<T>::add_up(lp_tmp, rad(I_tmp));
-			rop<T>::finish();
+			rop<T>::end();
 			ay2(i)(s + 1 + i) = lp_tmp;
 			ay2(i)(0) = I_tmp.lower();
 			if (ay2(i)(0) > 0.) {
@@ -250,7 +250,7 @@ allsol_list_affine(std::list< ub::vector< interval<T> > > targets, F f, int verb
 			I_tmp -= lp_tmp;
 			rop<T>::begin();
 			lp_tmp = rop<T>::add_up(lp_tmp, rad(I_tmp));
-			rop<T>::finish();
+			rop<T>::end();
 			ay2(i)(affine<T>::maxnum() + 1 + i) = lp_tmp;
 			ay2(i)(0) = I_tmp.lower();
 			if (ay2(i)(0) > 0.) {
@@ -318,7 +318,7 @@ allsol_list_affine(std::list< ub::vector< interval<T> > > targets, F f, int verb
 				if (tmp < 0.) tmp = -tmp;
 				rop<T>::begin();
 				tmp = rop<T>::sub_up(trim_tmp, tmp);
-				rop<T>::finish();
+				rop<T>::end();
 				trim_I = ax(j).get_mid() - (ay(i).get_mid() + tmp * interval<T>(-1., 1.)) * ax(j).get_coef(j+1) / ay(i).get_coef(j+1);
 				if (overlap(IR(j), trim_I)) {
 					if (!subset(IR(j), trim_I)) {
