@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef POINCAREMAP_HPP
@@ -7,9 +7,10 @@
 
 #include <kv/strobomap.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class F1, class F2, class T> class PoincareMap {
 	public:
@@ -18,8 +19,8 @@ template <class F1, class F2, class T> class PoincareMap {
 	interval<T> start;
 	ode_param<T> p;
 
-	PoincareMap(F1 f1_v, F2 f2_v, interval<T> start_v, ode_param<T> p_v = ode_param<T>())
-	: f1(f1_v), f2(f2_v), start(start_v), p(p_v) {}
+	PoincareMap(F1 f1, F2 f2, interval<T> start, ode_param<T> p = ode_param<T>())
+	: f1(f1), f2(f2), start(start), p(p) {}
 
 	ub::vector<T> operator() (const ub::vector<T>& x) {
 		int s = x.size();

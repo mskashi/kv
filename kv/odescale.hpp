@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODESCALE_HPP
@@ -11,15 +11,15 @@
  *  伊理, 藤野: 数値計算の常識, pp.95-96 の方法
  */
 
-namespace ub = boost::numeric::ublas;
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class F> class Odescale {
 	public:
 	F f;
-	Odescale(F f_v) : f(f_v) {}
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	Odescale(F f) : f(f) {}
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y, tx, ty;
 		T g0;
 		int s = x.size();

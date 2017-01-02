@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef STROBOMAP_HPP
@@ -14,27 +14,28 @@
 #endif
 #include <kv/ode-param.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 namespace kv {
 
+namespace ub = boost::numeric::ublas;
 
-// 微分方程式の右辺関数fの関数オブジェクトから、
-// ストロボマップの関数オブジェクトを生成する。
-// 生成された関数オブジェクトは、引数として、
+
+// Generate function object of strobomap
+// using function object of r.h.s of differential equation.
+// Generated function object can receive
 //   vector<T>,
 //   vector< autodif<T> >,
 //   vector< interval<T> >,
 //   vector< affine<T> >,
 //   vector< autodif< interval<T> > >
-// を受け付ける。それぞれ、内部で
-//   odelong_nv (通常版),
-//   odelong_nv (autodif版),
-//   odelong_maffine (通常版),
-//   odelong_maffine (affine版),
-//   odelong_maffine (autodif版)
-// を呼び出している。(-DUSE_MAFFINE2ならmaffine2)
+// as argument. In each case,
+//   odelong_nv in ode-nv.hpp,
+//   odelong_nv in ode-autodif-nv.hpp,
+//   odelong_maffine in ode-maffine.hpp (interval version)
+//   odelong_maffine in ode-maffine.hpp (affine version),
+//   odelong_maffine in ode-maffine.hpp (autodif version)
+// is called inside.
+// (If -DUSE_MAFFINE2 then ode-maffine2.hpp is used instead.)
 
 template <class F, class T> class StroboMap {
 	public:
@@ -42,8 +43,8 @@ template <class F, class T> class StroboMap {
 	interval<T> start, end;
 	ode_param<T> p;
 
-	StroboMap(F f_v, interval<T> start_v, interval<T> end_v, ode_param<T> p_v = ode_param<T>())
-	: f(f_v), start(start_v), end(end_v), p(p_v) {}
+	StroboMap(F f, interval<T> start, interval<T> end, ode_param<T> p = ode_param<T>())
+	: f(f), start(start), end(end), p(p) {}
 
 	ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> result;
@@ -124,25 +125,26 @@ template <class F, class T> class StroboMap {
 	}
 };
 
-// おまけ:
-// 関数fの関数オブジェクトから関数x-f(x)の関数オブジェクトを生成
+// Generate function object of "x-f(x)" from function object of f.
 
 template <class F> class FixedPoint {
 	public:
 	F f;
-	FixedPoint(F f_v) : f(f_v) {}
+	FixedPoint(F f) : f(f) {}
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		return x - f(x);
 	}
 };
 
 
-// 2変数関数のstrobomapから、2点境界値問題をShooting法で解くための
-// 非線形方程式を生成
-//   x(start_index) = start_value, x(end_index) = end_value
-//   のような境界条件を指定する。
-//   x(start_indexでないindex)を未知数として変動させ、
-//   e(end_index) - end_value を0にしようとする。
+// Generate function object for shooting method of two point
+// boundary value problem from 2-variable strobomap.
+//   boundary condition:
+//     x(start_index) = start_value, x(end_index) = end_value
+//   unknown variable:
+//     x(index != start_index)
+// Solve ODE from initial value (start_value, unknown) and try to
+// satisfy x(end_index) = end_value by changing unknown.
 
 template <class F, class TV> class Shooting_TPBVP {
 	public:
@@ -151,12 +153,12 @@ template <class F, class TV> class Shooting_TPBVP {
 	int start_index, end_index;
 	int variable_index;
 
-	Shooting_TPBVP(F f_v, TV start_value_v, TV end_value_v, int start_index_v, int end_index_v) : f(f_v) , start_value(start_value_v), end_value(end_value_v), start_index(start_index_v), end_index(end_index_v) {
+	Shooting_TPBVP(F f, TV start_value, TV end_value, int start_index, int end_index) : f(f) , start_value(start_value), end_value(end_value), start_index(start_index), end_index(end_index) {
 		variable_index = 1 - start_index;
 	}
 
-	// mid_ifnecessary<T1,T2>(x)は、T2からT1に変換可能ならxそのまま、
-	// 不可能ならmid(x)を返す。
+	// mid_ifnecessary<T1,T2>(x) returns x if T2 is convertible to T1,
+	// and returns mid(x) if impossoble.
 
 	#include <boost/utility/enable_if.hpp>
 

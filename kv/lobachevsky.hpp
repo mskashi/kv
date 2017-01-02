@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef LOBACHEVSKY_HPP
 #define LOBACHEVSKY_HPP
 
 #include <kv/defint.hpp>
+#include <kv/defint-singular.hpp>
 
 // Lobachevsky function
 
@@ -24,56 +25,6 @@ class Loba_nolog {
 		return 2. * sin(x);
 	}
 };
-
-template <class T, class F>
-interval<T>
-defint_log(F f, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
-	int i;
-	interval<T> step, c, z, result;
-	psa< interval<T> > x, y;
-	bool save_mode, save_uh, save_rh;
-
-	step = end - start;
-
-	save_mode = psa< interval<T> >::mode();
-	save_uh = psa< interval<T> >::use_history();
-	save_rh = psa< interval<T> >::record_history();
-	psa< interval<T> >::mode() = 2;
-	psa< interval<T> >::use_history() = false;
-	psa< interval<T> >::record_history() = false;
-
-
-	psa< interval<T> >::domain() = interval<T>(0, step.upper());
-
-
-	c = start;
-	x.v.resize(2);
-	x.v(0) = c;
-	x.v(1) = 1;
-	x = setorder(x, order + singularity_order);
-
-	y = f(x);
-	for (i=0; i<singularity_order; i++) {
-		if (! zero_in(x.v(i))) {
-			std::cout << "defint_log: something wrong\n";
-		}
-	}
-
-	for (i=singularity_order; i<x.v.size(); i++) {
-		y.v(i-singularity_order) = y.v(i);
-	}
-	y.v.resize(y.v.size() - singularity_order);
-
-
-	y = integrate(log(y));
-	result = eval(y, step) + (T)singularity_order * step * (log(step) - 1.);
-
-	psa< interval<T> >::mode() = save_mode;
-	psa< interval<T> >::use_history() = save_uh;
-	psa< interval<T> >::record_history() = save_rh;
-
-	return result;
-}
 
 #define LOBA_TH 0.25
 #define LOBA_ORDER 14

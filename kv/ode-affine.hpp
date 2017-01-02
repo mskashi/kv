@@ -129,7 +129,10 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	psa< affine<T> >::mode() = 2;
 
 	restart = 0;
-	resized = false;
+	// disable resize because resize algorithm is not suitable
+	//  for ode-affine
+	// resized = false;
+	resized = true;
 
 	while (true) {
 		if (p.autostep) {

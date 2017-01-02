@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DOUBLEINTEGRAL_HPP
@@ -102,8 +102,8 @@ template <class F, class TT> class DoubleIntegralTriangleConv {
 	F f;
 	TT x1, y1, x2x1, x3x1, y2y1, y3y1, J;
 
-	DoubleIntegralTriangleConv(F f_v, TT x1_v, TT y1_v, TT x2_v, TT y2_v, TT x3_v, TT y3_v) :
-	f(f_v), x1(x1_v), y1(y1_v), x2x1(x2_v-x1_v), x3x1(x3_v-x1_v), y2y1(y2_v-y1_v), y3y1(y3_v-y1_v) {
+	DoubleIntegralTriangleConv(F f, TT x1, TT y1, TT x2, TT y2, TT x3, TT y3) :
+	f(f), x1(x1), y1(y1), x2x1(x2-x1), x3x1(x3-x1), y2y1(y2-y1), y3y1(y3-y1) {
 		J = x2x1 * y3y1 - x3x1 * y2y1;
 		// J = (J >= 0.)? J : -J;
 		J = abs(J);

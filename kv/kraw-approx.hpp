@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef KRAW_APPROX_HPP
 #define KRAW_APPROX_HPP
 
-// 近似解を元にしたKrawczyk法
-// 事前に軽くNewton法で精度改善を試みることも出来る。
+// Krawczyk method using approximate solution
+// Newton iteration can be applied in advance.
 
 #include <limits>
 #include <boost/numeric/ublas/vector.hpp>
@@ -39,11 +39,11 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 
 	C = c;
 
-	for (i=0; i<newton_max; i++) {
-		// newton法をかける
-		// fが単なるTを受け付けない場合も考え、
-		// fにはintervalを食わせる。
+	// Newton iteration
+	// use interval<T> for argument of f
+	// preparing for the case that f can not accept T.
 
+	for (i=0; i<newton_max; i++) {
 		try {
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(C)), fc, fdc);
 		}
