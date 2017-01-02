@@ -1,11 +1,11 @@
-// sample program for dd-interval
+// sample program for mpfr-interval
 // all test is same as test-interval.cc
 
 #include <kv/interval.hpp>
-#include <kv/dd.hpp>
-#include <kv/rdd.hpp>
+#include <kv/mpfr.hpp>
+#include <kv/rmpfr.hpp>
 
-typedef kv::interval<kv::dd> itv;
+typedef kv::interval< kv::mpfr<106> > itv;
 
 int main()
 {

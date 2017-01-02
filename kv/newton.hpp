@@ -27,12 +27,12 @@ newton(F f, ub::vector<T>& x, T epsilon = std::numeric_limits<T>::epsilon(), int
 	int i, j, r;
 	ub::vector<T> fx;
 	ub::matrix<T> fdx;
-	ub::permutation_matrix<> pm(s);
 	T norm1, norm2, tmp;
 
 	for (i=0; i<maxloop; i++) {
 		try {
 			autodif<T>::split(f(autodif<T>::init(x)), fx, fdx);
+			ub::permutation_matrix<> pm(s);
 			r = ub::lu_factorize(fdx, pm);
 			if (r != 0) return false;
 			ub::lu_substitute(fdx, pm, fx);

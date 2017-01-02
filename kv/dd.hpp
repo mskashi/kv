@@ -654,7 +654,7 @@ template <> class numeric_limits<kv::dd> {
 	}
 
 	static const int digits = 106;
-	static const int digits10 = 31;
+	static const int digits10 = (digits-1)*301/1000; // ln(2)/ln(10)
 	static const int radix = 2;
 	static const int min_exponent = -1021;
 	static const int min_exponent10 = -307;
