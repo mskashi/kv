@@ -4,12 +4,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -22,8 +21,8 @@ class Lorenz {
 
 int main()
 {
-	ub::vector<itvd> x;
-	itvd end;
+	ub::vector<itv> x;
+	itv end;
 	kv::ode_param<double> p; // parameter for ode solver
 	int r;
 
@@ -59,7 +58,7 @@ int main()
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 1.;
 
-	r = kv::ode(Lorenz(), x, itvd(0.), end);
+	r = kv::ode(Lorenz(), x, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
@@ -73,7 +72,7 @@ int main()
 	end = 0.1;
 	p = kv::ode_param<double>().set_autostep(false);
 
-	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+	r = kv::ode(Lorenz(), x, itv(0.), end, p);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
@@ -87,7 +86,7 @@ int main()
 	end = 10.;
 	p = kv::ode_param<double>().set_autostep(false);
 
-	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+	r = kv::ode(Lorenz(), x, itv(0.), end, p);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
@@ -100,7 +99,7 @@ int main()
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = std::numeric_limits<double>::infinity();
 
-	r = kv::ode(Lorenz(), x, itvd(0.), end);
+	r = kv::ode(Lorenz(), x, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
@@ -114,7 +113,7 @@ int main()
 	end = 1.;
 	p = kv::ode_param<double>().set_order(15).set_iteration(3).set_epsilon(1e-8);
 
-	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+	r = kv::ode(Lorenz(), x, itv(0.), end, p);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
@@ -124,7 +123,7 @@ int main()
 
 
 	// odelong : connect multiple ode (autostep=true)
-	// odelong(f, x, start, end, order, iter_max=2, verbose=0)
+	// odelong(f, x, start, end, order, ode_param)
 	//
 	// effective parameters:
 	//   order: order of Taylor expansion.
@@ -137,7 +136,7 @@ int main()
 	//         so odelong can't calculate long time.
 	//         for long time calculation, you should use odelong_maffine or others.
 	end = 1.;
-	r = kv::odelong(Lorenz(), x, itvd(0.), end);
+	r = kv::odelong(Lorenz(), x, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 

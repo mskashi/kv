@@ -50,13 +50,13 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
 
 	t.restart();
-	allsol(I, Func());
+	allsol(Func(), I);
 	std::cout << t.elapsed() << " sec\n";
 
 	I.resize(5);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
 
 	t.restart();
-	allsol(I, Yamamura());
+	allsol(Yamamura(), I);
 	std::cout << t.elapsed() << " sec\n";
 }

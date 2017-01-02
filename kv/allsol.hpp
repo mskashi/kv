@@ -62,6 +62,10 @@
 #define USE_SUPERLINEAR 1
 #endif
 
+#ifndef UNIFY_REST
+#define UNIFY_REST 1
+#endif
+
 
 namespace kv {
 
@@ -173,6 +177,22 @@ template <class T> void recovery_inflation2 (ub::vector< interval<T> >& I, const
 	}
 }
 
+#if UNIFY_REST == 1
+// convex hull of interval vector
+template <class T> ub::vector< interval<T> > iv_hull (const ub::vector< interval<T> >& x, const ub::vector< interval<T> >& y) {
+	int i;
+	int s = x.size();
+	ub::vector< interval<T> > r;
+
+	r.resize(s);
+	for (i=0; i<s; i++) {
+		r(i) = interval<T>::hull(x(i), y(i));
+	}
+
+	return r;
+}
+#endif // UNIFY_REST == 1
+
 // **not used**
 // return index of division such that norm of M seems to be smallest
 // under the scaled norm u = rad(I:divided)
@@ -242,8 +262,9 @@ template <class T> int search_optimal_divide2 (const ub::vector< interval<T> >& 
 // find all solution of f in I
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
-allsol (const ub::vector< interval<T> >& I,
+allsol (
 F f,
+const ub::vector< interval<T> >& I,
 int verbose=1,
 T giveup = T(0.),
 std::list< ub::vector < interval<T> > >* rest=NULL
@@ -251,7 +272,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 {
 	std::list< ub::vector < interval<T> > > targets;
 	targets.push_back(I);
-	return allsol_list(targets, f, verbose, giveup, rest);
+	return allsol_list(f, targets, verbose, giveup, rest);
 }
 
 
@@ -259,8 +280,8 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
 allsol_list (
-std::list< ub::vector< interval<T> > > targets,
 F f,
+std::list< ub::vector< interval<T> > > targets,
 int verbose=1,
 T giveup = T(0.),
 std::list< ub::vector < interval<T> > >* rest=NULL
@@ -773,7 +794,28 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 			if (rest != NULL) {
 				#pragma omp critical (rest)
 				{
+				#if UNIFY_REST == 1
+				I1 = I;
+				while (true) {
+					flag = false;
+					p = (*rest).begin();
+					while (p != (*rest).end()) {
+						if (overlap(*p, I1)) {
+							I1 = allsol_sub::iv_hull(I1, *p);
+							p = (*rest).erase(p);
+							// #pragma omp atomic
+							// count_giveup--;
+							flag = true;
+							continue;
+						}
+						p++;
+					}
+					if (flag == false) break;
+				}
+				(*rest).push_back(I1);
+				#else // UNIFY_REST == 1
 				(*rest).push_back(I);
+				#endif // UNIFY_REST == 1
 				}
 			}
 			#pragma omp atomic

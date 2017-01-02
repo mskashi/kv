@@ -7,12 +7,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -50,15 +49,15 @@ template <class T> struct ode_callback_psaplot : ode_callback<T> {
 int main()
 {
 	int i;
-	ub::vector<itvd> ix;
-	bool r;
+	ub::vector<itv> ix;
+	int r;
 	kv::gnuplot g;
 
-	itvd end;
+	itv end;
 
 	ix.resize(3);
 	ix(0) = 15; ix(1) = 15.; ix(2) = 36.;
-	// ix(0) = itvd(15., 15.1); ix(1) = itvd(15., 15.1); ix(2) = itvd(36., 36.1);
+	// ix(0) = itv(15., 15.1); ix(1) = itv(15., 15.1); ix(2) = itv(36., 36.1);
 
 	std::cout.precision(17);
 
@@ -67,7 +66,7 @@ int main()
 	g.screen(0, -50, 1, 50);
 
 	end = 1.;
-	r = kv::odelong_maffine(Lorenz(), ix, itvd(0.), end, kv::ode_param<double>(), kv::ode_callback_psaplot<double>(g, 10));
+	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_psaplot<double>(g, 10));
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

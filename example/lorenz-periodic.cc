@@ -8,9 +8,8 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -21,9 +20,8 @@ class Lorenz {
 	}
 };
 
-class LorenzPoincareSection {
-	public:
-	template <class T> T operator() (ub::vector<T> x){
+struct LorenzPoincareSection {
+	template <class T> T operator() (const ub::vector<T>& x){
 		T y;
 
 		y = x(2) - 27.;
@@ -51,7 +49,7 @@ int main()
 	x(2) = 27.;
 	x(3) = 1.56;
 
-	newton(x, lopo);
+	kv::newton(lopo, x);
 
 	r = kv::krawczyk_approx(lopo, x, ix);
 	if (r) {
@@ -64,7 +62,7 @@ int main()
 	x(2) = 27.;
 	x(3) = 2.306;
 
-	newton(x, lopo);
+	kv::newton(lopo, x);
 
 	r = kv::krawczyk_approx(lopo, x, ix);
 	if (r) {
@@ -80,7 +78,7 @@ int main()
 	// 50次くらいないと通らない。
 	lopo = kv::PoincareMap<Lorenz,LorenzPoincareSection,double>(lo, lops, (itvd)0., kv::ode_param<double>().set_order(50));
 
-	newton(x, lopo);
+	kv::newton(lopo, x);
 
 	r = kv::krawczyk_approx(lopo, x, ix);
 	if (r) {

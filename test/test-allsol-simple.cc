@@ -70,7 +70,7 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	kv::allsol_simple(I, f1, 1);
+	kv::allsol_simple(f1, I, 1);
 	cout << t.elapsed() << " sec\n";
 
 
@@ -80,6 +80,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	kv::allsol_simple(I, f2, 1);
+	kv::allsol_simple(f2, I, 1);
 	cout << t.elapsed() << " sec\n";
 }

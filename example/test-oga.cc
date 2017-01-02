@@ -9,9 +9,8 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Oga {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Oga {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 		T tmp;
 
@@ -39,10 +38,10 @@ int main()
 	x.resize(1);
 	// [-0.76536687071596288,-0.76536685441430041]
 	x(0) = -0.76536686;
-	kv::newton(x, h);
+	kv::newton(h, x);
 	std::cout << x << "\n";
 
 	ix.resize(1);
 	ix(0) = itvd(-0.77, -0.76);
-	kv::allsol(ix, h, 2);
+	kv::allsol(h, ix, 2);
 }

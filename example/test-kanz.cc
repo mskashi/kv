@@ -11,8 +11,7 @@
 
 namespace ub = boost::numeric::ublas;
 
-class Kanz1 {
-	public:
+struct Kanz1 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 
@@ -34,8 +33,7 @@ class Kanz1 {
 	}
 };
 
-class Kanz2 {
-	public:
+struct Kanz2 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 		static const T ep = T(1.);
@@ -53,8 +51,7 @@ class Kanz2 {
 	}
 };
 
-class Kanz3 {
-	public:
+struct Kanz3 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		const T c1 = T("0.9999");
@@ -68,8 +65,7 @@ class Kanz3 {
 	}
 };
 
-class Kanz4 {
-	public:
+struct Kanz4 {
 	template <class T> T g1(T x) {
 		const T c1 = T("10.5");
 		const T c2 = T("11.8");
@@ -94,10 +90,9 @@ class Kanz4 {
 	}
 };
 
-class Kanz5 {
+struct Kanz5 {
 	int n;
 
-	public:
 	Kanz5 (int n = 1) : n(n){}
 	template <class T> T g(T x) {
 		const T c1 = T("10.5");
@@ -122,8 +117,7 @@ class Kanz5 {
 	}
 };
 
-class Kanz6 {
-	public:
+struct Kanz6 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 		const T c = T("3.84");
@@ -150,7 +144,7 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-5., 5.);
 
 	t.restart();
-	allsol(I, Kanz1());
+	allsol(Kanz1(), I);
 	std::cout << t.elapsed() << " sec\n";
 
 	I.resize(4);
@@ -158,21 +152,21 @@ int main()
 	for (i=2; i<4; i++) I(i) = kv::interval<double>(-0.3, 0.3);
 
 	t.restart();
-	allsol(I, Kanz2());
+	allsol(Kanz2(), I);
 	std::cout << t.elapsed() << " sec\n";
 
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-1., 1.);
 
 	t.restart();
-	allsol(I, Kanz3());
+	allsol(Kanz3(), I);
 	std::cout << t.elapsed() << " sec\n";
 
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-5., 5.);
 
 	t.restart();
-	allsol(I, Kanz4());
+	allsol(Kanz4(), I);
 	std::cout << t.elapsed() << " sec\n";
 
 	for (n=3; n<=6; n++) {
@@ -180,7 +174,7 @@ int main()
 		for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-2., 2.);
 
 		t.restart();
-		allsol(I, Kanz5(n));
+		allsol(Kanz5(n), I);
 		std::cout << t.elapsed() << " sec\n";
 	}
 
@@ -188,6 +182,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(0., 1.);
 
 	t.restart();
-	allsol(I, Kanz6());
+	allsol(Kanz6(), I);
 	std::cout << t.elapsed() << " sec\n";
 }

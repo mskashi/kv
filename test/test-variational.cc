@@ -4,12 +4,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -22,13 +21,12 @@ class Lorenz {
 
 namespace kv {
 
-template <class F> class VariationalEq {
-	public:
+template <class F> struct VariationalEq {
 	F f;
 
 	VariationalEq(F func) : f(func) {}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		int s = x.size();
 		int s2 = (int)std::floor((-1.+std::sqrt(1. + 4.*s))/2.+0.5);
 
@@ -75,10 +73,10 @@ template <class F> class VariationalEq {
 
 int main()
 {
-	ub::vector<itvd> x;
-	ub::vector< kv::autodif<itvd> > dx;
-	bool r;
-	itvd end;
+	ub::vector<itv> x;
+	ub::vector< kv::autodif<itv> > dx;
+	int r;
+	itv end;
 
 	std::cout.precision(17);
 
@@ -90,7 +88,7 @@ int main()
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 1.;
 
-	r = kv::ode(f, x, itvd(0.), end);
+	r = kv::ode(f, x, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {
@@ -102,10 +100,10 @@ int main()
 
 	x.resize(3);
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
-	dx = kv::autodif<itvd>::init(x);
+	dx = kv::autodif<itv>::init(x);
 	end = 1.;
 
-	r = kv::ode(f, dx, itvd(0.), end);
+	r = kv::ode(f, dx, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {
@@ -124,7 +122,7 @@ int main()
 	x(9) = 0.; x(10) = 0.; x(11) = 1.;
 	end = 1.;
 
-	r = kv::ode(g, x, itvd(0.), end);
+	r = kv::ode(g, x, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {

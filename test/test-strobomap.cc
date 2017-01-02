@@ -3,13 +3,12 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
-typedef kv::affine<double> afd;
+typedef kv::interval<double> itv;
+typedef kv::affine<double> aff;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1); y(1) = - x(0);
@@ -22,11 +21,10 @@ class Func {
 int main()
 {
 	ub::vector<double> x;
-	ub::vector<itvd> ix;
-	ub::vector<afd> ax;
+	ub::vector<itv> ix;
+	ub::vector<aff> ax;
 	ub::vector< kv::autodif<double> > dx;
-	ub::vector< kv::autodif<itvd> > dix;
-	bool r;
+	ub::vector< kv::autodif<itv> > dix;
 
 	std::cout.precision(17);
 
@@ -34,7 +32,7 @@ int main()
 
 	Func f;
 
-	kv::StroboMap<Func,double> g(f, (itvd)0., (itvd)1.);
+	kv::StroboMap<Func,double> g(f, (itv)0., (itv)1.);
 	kv::FixedPoint< kv::StroboMap<Func,double> > h(g);
 
 	x(0) = 1.;
@@ -46,6 +44,6 @@ int main()
 	std::cout << h(ix) << "\n";
 	ax = x;
 	std::cout << h(ax) << "\n";
-	dix = kv::autodif<itvd>::init(ix);
+	dix = kv::autodif<itv>::init(ix);
 	std::cout << h(dx) << "\n";
 }

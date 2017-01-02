@@ -16,73 +16,73 @@ int main()
 	Matsu1().range(I);
 	std::cout << "Matsu1\n";
 	t.restart();
-	allsol(I, Matsu1());
+	allsol(Matsu1(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Matsu2().range(I);
 	std::cout << "Matsu2\n";
 	t.restart();
-	allsol(I, Matsu2());
+	allsol(Matsu2(), I);
 	cout << t.elapsed() << " sec\n";
 
 	NoSol().range(I);
 	std::cout << "NoSol\n";
 	t.restart();
-	allsol(I, NoSol());
+	allsol(NoSol(), I);
 	cout << t.elapsed() << " sec\n";
 
 	BadCond().range(I);
 	std::cout << "BadCond\n";
 	t.restart();
-	allsol(I, BadCond());
+	allsol(BadCond(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Hansen1().range(I);
 	std::cout << "Hansen1\n";
 	t.restart();
-	allsol(I, Hansen1());
+	allsol(Hansen1(), I);
 	cout << t.elapsed() << " sec\n";
 
 	GE1().range(I);
 	std::cout << "GE1\n";
 	t.restart();
-	allsol(I, GE1());
+	allsol(GE1(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Shinohara1().range(I);
 	std::cout << "Shinohara1\n";
 	t.restart();
-	allsol(I, Shinohara1());
+	allsol(Shinohara1(), I);
 	cout << t.elapsed() << " sec\n";
 
 	// (2,0)が重解らしい?
 	Shinohara2().range(I);
 	std::cout << "Shinohara2\n";
 	t.restart();
-	allsol(I, Shinohara2(), 1, 1e-8);
+	allsol(Shinohara2(), I, 1, 1e-8);
 	cout << t.elapsed() << " sec\n";
 
 	Shinohara3().range(I);
 	std::cout << "Shinohara3\n";
 	t.restart();
-	allsol(I, Shinohara3());
+	allsol(Shinohara3(), I);
 	cout << t.elapsed() << " sec\n";
 
 	ModifiedHimmelblau().range(I);
 	std::cout << "ModifiedHimmelblau\n";
 	t.restart();
-	allsol(I, ModifiedHimmelblau());
+	allsol(ModifiedHimmelblau(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Heihachiro().range(I);
 	std::cout << "Heihachiro\n";
 	t.restart();
-	allsol(I, Heihachiro());
+	allsol(Heihachiro(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Yamamura2().range(7, I);
 	std::cout << "Yamamura2(7)\n";
 	t.restart();
-	allsol(I, Yamamura2());
+	allsol(Yamamura2(), I);
 	cout << t.elapsed() << " sec\n";
 }

@@ -1,3 +1,8 @@
+/*
+ * Examples taken from:
+ *  http://www-sop.inria.fr/coprin/logiciels/ALIAS/Benches/benches.html
+ */
+
 #include <boost/numeric/ublas/vector.hpp>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
@@ -6,7 +11,7 @@
 namespace ub = boost::numeric::ublas;
 
 struct Bellido {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(9);
 		T z1,z2,z3,z4,z5,z6,z7,z8,z9;
 		z1 = x(0); z2 = x(1); z3 = x(2); z4 = x(3);
@@ -39,7 +44,7 @@ struct Bellido {
 
 
 struct Bronstein {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 		T X = x(0);
 		T Y = x(1);
@@ -65,7 +70,7 @@ struct Bronstein {
 
 
 struct Caprasse {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 		T X = x(0);
 		T Y = x(1);
@@ -93,7 +98,7 @@ struct Caprasse {
 
 
 struct Celestial {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 		T p = x(0);
 		T s = x(1);
@@ -131,7 +136,7 @@ struct Celestial {
 
 
 struct Cyclo {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T> &x){
 		ub::vector<T> y(3);
 		T X = x(0);
 		T Y = x(1);
@@ -157,7 +162,7 @@ struct Cyclo {
 
 
 struct Eco9 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(8);
 		T x1 = x(0);
 		T x2 = x(1);
@@ -193,7 +198,7 @@ struct Eco9 {
 
 
 struct Freudenstein {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = -13. + x(0) + ((5.-x(1)) * x(1) - 2.) * x(1);
@@ -215,7 +220,7 @@ struct Freudenstein {
 
 
 struct Geneig {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(6);
 		T x1 = x(0);
 		T x2 = x(1);
@@ -252,7 +257,7 @@ struct Geneig {
 
 
 struct Geneig2 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(6);
 		T x1 = x(0);
 		T x2 = x(1);
@@ -291,7 +296,7 @@ struct Geneig2 {
 
 
 struct Geneig3 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(6);
 		T x1 = x(0);
 		T x2 = x(1);
@@ -328,7 +333,7 @@ struct Geneig3 {
 
 
 struct Himmelblau {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = -42.* x(0) + 2.* x(1)*x(1) + 4.*x(0)*x(1) + 4.*x(0)*x(0)*x(0) - 14.;
@@ -350,7 +355,7 @@ struct Himmelblau {
 
 
 struct Kincox {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 		T c1, c2, s1, s2;
 		c1 = x(0); c2 = x(1); s1 = x(2); s2 = x(3);
@@ -376,7 +381,7 @@ struct Kincox {
 
 
 struct Redeco8 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(8);
 		T x1 = x(0);
 		T x2 = x(1);
@@ -412,7 +417,7 @@ struct Redeco8 {
 
 
 struct Stenger {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0)*x(0) - 4.*x(1);
@@ -434,10 +439,10 @@ struct Stenger {
 
 
 struct Yamamura1 {
-	template <class T> T g(T x){
+	template <class T> T g(const T& x){
 		return 2.5 * x*x*x - 10.5 * x*x + 11.8 * x;
 	}
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int n = x.size();
 		ub::vector<T> y(n);
 		int i;
@@ -465,7 +470,7 @@ struct Yamamura1 {
 };
 
 struct Math_Maple {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		T cx, cy, sx, sy;
 
@@ -490,7 +495,7 @@ struct Math_Maple {
 };
 
 struct Collins {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 		T x2, x3, x4, x5, x6;
 
@@ -514,7 +519,7 @@ struct Collins {
 };
 
 struct Math_Num1 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 		T ch, c;
 
@@ -535,7 +540,7 @@ struct Math_Num1 {
 };
 
 struct Xu {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = 2. * sin(x(0)) + 0.8 * cos(2. * x(0)) + 7. * sin(x(1)) - x(0);
@@ -556,7 +561,7 @@ struct Xu {
 };
 
 struct Box3 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 
 		y(0) = exp(-0.1 * x(0)) - exp(-0.1 * x(1)) - x(2) * (exp(-0.1) - exp(-1.));
@@ -576,7 +581,7 @@ struct Box3 {
 };
 
 struct Rump_univariate {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 
 		y(0) = exp(x(0)) - 2. * x(0) - 1.;
@@ -592,7 +597,7 @@ struct Rump_univariate {
 };
 
 struct AOL_cosh1 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 
 		y(0) = x(0) * cosh(1. / x(0) + x(1)) + x(2) - 1.;
@@ -614,7 +619,7 @@ struct AOL_cosh1 {
 };
 
 struct AOL_log1 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 
 		y(0) = x(0) - 8. * log(x(0)) / log(T(2.)); 
@@ -630,7 +635,7 @@ struct AOL_log1 {
 };
 
 struct DiGregorio {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(3);
 
 		y(0) = -1000. + pow(10. - 40. * cos(x(0)) + x(1), 2) + pow(-40. + 40. * sin(x(0)), 2);
@@ -650,7 +655,7 @@ struct DiGregorio {
 };
 
 struct SMNA90897 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) - 0.0000179297550 * pow(x(1), 2); 
@@ -668,7 +673,7 @@ struct SMNA90897 {
 };
 
 struct SMNA92191 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		T tmp12 = exp(-12 * x(1));
 		T tmp13 = exp(-13 * x(1));
@@ -684,5 +689,63 @@ struct SMNA92191 {
 		x.resize(2);
 		x(0).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
 		x(1).assign(-10., 30.);
+	}
+};
+
+struct Sinxx {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
+		ub::vector<T> y(1);
+
+		y(0) = sin(x(0)) - x(0) / 100; 
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		x.resize(1);
+		x(0).assign(0, 1000);
+	}
+};
+
+struct Sinxx1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
+		ub::vector<T> y(1);
+
+		y(0) = (3*pow(x(0), 3) - 5*x(0) + 2) * pow(sin(x(0)), 2) + (pow(x(0), 3) + 5 * x(0)) * sin(x(0)) - 2 * pow(x(0), 2) - x(0) - 2;
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		x.resize(1);
+		x(0).assign(-10, 10);
+	}
+};
+
+struct Sjirk_Boon {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
+		ub::vector<T> y(4);
+		T c1 = x(0);
+		T c2 = x(1);
+		T p1 = x(2);
+		T p2 = x(3);
+
+		y(0) = 5 + c1 * cos(3 * p1) + c2 * cos(3 * p2);
+		y(1) = -3 + c1 * cos(p1) + c2 * cos(p2);
+		y(2) = c1 * sin(3 * p1) + c2 * sin(3 * p2);
+		y(3) = -4 + c1 * sin(p1) + c2 * sin(p2);
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		x.resize(4);
+		x(0).assign(-100, 100);
+		x(1).assign(-100, 100);
+		x(2).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
+		x(3).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
 	}
 };

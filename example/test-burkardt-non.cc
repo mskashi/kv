@@ -17,20 +17,20 @@ int main()
 	GenRosen().range(10, I);
 	std::cout << "GenRosen\n";
 	t.restart();
-	allsol(I, GenRosen());
+	allsol(GenRosen(), I);
 	cout << t.elapsed() << " sec\n";
 
 	// singular function
 	Powell().range(I);
 	std::cout << "Powell\n";
 	t.restart();
-	allsol(I, Powell(), 1, 1e-10);
+	allsol(Powell(), I, 1, 1e-10);
 	cout << t.elapsed() << " sec\n";
 
 	Wood().range(I);
 	std::cout << "Wood\n";
 	t.restart();
-	allsol(I, Wood());
+	allsol(Wood(), I);
 	cout << t.elapsed() << " sec\n";
 
 	// 重い。SX1でおよそ400秒。解は1つ。
@@ -38,7 +38,7 @@ int main()
 	Watson().range(4, I);
 	std::cout << "Watson\n";
 	t.restart();
-	allsol(I, Watson());
+	allsol(Watson(), I);
 	cout << t.elapsed() << " sec\n";
 #endif
 
@@ -46,49 +46,49 @@ int main()
 	Chebyquad().range(4, I);
 	std::cout << "Chebyquad\n";
 	t.restart();
-	allsol(I, Chebyquad());
+	allsol(Chebyquad(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Brown().range(6, I);
 	std::cout << "Brown\n";
 	t.restart();
-	allsol(I, Brown());
+	allsol(Brown(), I);
 	cout << t.elapsed() << " sec\n";
 
 	DBVP().range(20, I);
 	std::cout << "DBVP\n";
 	t.restart();
-	allsol(I, DBVP());
+	allsol(DBVP(), I);
 	cout << t.elapsed() << " sec\n";
 
 	DIntEq().range(8, I);
 	std::cout << "DIntEq\n";
 	t.restart();
-	allsol(I, DIntEq());
+	allsol(DIntEq(), I);
 	cout << t.elapsed() << " sec\n";
 
 	VDim().range(3, I);
 	std::cout << "VDim\n";
 	t.restart();
-	allsol(I, VDim());
+	allsol(VDim(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Broyden().range(15, I);
 	std::cout << "Broyden\n";
 	t.restart();
-	allsol(I, Broyden());
+	allsol(Broyden(), I);
 	cout << t.elapsed() << " sec\n";
 
 	BroydenBand().range(10, I);
 	std::cout << "BroydenBand\n";
 	t.restart();
-	allsol(I, BroydenBand());
+	allsol(BroydenBand(), I);
 	cout << t.elapsed() << " sec\n";
 
 	Hammarling2x2().range(I);
 	std::cout << "Hammarling2x2\n";
 	t.restart();
-	allsol(I, Hammarling2x2());
+	allsol(Hammarling2x2(), I);
 	cout << t.elapsed() << " sec\n";
 
 #if 0
@@ -96,14 +96,14 @@ int main()
 	Hammarling3x3().range(I);
 	std::cout << "Hammarling3x3\n";
 	t.restart();
-	allsol(I, Hammarling3x3());
+	allsol(Hammarling3x3(), I);
 	cout << t.elapsed() << " sec\n";
 #endif
 
 	P17().range(I);
 	std::cout << "P17\n";
 	t.restart();
-	allsol(I, P17());
+	allsol(P17(), I);
 	cout << t.elapsed() << " sec\n";
 
 #if 0
@@ -111,7 +111,7 @@ int main()
 	P19().range(I);
 	std::cout << "P19\n";
 	t.restart();
-	allsol(I, P19());
+	allsol(P19(), I, 1e-10);
 	cout << t.elapsed() << " sec\n";
 #endif
 
@@ -120,13 +120,13 @@ int main()
 	P20().range(I);
 	std::cout << "P20\n";
 	t.restart();
-	allsol(I, P20());
+	allsol(P20(), I);
 	cout << t.elapsed() << " sec\n";
 #endif
 
 	Chandrasekhar().range(20, I);
 	std::cout << "Chandrasekhar\n";
 	t.restart();
-	allsol(I, Chandrasekhar());
+	allsol(Chandrasekhar(), I);
 	cout << t.elapsed() << " sec\n";
 }

@@ -4,12 +4,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -22,10 +21,10 @@ class Lorenz {
 
 int main()
 {
-	ub::vector<itvd> x;
-	ub::vector< kv::autodif<itvd> > xd;
-	bool r;
-	itvd end;
+	ub::vector<itv> x;
+	ub::vector< kv::autodif<itv> > xd;
+	int r;
+	itv end;
 
 	std::cout.precision(17);
 
@@ -33,11 +32,11 @@ int main()
 	x.resize(3);
 
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
-	xd = kv::autodif<itvd>::init(x);
+	xd = kv::autodif<itv>::init(x);
 	end = std::numeric_limits<double>::infinity();
 
 	// same as ode() in ode.hpp but type of initial value x is "autodif"
-	r = kv::ode(Lorenz(), xd, itvd(0.), end);
+	r = kv::ode(Lorenz(), xd, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {
@@ -46,11 +45,11 @@ int main()
 	}
 
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
-	xd = kv::autodif<itvd>::init(x);
+	xd = kv::autodif<itv>::init(x);
 	end = 1.;
 
 	// same as odelong() in ode.hpp but type of initial value x is "autodif"
-	r = kv::odelong(Lorenz(), xd, itvd(0.), end);
+	r = kv::odelong(Lorenz(), xd, itv(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {

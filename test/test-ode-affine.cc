@@ -7,12 +7,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -27,8 +26,8 @@ class Lorenz {
 int main()
 {
 	ub::vector< kv::affine<double> > x;
-	bool r;
-	itvd end;
+	int r;
+	itv end;
 	int i;
 
 	std::cout.precision(17);
@@ -37,7 +36,7 @@ int main()
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 1.;
 
-	r = kv::odelong_affine(Lorenz(), x, (itvd)0., end);
+	r = kv::odelong_affine(Lorenz(), x, (itv)0., end);
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
 		for (i=0; i<x.size(); i++) {
@@ -53,7 +52,7 @@ int main()
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 1.;
 
-	r = kv::odelong_wrapper(Lorenz(), x, (itvd)0., end);
+	r = kv::odelong_wrapper(Lorenz(), x, (itv)0., end);
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
 		for (i=0; i<x.size(); i++) {

@@ -193,8 +193,8 @@ template <class T> class autodif {
 
 	template <class C> friend typename boost::enable_if_c< kv::acceptable_n<C, autodif>::value, autodif& >::type operator*=(autodif& a, const C& b) {
 		a.v *= b;
-		// a.r *= b;
-		a.r *= T(b); // assist for VC++
+		// a.d *= b;
+		a.d *= T(b); // assist for VC++
 		return a;
 	}
 

@@ -7,13 +7,12 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-template <class TT> class Duffing {
-	public:
+template <class TT> struct Duffing {
 	TT B;
 
 	Duffing(TT B_v): B(B_v) {}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -43,5 +42,5 @@ int main()
 	ix(0) = itvd(-5., 5.);
 	ix(1) = itvd(-5., 5.);
 
-	kv::allsol(ix, h, 2);
+	kv::allsol(h, ix, 2);
 }

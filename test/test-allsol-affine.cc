@@ -50,6 +50,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
 
 	t.restart();
-	kv::allsol_affine(I, Yamamura(), 2);
+	kv::allsol_affine(Yamamura(), I, 2);
 	std::cout << t.elapsed() << " sec\n";
 }

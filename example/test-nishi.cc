@@ -22,8 +22,7 @@ typedef kv::interval<double> itv;
 // Japan J. Indust. Appl. Math. Volume 26, Number 2-3 (2009), 327-336. 
 //
 
-class Nishi {
-	public:
+struct Nishi {
 	template <class T> ub::vector<T> operator() (ub::vector<T> x){
 		ub::vector<T> y(4);
 		int i, j;
@@ -113,6 +112,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	kv::allsol(I, Nishi());
+	kv::allsol(Nishi(), I);
 	std::cout << t.elapsed() << " sec\n";
 }

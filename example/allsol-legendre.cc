@@ -10,7 +10,7 @@ struct Legendre {
 	Legendre(int n) : n(n){
 	}
 
-	template <class T> ub::vector<T> operator()(ub::vector<T> x) {
+	template <class T> ub::vector<T> operator()(const ub::vector<T>& x) {
 		int i;
 		T tmp1, tmp2, tmp3;
 		ub::vector<T> y(1);
@@ -42,5 +42,5 @@ int main()
 
 	I(0) = itvd(-1, 1);
 
-	allsol(I, Legendre(20), 2);
+	allsol(Legendre(20), I, 2);
 }

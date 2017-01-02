@@ -5,12 +5,11 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1); y(1) = - x(0);
@@ -19,9 +18,8 @@ class Func {
 	}
 };
 
-class FuncPoincareSection {
-	public:
-	template <class T> T operator() (ub::vector<T> x){
+struct FuncPoincareSection {
+	template <class T> T operator() (const ub::vector<T>& x){
 		T y;
 
 		y = x(0) - 0.5;
@@ -35,9 +33,8 @@ class FuncPoincareSection {
    x'' - K(1-x^2)x'+x = 0
  */
 
-class VDP {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct VDP {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -47,9 +44,8 @@ class VDP {
 	}
 };
 
-class VDPPoincareSection {
-	public:
-	template <class T> T operator() (ub::vector<T> x){
+struct VDPPoincareSection {
+	template <class T> T operator() (const ub::vector<T>& x){
 		T y;
 
 		y = x(0) - 0.;
@@ -62,9 +58,9 @@ class VDPPoincareSection {
 int main()
 {
 	ub::vector<double> x;
-	ub::vector<itvd> ix;
+	ub::vector<itv> ix;
 	ub::vector< kv::autodif<double> > dx;
-	ub::vector< kv::autodif<itvd> > dix;
+	ub::vector< kv::autodif<itv> > dix;
 	bool r;
 
 	std::cout.precision(17);
@@ -74,7 +70,7 @@ int main()
 
 	FuncPoincareSection ps;
 
-	kv::PoincareMap<Func,FuncPoincareSection,double> po(f, ps, (itvd)0.);
+	kv::PoincareMap<Func,FuncPoincareSection,double> po(f, ps, (itv)0.);
 
 	x.resize(3);
 	x(0) = 0;
@@ -89,18 +85,18 @@ int main()
 	ix = x;
 	std::cout << po(ix) << "\n";
 
-	dix = kv::autodif<itvd>::init(ix);
+	dix = kv::autodif<itv>::init(ix);
 	std::cout << po(dix) << "\n";
 
 
 	VDP vdp;
 	VDPPoincareSection vdpps;
-	kv::PoincareMap<VDP,VDPPoincareSection,double> vdppo(vdp, vdpps, (itvd)0.);
+	kv::PoincareMap<VDP,VDPPoincareSection,double> vdppo(vdp, vdpps, (itv)0.);
 
 	x(0) = 0.; 
 	x(1) = 2.;
 	x(2) = 6;
-	kv::newton(x, vdppo);
+	kv::newton(vdppo, x);
 
 	r = kv::krawczyk_approx(vdppo, x, ix);
 	if (r) {

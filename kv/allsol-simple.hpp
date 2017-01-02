@@ -80,18 +80,18 @@ template <class T> T widthratio_min (const ub::vector< interval<T> >& I, const u
 // find all solution of f in I
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
-allsol_simple (const ub::vector< interval<T> >& I, F f, int verbose=1)
+allsol_simple (F f, const ub::vector< interval<T> >& I, int verbose=1)
 {
 	std::list< ub::vector < interval<T> > > targets;
 	targets.push_back(I);
-	return allsol_list_simple(targets, f, verbose);
+	return allsol_list_simple(f, targets, verbose);
 }
 
 
 // find all solution of f in targets (list of intervals)
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
-allsol_list_simple (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
+allsol_list_simple (F f, std::list< ub::vector< interval<T> > > targets, int verbose=1)
 {
 	int s = (targets.front()).size();
 	ub::vector< interval<T> > I, fc, fi, C, CK, K, mvf, I1, I2;

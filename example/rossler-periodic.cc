@@ -8,13 +8,12 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-template <class TT> class Rossler {
-	public:
+template <class TT> struct Rossler {
 	TT a;
 
 	Rossler (TT a_v): a(a_v) {}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = -x(1) - x(2);
@@ -25,8 +24,7 @@ template <class TT> class Rossler {
 	}
 };
 
-class RosslerPoincareSection {
-	public:
+struct RosslerPoincareSection {
 	template <class T> T operator() (ub::vector<T> x){
 		T y;
 
@@ -55,7 +53,7 @@ int main()
 	x(2) = 0.064;
 	x(3) = 5.73;
 
-	kv::newton(x, h);
+	kv::newton(h, x);
 
 	r = kv::krawczyk_approx(h, x, ix);
 	if (r) {
@@ -70,7 +68,7 @@ int main()
 	x(2) = 0.0296;
 	x(3) = 5.88;
 
-	kv::newton(x, h);
+	kv::newton(h, x);
 
 	r = kv::krawczyk_approx(h, x, ix);
 	if (r) {

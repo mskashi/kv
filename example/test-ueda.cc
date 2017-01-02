@@ -7,9 +7,8 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Ueda {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Ueda {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -49,9 +48,9 @@ int main()
 	ix(0) = itvd(-1., 1.);
 	ix(1) = itvd(-1., 1.);
 
-	// allsol(ix, h1, 2);
-	// allsol(ix, h2, 2);
-	// allsol(ix, h4, 2);
+	// allsol(h1, ix, 2);
+	// allsol(h2, ix, 2);
+	// allsol(h4, ix, 2);
 #endif
 
 	// D2

@@ -7,11 +7,10 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class Kepler {
-	public:
+struct Kepler {
 
 	template <class T> T pow23(T x, T y) {
 			T tmp;
@@ -19,7 +18,7 @@ class Kepler {
 			return tmp * sqrt(tmp);
 	}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(4);
 
 		T px = x(0);
@@ -42,10 +41,10 @@ int main()
 {
 	int i;
 	ub::vector<double> x;
-	ub::vector<itvd> ix;
-	bool r;
+	ub::vector<itv> ix;
+	int r;
 
-	itvd end;
+	itv end;
 
 	x.resize(4);
 	x(0) = 0.3;
@@ -61,7 +60,7 @@ int main()
 	ix = x;
 	// end = std::numeric_limits<double>::infinity();
 	end = 16.;
-	r = kv::odelong_maffine(f, ix, itvd(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
+	r = kv::odelong_maffine(f, ix, itv(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
 	if (!r) {
 		std::cout << "can't calculate verified solution\n";
 	} else {
@@ -74,7 +73,7 @@ int main()
 	ix(4) = 0.; // start time of original problem
 	// end = std::numeric_limits<double>::infinity();
 	end = 25.3;
-	r = kv::odelong_maffine(g, ix, itvd(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
+	r = kv::odelong_maffine(g, ix, itv(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
 	if (!r) {
 		std::cout << "can't calculate verified solution\n";
 	} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef MATRIX_INVERSION_HPP
@@ -7,7 +7,19 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+
+#if defined(BOOST_UBLAS_TYPE_CHECK)
+#define MATRIX_INVERSION_SAVE BOOST_UBLAS_TYPE_CHECK
+#undef BOOST_UBLAS_TYPE_CHECK
+#define BOOST_UBLAS_TYPE_CHECK 0
 #include <boost/numeric/ublas/lu.hpp>
+#undef BOOST_UBLAS_TYPE_CHECK
+#define BOOST_UBLAS_TYPE_CHECK MATRIX_INVERSION_SAVE
+#else
+#define BOOST_UBLAS_TYPE_CHECK 0
+#include <boost/numeric/ublas/lu.hpp>
+#undef BOOST_UBLAS_TYPE_CHECK
+#endif
 
 
 #ifdef USE_LAPACK
@@ -25,9 +37,10 @@ namespace bnb = boost::numeric::bindings;
 #endif
 
 
+namespace kv {
+
 namespace ub = boost::numeric::ublas;
 
-namespace kv {
 
 template <class T>
 bool invert(const ub::matrix<T>& a, ub::matrix<T>& b) {
@@ -38,7 +51,12 @@ bool invert(const ub::matrix<T>& a, ub::matrix<T>& b) {
 
 	b = ub::identity_matrix<T>(tmp.size1());
 
-	ub::lu_substitute(tmp, pm, b);
+	try {
+		ub::lu_substitute(tmp, pm, b);
+	}
+	catch (...) {
+		return false;
+	}
 
 	return true;
 }
