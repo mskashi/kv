@@ -58,7 +58,7 @@ class dd {
 	dd() {
 	}
 
-	template <class C> explicit dd(const C& x, typename boost::enable_if< boost::is_arithmetic<C> >::type* =0) {
+	template <class C> dd(const C& x, typename boost::enable_if< boost::is_arithmetic<C> >::type* =0) {
 		a1 = x;
 		a2 = 0.;
 	}
@@ -68,25 +68,11 @@ class dd {
 		a2 = y;
 	}
 
-	explicit dd(const std::string& x) {
+	dd(const std::string& x) {
 		dd tmp;
 		tmp = stringtodd(x, 0);
 		a1 = tmp.a1;
 		a2 = tmp.a2;
-	}
-
-	template <class C> typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator=(const C& x) {
-		a1 = x;
-		a2 = 0.;
-		return *this;
-	}
-
-	dd& operator=(const std::string& x) {
-		dd tmp;
-		tmp = stringtodd(x, 0);
-		a1 = tmp.a1;
-		a2 = tmp.a2;
-		return *this;
 	}
 
 	friend dd operator+(const dd& x, const dd& y) {
@@ -286,7 +272,7 @@ class dd {
 
 	friend dd sqrt(const dd& x) {
 		dd r;
-		r = sqrt(x.a1);
+		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		return r;
 	}
@@ -385,11 +371,11 @@ class dd {
 
 	friend dd floor(const dd& x) {
 		double z1, z2, z3, z4;
-		z1 = floor(x.a1);
+		z1 = std::floor(x.a1);
 		if (z1 != x.a1) {
 			return dd(z1, 0.);
 		} else {
-			z2 = floor(x.a2);
+			z2 = std::floor(x.a2);
 			twosum(z1, z2, z3, z4);
 			return dd(z3, z4);
 		}
@@ -397,7 +383,7 @@ class dd {
 
 	friend dd frexp(const dd& x, int* m) {
 		double z1, z2;
-		z1 = frexp(x.a1, m);
+		z1 = std::frexp(x.a1, m);
 		if (*m == 0) {
 			return x;
 		}
@@ -598,7 +584,7 @@ class dd {
 				carry /= 10;
 			}
 
-			while (buf[offset + emax] == 0 and emax >= 0) {
+			while (buf[offset + emax] == 0 && emax >= 0) {
 				emax--;
 			}
 		}
@@ -1142,21 +1128,25 @@ template <> class numeric_limits<kv::dd> {
 	public:
 
 	static kv::dd epsilon() {
-		return kv::dd(ldexp(1., -105));
+		static const kv::dd tmp(ldexp(1., -105));
+		return tmp;
 	}
 	static kv::dd infinity() {
-		const double tmp = numeric_limits<double>::infinity();
-		return kv::dd(tmp, tmp);
+		static const double tmp = numeric_limits<double>::infinity();
+		static const kv::dd tmp2(tmp, tmp);
+		return tmp2;
 	}
 
 	static kv::dd max() {
-		const double tmp = numeric_limits<double>::max();
-		return kv::dd(tmp, ldexp(tmp, -54));
+		static const double tmp = numeric_limits<double>::max();
+		static const kv::dd tmp2(tmp, ldexp(tmp, -54));
+		return tmp2;
 	}
 
 	static kv::dd min() {
-		const double tmp = numeric_limits<double>::min();
-		return kv::dd(tmp, 0.);
+		static const double tmp = numeric_limits<double>::min();
+		static const kv::dd tmp2(tmp, 0.);
+		return tmp2;
 	}
 };
 } // namespace std

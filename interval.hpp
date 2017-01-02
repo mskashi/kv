@@ -9,7 +9,6 @@
 
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
-#include "iec.hpp"
 
 
 namespace kv {
@@ -97,56 +96,24 @@ template <class T> class interval {
 	interval() {
 	}
 
-	#if 0
-	template <class C> explicit interval(const C& x, typename boost::enable_if< is_explicitly_convertible<C, T> >::type* =0) {
+	template <class C> interval(const C& x, typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value >::type* =0) {
 		inf = x;
 		sup = x;
 	}
 
-	template <class C1, class C2> interval(const C1& x, const C2& y, typename boost::enable_if_c< is_explicitly_convertible<C1, T>::value && is_explicitly_convertible<C2, T>::value >::type* =0) {
-		inf = x;
-		sup = y;
-	}
-	#endif
-
-	template <class C> explicit interval(const C& x, typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value >::type* =0) {
-		inf = x;
-		sup = x;
-	}
-
-	template <class C1, class C2> interval(const C1& x, const C2& y, typename boost::enable_if_c< (is_explicitly_convertible<C1, T>::value && ! boost::is_convertible<C1, std::string>::value) && (is_explicitly_convertible<C2, T>::value && ! boost::is_convertible<C2, std::string>::value) >::type* =0) {
+	template <class C1, class C2> interval(const C1& x, const C2& y, typename boost::enable_if_c< (boost::is_convertible<C1, T>::value && ! boost::is_convertible<C1, std::string>::value) && (boost::is_convertible<C2, T>::value && ! boost::is_convertible<C2, std::string>::value) >::type* =0) {
 		inf = x;
 		sup = y;
 	}
 
-	explicit interval(const std::string& x) {
+	template <class C> interval(const C& x, typename boost::enable_if< boost::is_convertible<C, std::string> >::type* =0) {
 		inf = rop<T>::fromstring_down(x);
 		sup = rop<T>::fromstring_up(x);
 	}
 
-	interval(const std::string& x, const std::string& y) {
+	template <class C1, class C2> interval(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_convertible<C1, std::string>::value && boost::is_convertible<C2, std::string>::value >::type* =0) {
 		inf = rop<T>::fromstring_down(x);
 		sup = rop<T>::fromstring_up(y);
-	}
-
-	#if 0
-	template <class C> typename boost::enable_if< is_explicitly_convertible<C, T>, interval& >::type operator=(const C& x) {
-		inf = x;
-		sup = x;
-		return *this;
-	}
-	#endif
-
-	template <class C> typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator=(const C& x) {
-		inf = x;
-		sup = x;
-		return *this;
-	}
-
-	interval& operator=(const std::string& x) {
-		inf = rop<T>::fromstring_down(x);
-		sup = rop<T>::fromstring_up(x);
-		return *this;
 	}
 
 	friend interval operator+(const interval& x, const interval& y) {
@@ -160,7 +127,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator+(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator+(const interval& x, const C& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -170,11 +137,11 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator+(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval>::type operator+(const interval& x, const C& y) {
 		return x + interval(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator+(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator+(const C& x, const interval& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -185,7 +152,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator+(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval>::type operator+(const C& x, const interval& y) {
 		return interval(x) + y;
 	}
 
@@ -194,7 +161,7 @@ template <class T> class interval {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator+=(interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator+=(interval& x, const C& y) {
 
 		rop<T>::begin();
 		x.inf = rop<T>::add_down(x.inf + T(y));
@@ -204,7 +171,7 @@ template <class T> class interval {
 		return x;
 	}
 
-	friend interval& operator+=(interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval& >::type operator+=(interval& x, const C& y) {
 		x = x + interval(y);
 		return x;
 	}
@@ -220,7 +187,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator-(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator-(const interval& x, const C& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -231,11 +198,11 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator-(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator-(const interval& x, const C& y) {
 		return x - interval(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator-(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator-(const C& x, const interval& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -246,7 +213,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator-(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator-(const C& x, const interval& y) {
 		return interval(x) - y;
 	}
 
@@ -255,7 +222,7 @@ template <class T> class interval {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator-=(interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator-=(interval& x, const C& y) {
 
 		rop<T>::begin();
 		x.inf = rop<T>::sub_down(x.inf, T(y));
@@ -265,7 +232,7 @@ template <class T> class interval {
 		return x;
 	}
 
-	friend interval& operator-=(interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval& >::type operator-=(interval& x, const C& y) {
 		x = x - interval(y);
 		return x;
 	}
@@ -327,7 +294,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator*(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator*(const interval& x, const C& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -343,11 +310,11 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator*(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator*(const interval& x, const C& y) {
 		return x * interval(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator*(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator*(const C& x, const interval& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -363,7 +330,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator*(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator*(const C& x, const interval& y) {
 		return interval(x) * y;
 	}
 
@@ -372,12 +339,12 @@ template <class T> class interval {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator*=(interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator*=(interval& x, const C& y) {
 		x = x * y;
 		return x;
 	}
 
-	friend interval& operator*=(interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval& >::type operator*=(interval& x, const C& y) {
 		x = x * interval(y);
 		return x;
 	}
@@ -417,7 +384,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator/(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator/(const interval& x, const C& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -436,11 +403,11 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator/(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator/(const interval& x, const C& y) {
 		return x / interval(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator/(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type operator/(const C& x, const interval& y) {
 		interval r;
 
 		rop<T>::begin();
@@ -461,7 +428,7 @@ template <class T> class interval {
 		return r;
 	}
 
-	friend interval operator/(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval >::type operator/(const C& x, const interval& y) {
 		return interval(x) / y;
 	}
 
@@ -470,12 +437,12 @@ template <class T> class interval {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator/=(interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval& >::type operator/=(interval& x, const C& y) {
 		x = x / y;
 		return x;
 	}
 
-	friend interval& operator/=(interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, interval& >::type operator/=(interval& x, const C& y) {
 		x = x / interval(y);
 		return x;
 	}
@@ -518,7 +485,7 @@ template <class T> class interval {
 		                 std::numeric_limits<T>::infinity() );
 	}
 
-	template <class C1, class C2> static typename boost::enable_if_c< (is_explicitly_convertible<C1, T>::value && ! boost::is_convertible<C1, std::string>::value) && (is_explicitly_convertible<C2, T>::value && ! boost::is_convertible<C2, std::string>::value), interval >::type hull(const C1& x, const C2& y) {
+	template <class C1, class C2> static typename boost::enable_if_c< (boost::is_convertible<C1, T>::value && ! boost::is_convertible<C1, std::string>::value) && (boost::is_convertible<C2, T>::value && ! boost::is_convertible<C2, std::string>::value), interval >::type hull(const C1& x, const C2& y) {
 		if (x < y) return interval(x, y);
 		else return interval(y, x);
 	}
@@ -532,7 +499,7 @@ template <class T> class interval {
 		return interval(tmp1, tmp2);
 	}
 
-	template <class C> static typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type hull(const interval& x, const C& y) {
+	template <class C> static typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type hull(const interval& x, const C& y) {
 		T tmp1, tmp2;
 		tmp1 = x.inf;
 		if (y < tmp1) tmp1 = y;
@@ -541,7 +508,7 @@ template <class T> class interval {
 		return interval(tmp1, tmp2);
 	}
 
-	template <class C> static typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type hull(const C& x, const interval& y) {
+	template <class C> static typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, interval >::type hull(const C& x, const interval& y) {
 		T tmp1, tmp2;
 		tmp1 = x;
 		if (y.inf < tmp1) tmp1 = y.inf;
@@ -605,7 +572,7 @@ template <class T> class interval {
 		return interval(0., tmp);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool >::type in(const C& a, const interval& x) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool >::type in(const C& a, const interval& x) {
 		return x.inf <= a && a <= x.sup;
 	}
 
@@ -644,19 +611,19 @@ template <class T> class interval {
 		return x.sup < y.inf;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<(const interval& x, const C& y) {
 		return x.sup < T(y);
 	}
 
-	friend bool operator<(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator<(const interval& x, const C& y) {
 		return x.sup < rop<T>::fromstring_down(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<(const C& x, const interval& y) {
 		return T(x) < y.inf;
 	}
 
-	friend bool operator<(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator<(const C& x, const interval& y) {
 		return rop<T>::fromstring_up(y) < y.inf;
 	}
 
@@ -665,19 +632,19 @@ template <class T> class interval {
 		return x.sup <= y.inf;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<=(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<=(const interval& x, const C& y) {
 		return x.sup <= T(y);
 	}
 
-	friend bool operator<=(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator<=(const interval& x, const C& y) {
 		return x.sup <= rop<T>::fromstring_down(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<=(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator<=(const C& x, const interval& y) {
 		return T(x) <= y.inf;
 	}
 
-	friend bool operator<=(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator<=(const C& x, const interval& y) {
 		return rop<T>::fromstring_up(y) <= y.inf;
 	}
 
@@ -686,19 +653,19 @@ template <class T> class interval {
 		return x.inf > y.sup;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>(const interval& x, const C& y) {
 		return x.inf > T(y);
 	}
 
-	friend bool operator>(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator>(const interval& x, const C& y) {
 		return x.inf > rop<T>::fromstring_up(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>(const C& x, const interval& y) {
 		return T(x) > y.sup;
 	}
 
-	friend bool operator>(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator>(const C& x, const interval& y) {
 		return rop<T>::fromstring_down(y) > y.sup;
 	}
 
@@ -707,19 +674,19 @@ template <class T> class interval {
 		return x.inf >= y.sup;
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>=(const interval& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>=(const interval& x, const C& y) {
 		return x.inf >= T(y);
 	}
 
-	friend bool operator>=(const interval& x, const std::string& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator>=(const interval& x, const C& y) {
 		return x.inf >= rop<T>::fromstring_up(y);
 	}
 
-	template <class C> friend typename boost::enable_if_c< is_explicitly_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>=(const C& x, const interval& y) {
+	template <class C> friend typename boost::enable_if_c< boost::is_convertible<C, T>::value && ! boost::is_convertible<C, std::string>::value, bool>::type operator>=(const C& x, const interval& y) {
 		return T(x) >= y.sup;
 	}
 
-	friend bool operator>=(const std::string& x, const interval& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, std::string>, bool>::type operator>=(const C& x, const interval& y) {
 		return rop<T>::fromstring_down(y) >= y.sup;
 	}
 

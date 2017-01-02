@@ -6,7 +6,6 @@
 
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
-#include "iec.hpp"
 
 
 namespace kv {
@@ -20,20 +19,14 @@ template <class T> class complex {
 	complex() {
 	}
 
-	template <class C> explicit complex(const C& x, typename boost::enable_if< is_explicitly_convertible<C, T> >::type* =0) {
+	template <class C> complex(const C& x, typename boost::enable_if< boost::is_convertible<C, T> >::type* =0) {
 		re = x;
 		im = 0.;
 	}
 
-	template <class C1, class C2> complex(const C1& x, const C2& y, typename boost::enable_if_c< is_explicitly_convertible<C1, T>::value && is_explicitly_convertible<C2, T>::value >::type* =0) {
+	template <class C1, class C2> complex(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_convertible<C1, T>::value && boost::is_convertible<C2, T>::value >::type* =0) {
 		re = x;
 		im = y;
-	}
-
-	template <class C> typename boost::enable_if< is_explicitly_convertible<C, T>, complex& >::type operator=(const C& x) {
-		re = x;
-		im = x;
-		return *this;
 	}
 
 	friend complex operator+(const complex& x, const complex& y) {
@@ -45,7 +38,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator+(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator+(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re + y;
@@ -54,7 +47,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator+(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator+(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x + y.re;
@@ -68,7 +61,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex& >::type operator+=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator+=(complex& x, const C& y) {
 		x.re += y;
 		return x;
 	}
@@ -82,7 +75,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator-(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator-(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re - y;
@@ -91,7 +84,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator-(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator-(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x - y.re;
@@ -105,7 +98,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex& >::type operator-=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator-=(complex& x, const C& y) {
 		x.re -= y;
 		return x;
 	}
@@ -128,7 +121,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator*(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator*(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re * y;
@@ -137,7 +130,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator*(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator*(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x * y.re;
@@ -151,7 +144,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex& >::type operator*=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator*=(complex& x, const C& y) {
 		x.re *= y;
 		x.im *= y;
 		return x;
@@ -168,7 +161,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator/(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator/(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re / y;
@@ -177,7 +170,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex >::type operator/(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator/(const C& x, const complex& y) {
 		complex r;
 		T tmp;
 
@@ -193,7 +186,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< is_explicitly_convertible<C, T>, complex& >::type operator/=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator/=(complex& x, const C& y) {
 		x.re /= y;
 		x.im /= y;
 		return x;

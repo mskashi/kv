@@ -224,7 +224,7 @@ template <> class rop <dd> {
 	static dd sqrt_up(const dd& x) {
 		dd r, r2;
 
-		r = sqrt(x.a1);
+		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_up(x, r);
 
@@ -235,7 +235,7 @@ template <> class rop <dd> {
 	static dd sqrt_down(const dd& x) {
 		dd r, r2;
 
-		r = sqrt(x.a1);
+		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_down(x, r);
 
