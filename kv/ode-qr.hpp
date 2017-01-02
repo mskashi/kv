@@ -28,8 +28,15 @@ namespace kv {
 
 template <class T, class F>
 int
-odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::matrix< interval<T> >* mat = NULL)
-{
+odelong_qr(
+	F f,
+	ub::vector< interval<T> >& init,
+	const interval<T>& start,
+	interval<T>& end,
+	ode_param<T> p = ode_param<T>(),
+	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL,
+	ub::matrix< interval<T> >* mat = NULL
+) {
 	int s = init.size();
 	int i, j;
 
@@ -40,7 +47,7 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	ub::vector< interval<T> > result_i;
 	ub::matrix< interval<T> > result_d;
 
-	ub::vector< interval<T> > x;
+	ub::vector< interval<T> > x, x1;
 	interval<T> t, t1;
 	ub::matrix< interval<T> > M;
 	int r, r2;
@@ -51,8 +58,19 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	ub::matrix< interval<T> > AQ, QAQ, Q2i;
 	ub::vector< interval<T> > y, y1, y2, tmp;
 
+	ub::vector< psa< interval<T> > > result_psa;
+	ub::vector< psa< autodif< interval<T> > > > result_tmp;
+	ub::vector< psa< autodif< interval<T> > > >* result_tmp_p;
+
+
 	if (mat != NULL) {
 		M = ub::identity_matrix< interval<T> >(s);
+	}
+
+	if (callback == NULL) {
+		result_tmp_p = NULL;
+	} else {
+		result_tmp_p = &result_tmp;
 	}
 
 	t = start;
@@ -65,12 +83,14 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	ode_param<T> p2;
 
 	while (1) {
+		x1 = x;
 		t1 = end;
-		Iad = autodif< interval<T> >::init(x);
+
+		Iad = autodif< interval<T> >::init(x1);
 		p2 = p;
 		p2.set_autostep(true);
 		// 自動的にautodif対応のものが呼ばれるはず
-		r = ode(f, Iad, t, t1, p2);
+		r = ode(f, Iad, t, t1, p2, result_tmp_p);
 		if (r == 0) break;
 
 		fc = c;
@@ -111,7 +131,9 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 		bo = vleq(Q2i, tmp, y2, Q2t);
 		if (bo == false) break;
 		y = y1 + y2;
-		x = prod(Q2, y) + c;
+		x1 = prod(Q2, y) + c;
+		// 入れるとわずかに効果があるが、理論的によく分からんのでcomment out
+		// x1 = intersect(x1, result_i);
 		Q = Q2;
 
 		ret_val = 1;
@@ -120,7 +142,19 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 
 		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
-			std::cout << x << "\n";
+			std::cout << x1 << "\n";
+		}
+
+		if (callback != NULL) {
+			// result_tmpからautodif情報を外し、result_psaに格納。
+			result_psa.resize(s);
+			for (i=0; i<s; i++) {
+				result_psa(i).v.resize(result_tmp(i).v.size());
+				for (j=0; j<result_tmp(i).v.size(); j++) {
+					result_psa(i).v(j) = result_tmp(i).v(j).v;
+				}
+			}
+			callback(t, t1, x, x1, result_psa);
 		}
 
 		if (r == 2) {
@@ -129,10 +163,11 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 		}
 
 		t = t1;
+		x = x1;
 	}
 
 	if (ret_val >= 1) {
-		init = x;
+		init = x1;
 		if (mat != NULL) *mat = M;
 	}
 	if (ret_val == 1) {
@@ -145,8 +180,13 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 
 template <class T, class F>
 int
-odelong_qr(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
-{
+odelong_qr(
+	F f,
+	ub::vector< autodif< interval<T> > >& init,
+	const interval<T>& start,
+	interval<T>& end, ode_param<T> p = ode_param<T>(),
+	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL
+) {
 	int s = init.size();
 	int i, j;
 	ub::vector< interval<T> > x;
@@ -157,7 +197,7 @@ odelong_qr(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 	autodif< interval<T> >::split(init, x, M);
 	int s2 = M.size2();
 
-	r = odelong_qr(f, x, start, end2, p, &M_tmp);
+	r = odelong_qr(f, x, start, end2, p, callback, &M_tmp);
 
 	if (r == 0) return 0;
 

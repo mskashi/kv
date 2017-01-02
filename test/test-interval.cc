@@ -104,8 +104,12 @@ int main()
 	// mathematical functions
 	std::cout << sqrt(itvd(2.5, 3.5)) << "\n";
 	std::cout << exp(itvd(2.5, 3.5)) << "\n";
+	std::cout << exp(itvd(-std::numeric_limits<double>::infinity(), 0.)) << "\n";
+	std::cout << exp(itvd(0., std::numeric_limits<double>::infinity())) << "\n";
 	std::cout << expm1(itvd(-0.25, 0.25)) << "\n";
 	std::cout << log(itvd(0.75, 1.25)) << "\n";
+	std::cout << log(itvd(1., std::numeric_limits<double>::infinity())) << "\n";
+	std::cout << log(itvd(0., 1.)) << "\n";
 	std::cout << log1p(itvd(-0.25, 0.25)) << "\n";
 	std::cout << sin(itvd(-0.25, 0.25)) << "\n";
 	std::cout << cos(itvd(-0.25, 0.25)) << "\n";

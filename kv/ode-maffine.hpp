@@ -80,7 +80,9 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 
 	// result_tmpからautodif情報を外し、*result_psaに格納。
 	if (result_psa != NULL) {
+		(*result_psa).resize(n);
 		for (i=0; i<n; i++) {
+			(*result_psa)(i).v.resize(result_tmp(i).v.size());
 			for (j=0; j<result_tmp(i).v.size(); j++) {
 				(*result_psa)(i).v(j) = result_tmp(i).v(j).v;
 			}
@@ -142,11 +144,12 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL,
+	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL,
 	ub::matrix< interval<T> >* mat = NULL
 ) {
+
 	int s = init.size();
-	ub::vector< affine<T> > x;
+	ub::vector< affine<T> > x, x1;
 	interval<T> t, t1;
 	int r;
 	ub::matrix< interval<T> > M, M_tmp;
@@ -164,22 +167,24 @@ odelong_maffine(
 		M = ub::identity_matrix< interval<T> >(s);
 	}
 
-	if (result_psa != NULL) {
-		result_tmp_p = &result_tmp;
-	} else {
+	
+	if (callback == NULL) {
 		result_tmp_p = NULL;
+	} else {
+		result_tmp_p = &result_tmp;
 	}
 
 	x = init;
 	t = start;
 	p.set_autostep(true);
 	while (1) {
+		x1 = x;
 		t1 = end;
 
-		r = ode_maffine(f, x, t, t1, p, M_p, result_tmp_p);
+		r = ode_maffine(f, x1, t, t1, p, M_p, result_tmp_p);
 		if (r == 0) {
 			if (ret_val == 1) {
-				init = x;
+				init = x1;
 				if (mat != NULL) *mat = M;
 				end = t;
 			}
@@ -187,19 +192,25 @@ odelong_maffine(
 		}
 		ret_val = 1;
 		if (mat != NULL) M = prod(M_tmp, M);
+		#if 0
 		if (result_psa != NULL) {
 			(*result_psa).push_back(boost::make_tuple(t, t1, result_tmp));
 		}
+		#endif
 		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
-			std::cout << to_interval(x) << "\n";
+			std::cout << to_interval(x1) << "\n";
+		}
+		if (callback != NULL) {
+			callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
 		}
 		if (r == 2) {
-			init = x;
+			init = x1;
 			if (mat != NULL) *mat = M;
 			return 2;
 		}
 		t = t1;
+		x = x1;
 	}
 }
 
@@ -211,7 +222,7 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL
+	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL
 ) {
 	int s = init.size();
 	int i;
@@ -225,7 +236,7 @@ odelong_maffine(
 
 	x = init;
 
-	r = odelong_maffine(f, x, start, end2, p, result_psa);
+	r = odelong_maffine(f, x, start, end2, p, callback);
 
 	affine<T>::maxnum() = maxnum_save;
 
@@ -245,7 +256,7 @@ odelong_maffine(
 	const interval<T>& start,
 	interval<T>& end,
 	ode_param<T> p = ode_param<T>(),
-	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL
+	void (*callback) (const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) = NULL
 ) {
 	int s = init.size();
 	int i, j;
@@ -264,7 +275,7 @@ odelong_maffine(
 
 	x = xi;
 
-	r = odelong_maffine(f, x, start, end2, p, result_psa, &M_tmp);
+	r = odelong_maffine(f, x, start, end2, p, callback, &M_tmp);
 
 	affine<T>::maxnum() = maxnum_save;
 

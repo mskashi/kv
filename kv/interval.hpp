@@ -931,6 +931,13 @@ template <class T> class interval {
 		interval r, y, remainder;
 		int i;
 
+		if (x == std::numeric_limits<T>::infinity()) {
+			return interval(std::numeric_limits<T>::infinity());
+		}
+		if (x == -std::numeric_limits<T>::infinity()) {
+			return interval(0.);
+		}
+
 		remainder = interval((1./sqrt(constants<T>::e())).lower(), sqrt(constants<T>::e()).upper());
 
 		using std::floor;
@@ -1020,6 +1027,13 @@ template <class T> class interval {
 		int p_i;
 		T p;
 		int i;
+
+		if (x == std::numeric_limits<T>::infinity()) {
+			return std::numeric_limits<T>::infinity();
+		}
+		if (x == 0.) {
+			return -std::numeric_limits<T>::infinity();
+		}
 
 		using std::frexp;
 		x2 = frexp(x, &p_i);
@@ -1243,6 +1257,14 @@ template <class T> class interval {
 		T n;
 		interval r, I2;
 
+		using std::abs;
+		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
+			return hull(-1. , 1.);
+		}
+		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
+			return hull(-1. , 1.);
+		}
+
 		I2 = I;
 		while (I2.lower() <= -pi.upper() || I2.lower() >= pi.upper()) {
 			using std::floor;
@@ -1281,6 +1303,14 @@ template <class T> class interval {
 
 		T n;
 		interval r, I2;
+
+		using std::abs;
+		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
+			return hull(-1. , 1.);
+		}
+		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
+			return hull(-1. , 1.);
+		}
 
 		I2 = I;
 		while (I2.lower() <= -pi.upper() || I2.lower() >= pi.upper()) {
@@ -1328,6 +1358,14 @@ template <class T> class interval {
 
 		T n;
 		interval I2;
+
+		using std::abs;
+		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
+			return hull(-std::numeric_limits<T>::infinity(), std::numeric_limits<T>::infinity());
+		}
+		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
+			return hull(-std::numeric_limits<T>::infinity(), std::numeric_limits<T>::infinity());
+		}
 
 		I2 = I;
 		while (I2.lower() <= -pih.upper() || I2.lower() >= pih.upper()) {
