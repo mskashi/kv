@@ -2,6 +2,9 @@
  * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
+#ifndef RDOUBLE_NOHWROUND_HPP
+#define RDOUBLE_NOHWROUND_HPP
+
 #include <iostream>
 #include <string>
 #include <limits>
@@ -205,7 +208,7 @@ template <> struct rop <double> {
 		static const double th = ldexp(1., -969); // -1074 + 106 - 1
 		static const double c = ldexp(1., 537); // 1074 / 2
 
-		if (x == 0. || y == 0.) return x * y;
+		// if (x == 0. || y == 0.) return x * y;
 
 		twoproduct(x, y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
@@ -238,7 +241,7 @@ template <> struct rop <double> {
 		static const double th = ldexp(1., -969); // -1074 + 106 - 1
 		static const double c = ldexp(1., 537); // 1074 / 2
 
-		if (x == 0. || y == 0.) return x * y;
+		// if (x == 0. || y == 0.) return x * y;
 
 		twoproduct(x, y, r, r2);
 		if (r == std::numeric_limits<double>::infinity()) {
@@ -271,7 +274,6 @@ template <> struct rop <double> {
 		static const double th2 = ldexp(1., 918); // 1023 - 105
 		static const double c1 = ldexp(1., 105); // -969 - (-1074)
 		static const double c2 = ldexp(1., -1074);
-		bool flag = false;
 
 		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
 			return x / y;
@@ -290,7 +292,8 @@ template <> struct rop <double> {
 				xn *= c1;
 				yn *= c1;
 			} else {
-				flag = true;
+				if (xn < 0.) return 0.;
+				else return c2;
 			}
 		}
 
@@ -300,11 +303,6 @@ template <> struct rop <double> {
 			return d;
 		} else if (d == -std::numeric_limits<double>::infinity()) {
 			return -(std::numeric_limits<double>::max)();
-		}
-
-		if (flag) {
-			if (xn < 0.) return 0.;
-			else return c2;
 		}
 
 		twoproduct(d, yn, r, r2);
@@ -321,7 +319,6 @@ template <> struct rop <double> {
 		static const double th2 = ldexp(1., 918); // 1023 - 105
 		static const double c1 = ldexp(1., 105); // -969 - (-1074)
 		static const double c2 = ldexp(1., -1074);
-		bool flag = false;
 
 		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
 			return x / y;
@@ -340,7 +337,8 @@ template <> struct rop <double> {
 				xn *= c1;
 				yn *= c1;
 			} else {
-				flag = true;
+				if (xn < 0.) return -c2;
+				else return 0.;
 			}
 		}
 
@@ -352,11 +350,6 @@ template <> struct rop <double> {
 			return d;
 		}
 
-		if (flag) {
-			if (xn < 0.) return -c2;
-			else return 0.;
-		}
-
 		twoproduct(d, yn, r, r2);
 		if ( r > xn || ((r == xn) && r2 > 0.)) {
 			return pred(d);
@@ -366,9 +359,9 @@ template <> struct rop <double> {
 
 	static double sqrt_up(const double& x) {
 		double r, r2, d;
-		static const double th1 = ldexp(1., -970);
-		static const double c1 = ldexp(1., 104);
-		static const double c2 = ldexp(1., 52);
+		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
+		static const double c1 = ldexp(1., 106); // -969 - (-1074) + 1
+		static const double c2 = ldexp(1., 53); // sqrt(c1)
 
 		d = sqrt(x);
 
@@ -392,9 +385,9 @@ template <> struct rop <double> {
 
 	static double sqrt_down(const double& x) {
 		double r, r2, d;
-		static const double th1 = ldexp(1., -970);
-		static const double c1 = ldexp(1., 104);
-		static const double c2 = ldexp(1., 52);
+		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
+		static const double c1 = ldexp(1., 106); // -969 - (-1074) + 1
+		static const double c2 = ldexp(1., 53); // sqrt(c1)
 
 		d = sqrt(x);
 
@@ -468,3 +461,5 @@ template <> struct rop <double> {
 };
 
 } // namespace kv
+
+#endif // RDOUBLE_NOHWROUND_HPP

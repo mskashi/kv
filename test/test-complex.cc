@@ -42,6 +42,9 @@ int main()
 	#ifndef TEST_DD
 	std::cout << arg(x) << "\n";
 	std::cout << sqrt(x) << "\n";
+	std::cout << pow(x, y) << "\n";
+	std::cout << pow(2., y) << "\n";
+	std::cout << pow(x, 2.) << "\n";
 	std::cout << exp(x) << "\n";
 	std::cout << log(x) << "\n";
 	std::cout << sin(x) << "\n";

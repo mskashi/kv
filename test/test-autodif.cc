@@ -69,7 +69,7 @@ int main()
 	std::cout << a2.d(0) << "\n"; // f'(1.5)
 
 	d1 = 1.5;
-	d2 = testfunc2(d2); // double can be also passed
+	d2 = testfunc2(d1); // double can be also passed
 	std::cout << d2 << "\n"; // f(1.5)
 
 	//
@@ -170,5 +170,5 @@ int main()
 	va4 = testfunc4(va3);
 	std::cout << va4 << ": compressed output\n";
 	va5 = kv::autodif<double>::expand(va4, save);
-	std::cout << va5 << ": expanted output\n";
+	std::cout << va5 << ": expanded output\n";
 }

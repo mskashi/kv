@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -449,6 +449,8 @@ class dd {
 
 	friend dd sqrt(const dd& x) {
 		dd r;
+
+		if (x == 0.) return dd(0.);
 		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		return r;
@@ -629,7 +631,7 @@ template <> class numeric_limits<kv::dd> {
 	}
 	static kv::dd infinity() {
 		static const double tmp = numeric_limits<double>::infinity();
-		static const kv::dd tmp2(tmp, tmp);
+		static const kv::dd tmp2(tmp, 0.);
 		return tmp2;
 	}
 

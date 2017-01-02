@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef COMPLEX_HPP
@@ -243,7 +243,7 @@ template <class T> class complex {
 
 	friend T abs(const complex& x) {
 		using std::sqrt;
-		return sqrt(x.re * x.re + x.im * x.im);
+		return sqrt(pow(x.re, 2) + pow(x.im, 2));
 	}
 
 	friend T arg(const complex& x) {
@@ -252,10 +252,13 @@ template <class T> class complex {
 	}
 
 	friend complex sqrt(const complex& x) {
-		T tmp;
+		T a, r;
+		r = sqrt(abs(x));
+		a = arg(x) * 0.5;
 		using std::sqrt;
-		tmp = sqrt((x.re + abs(x)) * 0.5);
-		return complex(tmp, x.im / (2. * tmp));
+		using std::cos;
+		using std::sin;
+		return complex(r * cos(a), r * sin(a));
 	}
 
 	friend complex pow(const complex& x, int y) {
@@ -280,6 +283,18 @@ template <class T> class complex {
 		}
 
 		return r;
+	}
+
+	friend complex pow(const complex& x, const complex& y) {
+		return exp(y * log(x));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type pow(const complex& x, const C& y) {
+		return exp(y * log(x));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type pow(const C& x, const complex& y) {
+		return exp(y * log(x));
 	}
 
 	friend complex exp(const complex& x) {

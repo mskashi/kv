@@ -1,9 +1,17 @@
 #include <boost/timer.hpp>
 #include <kv/allsol.hpp>
+#ifdef TEST_DD
+#include <kv/dd.hpp>
+#include <kv/rdd.hpp>
+#endif
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+#ifdef TEST_DD
+typedef kv::interval<kv::dd> itv;
+#else
+typedef kv::interval<double> itv;
+#endif
 
 
 //
@@ -93,12 +101,16 @@ int main()
 {
 	int i;
 	boost::timer t;
-	ub::vector<itvd> I;
+	ub::vector<itv> I;
 
+	#ifdef TEST_DD
+	std::cout.precision(34);
+	#else
 	std::cout.precision(17);
+	#endif
 
 	I.resize(4);
-	for (i=0; i<I.size(); i++) I(i) = itvd(-10., 10.);
+	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
 	kv::allsol(I, Nishi());

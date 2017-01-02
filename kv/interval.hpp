@@ -953,6 +953,25 @@ template <class T> class interval {
 		return exp(y * log(x));
 	}
 
+	// power by integer (i is passed by double)
+	static interval ipower(const interval& x, double i) {
+		double tmp;
+		interval xp = x;
+		interval r(1.);
+
+		while (i != 0.) {
+			i *= 0.5;
+			tmp = floor(i);
+			if (tmp != i) {
+				i = tmp;
+				r *= xp;
+			}
+			xp = xp * xp;
+		}
+
+		return r;
+	}
+
 	static interval exp_point(const T& x) {
 		T x_i, x_f, tmp;
 		interval r, y, remainder;
@@ -998,9 +1017,11 @@ template <class T> class interval {
 		}
 
 		if (x_i >= 0.) {
-			r *= pow(constants<interval>::e(), (int)x_i);
+			// r *= pow(constants<interval>::e(), (int)x_i);
+			r *= ipower(constants<interval>::e(), (double)x_i);
 		} else {
-			r /= pow(constants<interval>::e(), -(int)x_i);
+			// r /= pow(constants<interval>::e(), -(int)x_i);
+			r /= ipower(constants<interval>::e(), -(double)x_i);
 		}
 
 		return r;
@@ -1567,7 +1588,11 @@ template <class T> class interval {
 				if (Ix > 0.) {
 					return interval(atan2_point(Iy.lower(), Ix.lower()).lower(), atan2_point(Iy.upper(), Ix.lower()).upper());
 				} else {
-					return interval(atan2_point(Iy.upper(), Ix.upper()).lower(), (pi * 2. + atan2_point(Iy.lower(), Ix.upper())).upper());
+					if (Iy.lower() < 0)
+						return interval(atan2_point(Iy.upper(), Ix.upper()).lower(), (pi * 2. + atan2_point(Iy.lower(), Ix.upper())).upper());
+					else {
+						return interval(atan2_point(Iy.upper(), Ix.upper()).lower(), (atan2_point(Iy.lower(), Ix.upper())).upper());
+					}
 				}
 			} else {
 				if (Ix > 0.) {

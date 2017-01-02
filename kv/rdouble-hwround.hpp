@@ -2,6 +2,9 @@
  * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
+#ifndef RDOUBLE_HWROUND_HPP
+#define RDOUBLE_HWROUND_HPP
+
 #include <iostream>
 #include <string>
 #include <limits>
@@ -148,3 +151,5 @@ template <> struct rop <double> {
 };
 
 } // namespace kv
+
+#endif // RDOUBLE_HWROUND_HPP
