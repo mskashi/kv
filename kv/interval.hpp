@@ -895,27 +895,37 @@ template <class T> class interval {
 		return r;
 	}
 
+	static interval pow_point(const T& x, int y) {
+		interval r, xp;
+
+		r = 1.;
+		xp = (interval)x;
+
+		while (y != 0) {
+			if (y % 2 != 0) {
+				r *= xp;
+			}
+			y /= 2;
+			xp *= xp;
+		}
+
+		return r;
+	}
+
 	friend interval pow(const interval& x, int y) {
 		interval r, xp;
-		int a, tmp;
+		int a;
 
 		if (y == 0) return interval(1.);
 
 		a = (y >= 0) ? y : -y;
 
-		tmp = a;
-		r = 1.;
-		xp = x;
-		while (tmp != 0) {
-			if (tmp % 2 != 0) {
-				r *= xp;
-			}
-			tmp /= 2;
-			xp = xp * xp;
+		if (a % 2 == 0 && in(0., x)) {
+			r = hull(0., pow_point(mag(x), a));
+		} else {
+			r = hull(pow_point(x.lower(), a), pow_point(x.upper(), a));
 		}
-		if (a % 2 == 0 && r.inf < 0.) {
-			r.inf = 0.;
-		}
+
 		if (y < 0) {
 			r = 1. / r;
 		}

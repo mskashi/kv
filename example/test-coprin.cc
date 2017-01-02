@@ -16,7 +16,6 @@ int main()
 
 	std::cout.precision(17);
 
-
 	Bellido().range(I);
 	std::cout << "Bellido\n";
 	t.restart();
@@ -162,6 +161,21 @@ int main()
 	t.restart();
 	allsol(I, DiGregorio());
 	cout << t.elapsed() << " sec\n";
+
+	SMNA90897().range(I);
+	std::cout << "SMNA90897\n";
+	t.restart();
+	allsol(I, SMNA90897());
+	cout << t.elapsed() << " sec\n";
+
+	#if 0
+	// too difficult for our system
+	SMNA92191().range(I);
+	std::cout << "SMNA92191\n";
+	t.restart();
+	allsol(I, SMNA92191(), 2);
+	cout << t.elapsed() << " sec\n";
+	#endif
 
 	// Bellido().range(I);
 	// allsol(I, Bellido());

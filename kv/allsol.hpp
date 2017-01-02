@@ -61,6 +61,9 @@ namespace ub = boost::numeric::ublas;
 #define USE_FI 1
 #endif
 
+#ifndef USE_SUPERLINEAR
+#define USE_SUPERLINEAR 1
+#endif
 
 namespace kv {
 
@@ -734,6 +737,12 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 				// 反復改良
 				while (1) {
 					C = mid(K);
+					#if USE_SUPERLINEAR == 1
+					autodif< interval<T> >::split(f(autodif< interval<T> >::init(K)), fi, fdi);
+					L = mid(fdi);
+					r = invert(L, R);
+					M = E - prod(R, fdi);
+					#endif
 					I1 = C - prod(R, f(C)) + prod(M, K - C);
 					I1 = intersect(K, I1);
 					tmp = widthratio_min(I1, K);

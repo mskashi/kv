@@ -684,3 +684,47 @@ class DiGregorio {
 		x(2).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
 	}
 };
+
+class SMNA90897 {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		ub::vector<T> y(2);
+
+		y(0) = x(0) - 0.0000179297550 * pow(x(1), 2); 
+		y(1) = x(1) - 90. / (1 - x(0));
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(2);
+		x(0).assign(-1000., 0.99);
+		x(1).assign(-1e8, 1e8);
+	}
+};
+
+class SMNA92191 {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		ub::vector<T> y(2);
+		T tmp12 = exp(-12 * x(1));
+		T tmp13 = exp(-13 * x(1));
+
+		y(0) = 0.7 * tmp12 * cos(12 * x(0)) + 0.3 * tmp13 * cos(13 * x(0)) - 32.;
+		y(0) = 0.7 * tmp12 * sin(12 * x(0)) + 0.3 * tmp13 * cos(13 * x(0));
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(2);
+		x(0).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
+		x(1).assign(-10., 30.);
+	}
+};
