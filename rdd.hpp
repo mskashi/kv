@@ -1,25 +1,48 @@
 #ifndef RDD_HPP
 #define RDD_HPP
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <float.h>
+#else
+#include <fenv.h>
+#endif
+
+
 namespace kv {
 
 template <> class rop <dd> {
 	public:
 
 	static void roundnear() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_NEAR, _MCW_RC);
+		#else
 		fesetround(FE_TONEAREST);
+		#endif
 	}
 
 	static void rounddown() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_DOWN, _MCW_RC);
+		#else
 		fesetround(FE_DOWNWARD);
+		#endif
 	}
 
 	static void roundup() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_UP, _MCW_RC);
+		#else
 		fesetround(FE_UPWARD);
+		#endif
 	}
 
 	static void roundchop() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_UP, _MCW_RC);
+		#else
 		fesetround(FE_TOWARDZERO);
+		#endif
 	}
 
 	static void twoproduct_up(const double& a, const double& b, double& x, double& y) {
@@ -30,7 +53,7 @@ template <> class rop <dd> {
 		dd::split(b, b1, b2);
 		roundup();
 		v1 = x; v3 = a1; v4 = a2; v5 =b1; v6 = b2; 
-		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) - v4 * v6;
+		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) + v4 * v6;
 		y = v2;
 		roundnear();
 	}
@@ -43,7 +66,7 @@ template <> class rop <dd> {
 		dd::split(b, b1, b2);
 		rounddown();
 		v1 = x; v3 = a1; v4 = a2; v5 =b1; v6 = b2; 
-		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) - v4 * v6;
+		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) + v4 * v6;
 		y = v2;
 		roundnear();
 	}
@@ -59,9 +82,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd add_down(const dd& x, const dd& y) {
@@ -75,9 +97,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd sub_up(const dd& x, const dd& y) {
@@ -91,9 +112,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd sub_down(const dd& x, const dd& y) {
@@ -107,9 +127,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd mul_up(const dd& x, const dd& y) {
@@ -123,9 +142,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd mul_down(const dd& x, const dd& y) {
@@ -139,9 +157,8 @@ template <> class rop <dd> {
 		z2 = v1;
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd div_up(const dd& x, const dd& y) {
@@ -170,9 +187,8 @@ template <> class rop <dd> {
 		}
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd div_down(const dd& x, const dd& y) {
@@ -201,15 +217,14 @@ template <> class rop <dd> {
 		}
 		roundnear();
 		dd::twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	static dd sqrt_up(const dd& x) {
 		dd r, r2;
 
-		r = std::sqrt(x.a1);
+		r = sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_up(x, r);
 
@@ -220,7 +235,7 @@ template <> class rop <dd> {
 	static dd sqrt_down(const dd& x) {
 		dd r, r2;
 
-		r = std::sqrt(x.a1);
+		r = sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_down(x, r);
 

@@ -85,6 +85,7 @@ int main()
 	std::cout << acosh(itvd(1.5, 2.)) << "\n";
 	std::cout << atanh(itvd(-0.25, 0.25)) << "\n";
 
-	x = itvd("0.1");
+	x = "0.1";
 	std::cout << x << "\n";
+	std::cout << "0.1" * x << "\n";
 }

@@ -1,6 +1,12 @@
 #ifndef RDOUBLE_HPP
 #define RDOUBLE_HPP
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <float.h>
+#else
+#include <fenv.h>
+#endif
+
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -17,19 +23,35 @@ template <> class rop <double> {
 	public:
 
 	static void roundnear() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_NEAR, _MCW_RC);
+		#else
 		fesetround(FE_TONEAREST);
+		#endif
 	}
 
 	static void rounddown() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_DOWN, _MCW_RC);
+		#else
 		fesetround(FE_DOWNWARD);
+		#endif
 	}
 
 	static void roundup() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_UP, _MCW_RC);
+		#else
 		fesetround(FE_UPWARD);
+		#endif
 	}
 
 	static void roundchop() {
+		#if defined(_WIN32) || defined(_WIN64)
+		_controlfp(_RC_CHOP, _MCW_RC);
+		#else
 		fesetround(FE_TOWARDZERO);
+		#endif
 	}
 
 	static double add_up(const double& x, const double& y) {
@@ -233,7 +255,7 @@ template <> class rop <double> {
 				carry /= 10;
 			}
 
-			while (buf[offset + emax] == 0 and emax >= 0) {
+			while (buf[offset + emax] == 0 && emax >= 0) {
 				emax--;
 			}
 		}
@@ -304,7 +326,7 @@ template <> class rop <double> {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -340,7 +362,7 @@ template <> class rop <double> {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -380,7 +402,7 @@ template <> class rop <double> {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -684,7 +706,7 @@ template <> class rop <double> {
 			}
 
 			while (table[offset + table_min] == 0 && table_min < 0) {
-				table_min--;
+				table_min++;
 			}
 		}
 
@@ -730,7 +752,7 @@ template <> class rop <double> {
 				if (sign == 1) {
 					if (mode == -1) {
 					} else if (mode == 0) {
-						if ((int)result[offset2 + i] == 0) {
+						if (result[offset2 + i] == 0) {
 						} else {
 							r += ldexp(1., i+1);
 						}
@@ -741,7 +763,7 @@ template <> class rop <double> {
 					if (mode == -1) {
 						r += ldexp(1., i+1);
 					} else if (mode == 0) {
-						if ((int)result[offset2 + i] == 0) {
+						if (result[offset2 + i] == 0) {
 						} else {
 							r += ldexp(1., i+1);
 						}

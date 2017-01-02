@@ -5,7 +5,6 @@
 #include <limits>
 #include <stdexcept>
 #include <cmath>
-#include <fenv.h>
 #include <cstdio>
 #include <string>
 #include <cctype>
@@ -59,21 +58,35 @@ class dd {
 	dd() {
 	}
 
-	template <class C> dd(const C& x, typename boost::enable_if< boost::is_convertible<C, double> >::type* =0) {
+	template <class C> explicit dd(const C& x, typename boost::enable_if< boost::is_arithmetic<C> >::type* =0) {
 		a1 = x;
 		a2 = 0.;
 	}
 
-	template <class C1, class C2> dd(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_convertible<C1, double>::value && boost::is_convertible<C2, double>::value >::type* =0) {
+	template <class C1, class C2> dd(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_arithmetic<C1>::value && boost::is_arithmetic<C2>::value >::type* =0) {
 		a1 = x;
 		a2 = y;
 	}
 
-	dd(const std::string& x) {
+	explicit dd(const std::string& x) {
 		dd tmp;
 		tmp = stringtodd(x, 0);
 		a1 = tmp.a1;
 		a2 = tmp.a2;
+	}
+
+	template <class C> typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator=(const C& x) {
+		a1 = x;
+		a2 = 0.;
+		return *this;
+	}
+
+	dd& operator=(const std::string& x) {
+		dd tmp;
+		tmp = stringtodd(x, 0);
+		a1 = tmp.a1;
+		a2 = tmp.a2;
+		return *this;
 	}
 
 	friend dd operator+(const dd& x, const dd& y) {
@@ -82,31 +95,28 @@ class dd {
 		twosum(x.a1, y.a1, z1, z2);
 		z2 += x.a2 + y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator+(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator+(const dd& x, const C& y) {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, y, z1, z2);
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator+(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator+(const C& x, const dd& y) {
 		double z1, z2, z3, z4;
 
 		twosum(x, y.a1, z1, z2);
 		z2 += y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	friend dd& operator+=(dd& x, const dd& y) {
@@ -114,7 +124,7 @@ class dd {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd& >::type operator+=(dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd& >::type operator+=(dd& x, const C& y) {
 		x = x + y;
 		return x;
 	}
@@ -125,31 +135,28 @@ class dd {
 		twosum(x.a1, -y.a1, z1, z2);
 		z2 += x.a2 - y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator-(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator-(const dd& x, const C& y) {
 		double z1, z2, z3, z4;
 
 		twosum(x.a1, -y, z1, z2);
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator-(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator-(const C& x, const dd& y) {
 		double z1, z2, z3, z4;
 
 		twosum(x, -y.a1, z1, z2);
 		z2 -= y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	friend dd& operator-=(dd& x, const dd& y) {
@@ -157,7 +164,7 @@ class dd {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd& >::type operator-=(dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd& >::type operator-=(dd& x, const C& y) {
 		x = x - y;
 		return x;
 	}
@@ -177,31 +184,28 @@ class dd {
 		twoproduct(x.a1, y.a1, z1, z2);
 		z2 += x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator*(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator*(const dd& x, const C& y) {
 		double z1, z2, z3, z4;
 
 		twoproduct(x.a1, y, z1, z2);
 		z2 += x.a2 * y;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator*(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator*(const C& x, const dd& y) {
 		double z1, z2, z3, z4;
 
 		twoproduct(x, y.a1, z1, z2);
 		z2 += x * y.a2;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	friend dd& operator*=(dd& x, const dd& y) {
@@ -209,7 +213,7 @@ class dd {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd& >::type operator*=(dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd& >::type operator*=(dd& x, const C& y) {
 		x = x * y;
 		return x;
 	}
@@ -223,12 +227,11 @@ class dd {
 		// z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
 		z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator/(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator/(const dd& x, const C& y) {
 		double z1, z2, z3, z4;
 
 		z1 = x.a1 / y;
@@ -236,12 +239,11 @@ class dd {
 		twoproduct(-z1, y, z3, z4);
 		z2 = (((z3 + x.a1) + x.a2) + z4) / y;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd >::type operator/(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd >::type operator/(const C& x, const dd& y) {
 		double z1, z2, z3, z4;
 
 		z1 = x / y.a1;
@@ -249,9 +251,8 @@ class dd {
 		twoproduct(-z1, y.a1, z3, z4);
 		z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
 		twosum(z1, z2, z3, z4);
-		z1 = z3; z2 = z4;
 
-		return dd(z1, z2);
+		return dd(z3, z4);
 	}
 
 	friend dd& operator/=(dd& x, const dd& y) {
@@ -259,7 +260,7 @@ class dd {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, dd& >::type operator/=(dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, dd& >::type operator/=(dd& x, const C& y) {
 		x = x / y;
 		return x;
 	}
@@ -285,7 +286,7 @@ class dd {
 
 	friend dd sqrt(const dd& x) {
 		dd r;
-		r = std::sqrt(x.a1);
+		r = sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		return r;
 	}
@@ -303,12 +304,12 @@ class dd {
 		else if (x.a1 > y.a1) return false;
 		else return (x.a2 < y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator<(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator<(const dd& x, const C& y) {
 		if (x.a1 < y) return true;
 		else if (x.a1 > y) return false;
 		else return (x.a2 < 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator<(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator<(const C& x, const dd& y) {
 		if (x < y.a1) return true;
 		else if (x > y.a1) return false;
 		else return (0. < y.a2);
@@ -319,12 +320,12 @@ class dd {
 		else if (x.a1 > y.a1) return false;
 		else return (x.a2 <= y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator<=(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator<=(const dd& x, const C& y) {
 		if (x.a1 < y) return true;
 		else if (x.a1 > y) return false;
 		else return (x.a2 <= 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator<=(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator<=(const C& x, const dd& y) {
 		if (x < y.a1) return true;
 		else if (x > y.a1) return false;
 		else return (0. <= y.a2);
@@ -335,12 +336,12 @@ class dd {
 		else if (x.a1 < y.a1) return false;
 		else return (x.a2 > y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator>(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator>(const dd& x, const C& y) {
 		if (x.a1 > y) return true;
 		else if (x.a1 < y) return false;
 		else return (x.a2 > 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator>(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator>(const C& x, const dd& y) {
 		if (x > y.a1) return true;
 		else if (x < y.a1) return false;
 		else return (0. > y.a2);
@@ -351,12 +352,12 @@ class dd {
 		else if (x.a1 < y.a1) return false;
 		else return (x.a2 >= y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator>=(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator>=(const dd& x, const C& y) {
 		if (x.a1 > y) return true;
 		else if (x.a1 < y) return false;
 		else return (x.a2 >= 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator>=(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator>=(const C& x, const dd& y) {
 		if (x > y.a1) return true;
 		else if (x < y.a1) return false;
 		else return (0. >= y.a2);
@@ -365,20 +366,20 @@ class dd {
 	friend bool operator==(const dd& x, const dd& y) {
 		return (x.a1 == y.a1) && (x.a2 == y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator==(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator==(const dd& x, const C& y) {
 		return (x.a1 == y) && (x.a2 == 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator==(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator==(const C& x, const dd& y) {
 		return (x == y.a1) && (0. == y.a2);
 	}
 
 	friend bool operator!=(const dd& x, const dd& y) {
 		return (x.a1 != y.a1) || (x.a2 != y.a2);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator!=(const dd& x, const C& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator!=(const dd& x, const C& y) {
 		return (x.a1 != y) || (x.a2 != 0.);
 	}
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, double>, bool >::type operator!=(const C& x, const dd& y) {
+	template <class C> friend typename boost::enable_if< boost::is_arithmetic<C>, bool >::type operator!=(const C& x, const dd& y) {
 		return (x != y.a1) || (0. != y.a2);
 	}
 
@@ -390,7 +391,7 @@ class dd {
 		} else {
 			z2 = floor(x.a2);
 			twosum(z1, z2, z3, z4);
-			z1 = z3; z2 = z4;
+			return dd(z3, z4);
 		}
 	}
 
@@ -668,7 +669,7 @@ class dd {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -704,7 +705,7 @@ class dd {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -744,7 +745,7 @@ class dd {
 					result_max++;
 					for (i=result_min; i<=result_max; i++) {
 						result[offset2 + i]++;
-						if (result[i] != 10) break;
+						if (result[offset2 + i] != 10) break;
 						result[offset2 + i] = 0;
 					}
 					if (result[offset2 + result_max] == 0) {
@@ -1017,7 +1018,7 @@ class dd {
 			}
 
 			while (table[offset + table_min] == 0 && table_min < 0) {
-				table_min--;
+				table_min++;
 			}
 		}
 
@@ -1067,13 +1068,13 @@ class dd {
 		for (i=result_max; i >= result_min; i--) {
 			if (result_max - i == 53 || i == -1075) {
 				if (sign == 1) {
-					if ((int)result[offset2 + i] == 0) {
+					if (result[offset2 + i] == 0) {
 					} else {
 						r += ldexp(1., i+1);
 						flag = 1;
 					}
 				} else {
-					if ((int)result[offset2 + i] == 0) {
+					if (result[offset2 + i] == 0) {
 					} else {
 						r += ldexp(1., i+1);
 						flag = 1;
@@ -1103,7 +1104,7 @@ class dd {
 				if (sign == 1) {
 					if (mode == -1) {
 					} else if (mode == 0) {
-						if ((int)result[offset2 + i] == 0) {
+						if (result[offset2 + i] == 0) {
 						} else {
 							r2 += ldexp(1., i+1);
 						}
@@ -1114,7 +1115,7 @@ class dd {
 					if (mode == -1) {
 						r2 += ldexp(1., i+1);
 					} else if (mode == 0) {
-						if ((int)result[offset2 + i] == 0) {
+						if (result[offset2 + i] == 0) {
 						} else {
 							r2 += ldexp(1., i+1);
 						}
@@ -1133,33 +1134,6 @@ class dd {
 		return kv::dd(sign * r, sign * r2);
 	}
 };
-
-#if 0
-template <> class constants<dd> {
-	public:
-
-	static interval<dd> pi() {
-		return interval<dd>(
-			7074237752028440. / 2251799813685248., // 3.1415926535897931
-			7074237752028441. / 2251799813685248. // 3.1415926535897936
-		);
-	}
-
-	static interval<dd> e() {
-		return interval<dd>(
-			6121026514868073. / 2251799813685248., // 2.7182818284590451
-			6121026514868074. / 2251799813685248. // 2.7182818284590455
-		);
-	}
-
-	static interval<dd> ln2() {
-		return interval<dd>(
-			6243314768165360. / 9007199254740992., // 0.6931471805599454
-			6243314768165359. / 9007199254740992. // 0.69314718055994529
-		);
-	}
-};
-#endif
 
 } // namespace kv
 
