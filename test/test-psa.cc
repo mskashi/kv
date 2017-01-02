@@ -46,6 +46,8 @@ int main()
 	std::cout << pow(a, 2) << "\n";
 	std::cout << pow(a, -2) << "\n";
 	std::cout << pow(a, a) << "\n";
+	std::cout << tan(a / 100) << "\n";
+	std::cout << tanh(a / 100) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";
@@ -81,6 +83,8 @@ int main()
 	std::cout << pow(a, 2) << "\n";
 	std::cout << pow(a, -2) << "\n";
 	std::cout << pow(a, a) << "\n";
+	std::cout << tan(a / 100) << "\n";
+	std::cout << tanh(a / 100) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";

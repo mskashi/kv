@@ -465,7 +465,11 @@ template <class T> class psa {
 			xn2 = 1./range;
 		}
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -516,7 +520,11 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -571,7 +579,11 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -623,7 +635,11 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -673,7 +689,11 @@ template <class T> class psa {
 			xn2 = 1./(2. * sqrt(range));
 		}
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -722,7 +742,11 @@ template <class T> class psa {
 			xn2 = -1.;
 		}
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -771,7 +795,11 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -822,7 +850,11 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			old_size = history().front().v.size();
+			if (history().size() == 0) {
+				old_size = 0;
+			} else {
+				old_size = history().front().v.size();
+			}
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -882,6 +914,14 @@ template <class T> class psa {
 
 	friend psa pow(const psa& x, const psa& y) {
 		return exp(y * log(x));
+	}
+
+	friend psa tan(const psa& x) {
+		return sin(x) / cos(x);
+	}
+
+	friend psa tanh(const psa& x) {
+		return sinh(x) / cosh(x);
 	}
 
 	friend std::ostream& operator<<(std::ostream& s, const psa& x) {

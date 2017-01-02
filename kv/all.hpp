@@ -12,6 +12,7 @@
 #include <kv/convert.hpp>
 #include <kv/dd.hpp>
 #include <kv/defint.hpp>
+#include <kv/defint-singular.hpp>
 #include <kv/digamma.hpp>
 #include <kv/dka.hpp>
 #include <kv/doubleintegral.hpp>
