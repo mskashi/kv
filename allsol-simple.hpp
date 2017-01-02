@@ -128,7 +128,7 @@ allsol_list (std::list< ub::vector< kv::interval<T> > > targets, F f, int verbos
 		C = mid(I);
 		try {
 			fc = f(C);
-			split_dif(f(init_dif(I)), fi, fdi);
+			kv::autodif< kv::interval<T> >::split(f(kv::autodif< kv::interval<T> >::init(I)), fi, fdi);
 		}
 		catch (std::range_error& e) {
 			goto label;

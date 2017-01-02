@@ -24,7 +24,8 @@ template <> struct rop <double> {
 
 	static double add_down(const double& x, const double& y) {
 		volatile double r, x1 = -x, y1 = -y;
-		r = -(x1 + y1);
+		r = x1 + y1;
+		r = -r;
 		return r;
 	}
 
@@ -36,7 +37,8 @@ template <> struct rop <double> {
 
 	static double sub_down(const double& x, const double& y) {
 		volatile double r, x1 = -x, y1 = -y;
-		r = -(x1 - y1);
+		r = x1 - y1;
+		r = -r;
 		return r;
 	}
 
@@ -48,7 +50,8 @@ template <> struct rop <double> {
 
 	static double mul_down(const double& x, const double& y) {
 		volatile double r, x1 = -x, y1 = y;
-		r = -(x1 * y1);
+		r = x1 * y1;
+		r = -r;
 		return r;
 	}
 
@@ -60,7 +63,8 @@ template <> struct rop <double> {
 
 	static double div_down(const double& x, const double& y) {
 		volatile double r, x1 = -x, y1 = y;
-		r = -(x1 / y1);
+		r = x1 / y1;
+		r = -r;
 		return r;
 	}
 
@@ -112,7 +116,7 @@ template <> struct rop <double> {
 		if (x >= ldexp(1., 1023)) return 1023;
 		if (x < ldexp(1., -1074)) return -1075;
 
-		frexp(x, &i);
+		std::frexp(x, &i);
 
 		return i - 1;
 	}

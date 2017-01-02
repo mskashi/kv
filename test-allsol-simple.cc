@@ -3,6 +3,7 @@
 #include "rdouble.hpp"
 #include "dd.hpp"
 #include "rdd.hpp"
+#include "fpu53.hpp"
 #include <boost/timer.hpp>
 
 using namespace std;
@@ -26,7 +27,7 @@ class Func {
 
 class Yamamura {
 	template <class T> T g(T x){
-		static const T v118 = "11.8";
+		static const T v118(11.8);
 		return 2.5 * x*x*x - 10.5 * x*x + v118 * x;
 	}
 	public:
@@ -53,7 +54,9 @@ typedef kv::interval<kv::dd> itv;
 
 int main()
 {
-	std::cout.precision(32);
+	kv::fpu53();
+
+	std::cout.precision(33);
 
 	int i;
 	boost::timer t;

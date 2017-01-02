@@ -61,7 +61,16 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return -(std::numeric_limits<dd>::max)();
+		}
+		#endif
+
 		return dd(z3, z4);
+
 	}
 
 	static dd add_down(const dd& x, const dd& y) {
@@ -75,6 +84,14 @@ template <> struct rop <dd> {
 		z2 = v1;
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
+
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return (std::numeric_limits<dd>::max)();
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
+		#endif
 
 		return dd(z3, z4);
 	}
@@ -91,6 +108,14 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return -(std::numeric_limits<dd>::max)();
+		}
+		#endif
+
 		return dd(z3, z4);
 	}
 
@@ -105,6 +130,14 @@ template <> struct rop <dd> {
 		z2 = v1;
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
+
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return (std::numeric_limits<dd>::max)();
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
+		#endif
 
 		return dd(z3, z4);
 	}
@@ -121,6 +154,14 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return -(std::numeric_limits<dd>::max)();
+		}
+		#endif
+
 		return dd(z3, z4);
 	}
 
@@ -135,6 +176,14 @@ template <> struct rop <dd> {
 		z2 = v1;
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
+
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return (std::numeric_limits<dd>::max)();
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
+		#endif
 
 		return dd(z3, z4);
 	}
@@ -166,6 +215,14 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return -(std::numeric_limits<dd>::max)();
+		}
+		#endif
+
 		return dd(z3, z4);
 	}
 
@@ -195,6 +252,14 @@ template <> struct rop <dd> {
 		}
 		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
+
+		#if defined(DD_INFINITY)
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return (std::numeric_limits<dd>::max)();
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
+		#endif
 
 		return dd(z3, z4);
 	}

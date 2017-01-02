@@ -4,11 +4,21 @@
 #include <iostream>
 #include <cmath>
 
-#include <boost/type_traits.hpp>
-#include <boost/utility/enable_if.hpp>
+#include "convert.hpp"
 
 
 namespace kv {
+
+
+template <class T> class complex;
+
+template <class C, class T> struct convertible<C, complex<T> > {
+	static const bool value = convertible<C, T>::value || boost::is_same<C, complex<T> >::value;
+};
+template <class C, class T> struct acceptable_n<C, complex<T> > {
+	static const bool value = convertible<C, T>::value;
+};
+
 
 template <class T> class complex {
 	T re;
@@ -17,16 +27,24 @@ template <class T> class complex {
 	public:
 
 	complex() {
+		re = 0.;
+		im = 0.;
 	}
 
-	template <class C> complex(const C& x, typename boost::enable_if< boost::is_convertible<C, T> >::type* =0) {
+	template <class C> explicit complex(const C& x, typename boost::enable_if_c< acceptable_n<C, complex>::value >::type* =0) {
 		re = x;
 		im = 0.;
 	}
 
-	template <class C1, class C2> complex(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_convertible<C1, T>::value && boost::is_convertible<C2, T>::value >::type* =0) {
+	template <class C1, class C2> complex(const C1& x, const C2& y, typename boost::enable_if_c< acceptable_n<C1, complex>::value && acceptable_n<C2, complex>::value >::type* =0) {
 		re = x;
 		im = y;
+	}
+
+	template <class C> typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator=(const C& x) {
+		re = x;
+		im = 0.;
+		return *this;
 	}
 
 	friend complex operator+(const complex& x, const complex& y) {
@@ -38,7 +56,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator+(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator+(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re + y;
@@ -47,7 +65,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator+(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator+(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x + y.re;
@@ -61,7 +79,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator+=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator+=(complex& x, const C& y) {
 		x.re += y;
 		return x;
 	}
@@ -75,7 +93,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator-(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator-(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re - y;
@@ -84,7 +102,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator-(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator-(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x - y.re;
@@ -98,7 +116,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator-=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator-=(complex& x, const C& y) {
 		x.re -= y;
 		return x;
 	}
@@ -121,7 +139,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator*(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator*(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re * y;
@@ -130,7 +148,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator*(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator*(const C& x, const complex& y) {
 		complex r;
 
 		r.re = x * y.re;
@@ -144,7 +162,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator*=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator*=(complex& x, const C& y) {
 		x.re *= y;
 		x.im *= y;
 		return x;
@@ -161,7 +179,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator/(const complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator/(const complex& x, const C& y) {
 		complex r;
 
 		r.re = x.re / y;
@@ -170,7 +188,7 @@ template <class T> class complex {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex >::type operator/(const C& x, const complex& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type operator/(const C& x, const complex& y) {
 		complex r;
 		T tmp;
 
@@ -186,7 +204,7 @@ template <class T> class complex {
 		return x;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, complex& >::type operator/=(complex& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator/=(complex& x, const C& y) {
 		x.re /= y;
 		x.im /= y;
 		return x;
@@ -218,15 +236,18 @@ template <class T> class complex {
 
 
 	friend T abs(const complex& x) {
+		using std::sqrt;
 		return sqrt(x.re * x.re + x.im * x.im);
 	}
 
 	friend T arg(const complex& x) {
+		using std::atan2;
 		return atan2(x.im, x.re);
 	}
 
 	friend complex sqrt(const complex& x) {
 		T tmp;
+		using std::sqrt;
 		tmp = sqrt((x.re + abs(x)) * 0.5);
 		return complex(tmp, x.im / (2. * tmp));
 	}
@@ -257,19 +278,31 @@ template <class T> class complex {
 
 	friend complex exp(const complex& x) {
 		T tmp;
+		using std::exp;
+		using std::cos;
+		using std::sin;
 		tmp = exp(x.re);
 		return complex(tmp * cos(x.im), tmp * sin(x.im));
 	}
 
 	friend complex log(const complex& x) {
+		using std::log;
 		return complex(log(abs(x)), arg(x));
 	}
 
 	friend complex sin(const complex& x) {
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		return complex(sin(x.re) * cosh(x.im), cos(x.re) * sinh(x.im));
 	}
 
 	friend complex cos(const complex& x) {
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		return complex(cos(x.re) * cosh(x.im), - sin(x.re) * sinh(x.im));
 	}
 
@@ -277,6 +310,10 @@ template <class T> class complex {
 		T tx, ty, tmp;
 		tx = 2. * x.re;
 		ty = 2. * x.im;
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		tmp = cos(tx) + cosh(ty);
 		return complex(sin(tx) / tmp, sinh(ty) / tmp);
 	}
@@ -294,10 +331,18 @@ template <class T> class complex {
 	}
 
 	friend complex sinh(const complex& x) {
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		return complex(sinh(x.re) * cos(x.im), cosh(x.re) * sin(x.im));
 	}
 
 	friend complex cosh(const complex& x) {
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		return complex(cosh(x.re) * cos(x.im), sinh(x.re) * sin(x.im));
 	}
 
@@ -305,6 +350,10 @@ template <class T> class complex {
 		T tx, ty, tmp;
 		tx = 2. * x.re;
 		ty = 2. * x.im;
+		using std::sin;
+		using std::cos;
+		using std::cosh;
+		using std::sinh;
 		tmp = cosh(tx) + cos(ty);
 		return complex(sinh(tx) / tmp, sin(ty) / tmp);
 	}

@@ -1,18 +1,32 @@
+// test program for complex.hpp
+
 #include "complex.hpp"
 #include "interval.hpp"
 #include "rdouble.hpp"
 #include "dd.hpp"
 #include "rdd.hpp"
 
-// typedef kv::complex<double> cp;
-// typedef kv::complex<kv::dd> cp;
-// typedef kv::complex< kv::interval<double> > cp;
+#ifdef TEST_D
+typedef kv::complex<double> cp;
+#else
+ #ifdef TEST_DD
+typedef kv::complex<kv::dd> cp;
+ #else
+  #ifdef TEST_ID
+typedef kv::complex< kv::interval<double> > cp;
+  #else
 typedef kv::complex< kv::interval<kv::dd> > cp;
+  #endif // TEST_ID
+ #endif // TEST_DD
+#endif // TEST_D
 
 int main()
 {
-	// std::cout.precision(17);
+	#if defined(TEST_D) || defined(TEST_ID)
+	std::cout.precision(17);
+	#else
 	std::cout.precision(33);
+	#endif
 
 	cp x, y, z;
 
@@ -22,7 +36,10 @@ int main()
 	std::cout << x - y << "\n";
 	std::cout << x * y << "\n";
 	std::cout << x / y << "\n";
+	std::cout << cp::i() << "\n";
 	std::cout << abs(x) << "\n";
+	// we don't have math functions for dd
+	#ifndef TEST_DD
 	std::cout << arg(x) << "\n";
 	std::cout << sqrt(x) << "\n";
 	std::cout << exp(x) << "\n";
@@ -39,4 +56,5 @@ int main()
 	std::cout << asinh(x) << "\n";
 	std::cout << acosh(x) << "\n";
 	std::cout << atanh(x) << "\n";
+	#endif // TEST_DD
 }
