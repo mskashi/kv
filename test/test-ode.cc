@@ -23,33 +23,58 @@ class Lorenz {
 int main()
 {
 	ub::vector<itvd> x;
-	int r;
 	itvd end;
+	kv::ode_param<double> p; // parameter for ode solver
+	int r;
 
 	std::cout.precision(17);
 
 	x.resize(3);
 
 	//
-	// ode(f, x, start, end, order, autostep=true, iter_max=2, result_psa=NULL)
+	// ode(f, x, start, end, ode_param, result_psa=NULL)
 	// 
-	// integrate f from start (0) to end (0.1)
+	// integrate f from start to end
 	// x : initial vector
-	// end time should be given by "writable" interval variable
-	// order (24): order of Taylor expansion.
-	// autostep: use automatic step size control or not
-	// iter_max: maximum number of iterative refinement
-	// the result is overwritten to x.
+	// "x" and "end" must be given by *writable* variable because
+	// the result is returned by *overwrite* "x" and "end".
+	//
+	// effective parameters:
+	//   order: order of Taylor expansion.
+	//   autostep: use automatic step size control or not
+	//   epsilon: relative error tolerance of each step
+	//   iteration: maximum number of iterative refinement
+	//   restart_max: maximum number of restart when verification failed
+	// 
 	// return value: 0 - can't calculate verified solution.
 	//               1 - verified solution is obtained but end time
 	//                   is less than given end time.
-	//                   the reference valiable end is overwritten.
-	//               2 - verified solution is obtained up to given end time
-	// if result_psa != NULL then the verified solution on [start, end] is written
-	// to the variable result_psa.
+	//                   the valiable end is overwritten.
+	//               2 - verified solution is obtained up to given end time.
+	// if result_psa != NULL then the verified solution on [start, end] is written to the variable result_psa.
+
+
+	// automatic step size control (default)
+
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	end = 1.;
+
+	r = kv::ode(Lorenz(), x, itvd(0.), end);
+
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else { 
+		std::cout << x << "\n";
+		std::cout << end << "\n";
+	}
+
+	// fixed step size
+
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 0.1;
-	r = kv::ode(Lorenz(), x, itvd(0.), end, 24, false);
+	p = kv::ode_param<double>().set_autostep(false);
+
+	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
 		std::cout << x << "\n";
@@ -57,19 +82,13 @@ int main()
 	}
 
 	// too long step size
-	x(0) = 15.; x(1) = 15.; x(2) = 36.;
-	end = 10.;
-	r = kv::ode(Lorenz(), x, itvd(0.), end, 24, false);
-	if (!r) std::cout << "can't calculate verified solution\n";
-	else { 
-		std::cout << x << "\n";
-		std::cout << end << "\n";
-	}
 
-	// enable automatic step size control
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = 10.;
-	r = kv::ode(Lorenz(), x, itvd(0.), end, 24, true);
+	p = kv::ode_param<double>().set_autostep(false);
+
+	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
 		std::cout << x << "\n";
@@ -77,23 +96,48 @@ int main()
 	}
 
 	// if you want to progress as long as possible, set end to infinity.
+
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	end = std::numeric_limits<double>::infinity();
-	r = kv::ode(Lorenz(), x, itvd(0.), end, 24, true);
+
+	r = kv::ode(Lorenz(), x, itvd(0.), end);
+
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 
 		std::cout << x << "\n";
 		std::cout << end << "\n";
 	}
 
+	// set many parameters
+
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	end = 1.;
+	p = kv::ode_param<double>().set_order(15).set_iteration(3).set_epsilon(1e-8);
+
+	r = kv::ode(Lorenz(), x, itvd(0.), end, p);
+
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else { 
+		std::cout << x << "\n";
+		std::cout << end << "\n";
+	}
+
+
 	// odelong : connect multiple ode (autostep=true)
 	// odelong(f, x, start, end, order, iter_max=2, verbose=0)
-	// if verbose=1 then become verbose
+	//
+	// effective parameters:
+	//   order: order of Taylor expansion.
+	//   epsilon: used for deciding error tolerance of each step
+	//   iteration: maximum number of iterative refinement
+	//   restart_max: maximum number of restart when verification failed
+	//   verbose: if verbose==1 then become verbose
+	//
 	// NOTICE: odelong don't use any idea to supress so-called wrapping effect.
 	//         so odelong can't calculate long time.
 	//         for long time calculation, you should use odelong_maffine or others.
 	end = 1.;
-	r = kv::odelong(Lorenz(), x, itvd(0.), end, 24);
+	r = kv::odelong(Lorenz(), x, itvd(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else { 

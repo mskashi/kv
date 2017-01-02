@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <cmath>
-#include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -19,21 +18,18 @@
 #include <kv/make-candidate.hpp>
 #include <kv/psa.hpp>
 #include <kv/affine.hpp>
+#include <kv/ode-param.hpp>
 
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
 #endif
 
-#ifndef RESTART_MAX
-#define RESTART_MAX 1
-#endif
-
+#if 0
 #ifndef TOL1
 #define TOL1 0.1
 #endif
 
-#if 0
 #ifndef TOL2
 #define TOL2 100.
 #endif
@@ -51,7 +47,7 @@ namespace kv {
 
 template <class T, class F>
 int
-ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, bool autostep = true, int iter_max = 2, int ep_reduce = 0, int ep_reduce_limit = 0)
+ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int n = init.size();
 	int i, j;
@@ -89,12 +85,14 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 
 	bool save_mode, save_uh, save_rh;
 
-	m = std::numeric_limits<T>::epsilon();
+	m = p.epsilon;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(to_interval(init(i))) * std::numeric_limits<T>::epsilon();
+		m_tmp = norm(to_interval(init(i))) * p.epsilon;
 		if (m_tmp > m) m = m_tmp;
+		#if 0
 		m_tmp = rad(init(i)) * TOL1;
 		if (m_tmp > m) m = m_tmp;
+		#endif
 	}
 	tolerance = m;
 
@@ -112,7 +110,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	psa< affine<T> >::record_history() = true;
 	psa< affine<T> >::history().clear();
 	#endif
-	for (j=0; j<order; j++) {
+	for (j=0; j<p.order; j++) {
 		#if ODE_FAST == 1
 		if (j == 1) psa< affine<T> >::use_history() = true;
 		#endif
@@ -125,10 +123,10 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		x = init + y;
 	}
 
-	if (autostep) {
+	if (p.autostep) {
 		radius = 0.;
 		n_rad = 0;
-		for (j = order; j>=1; j--) {
+		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
 				// m_tmp = norm(to_interval(x(i).v(j)));
@@ -142,7 +140,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			n_rad++;
 			if (n_rad == 2) break;
 		}
-		radius = std::pow((double)tolerance, 1./order) / radius;
+		radius = std::pow((double)tolerance, 1./p.order) / radius;
 	}
 
 	psa< affine<T> >::mode() = 2;
@@ -151,7 +149,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	resized = false;
 
 	while (true) {
-		if (autostep) {
+		if (p.autostep) {
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
@@ -168,19 +166,19 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		psa< affine<T> >::domain() = interval<T>(0., deltat.upper());
 
 		z = x;
-		t = setorder(torg, order);
+		t = setorder(torg, p.order);
 
 		w = f(z, t);
 
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
-			w(i) = setorder(temp, order);
+			w(i) = setorder(temp, p.order);
 		}
 		w = init + w;
 
 		newton_step.resize(n);
 		for (i=0; i<n; i++) {
-			newton_step(i) = norm(to_interval(w(i).v(order) - z(i).v(order)));
+			newton_step(i) = norm(to_interval(w(i).v(p.order) - z(i).v(p.order)));
 		}
 		make_candidate(newton_step);
 
@@ -188,21 +186,21 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		s2i_save.resize(n);
 
 		for (i=0; i<n; i++) {
-			z(i).v(order) += (affine<T>)(newton_step(i) * interval<T>(-1., 1.));
+			z(i).v(p.order) += (affine<T>)(newton_step(i) * interval<T>(-1., 1.));
 			#ifdef ODE_AFFINE_SIMPLE
-			s2i = to_interval(z(i).v(order));
+			s2i = to_interval(z(i).v(p.order));
 			s2i_save(i) = s2i;
-			z(i).v(order) = (affine<T>)s2i;
+			z(i).v(p.order) = (affine<T>)s2i;
 			#else 
-			split(z(i).v(order), maxnum_save, s1, s2);
+			split(z(i).v(p.order), maxnum_save, s1, s2);
 			s2i = to_interval(s2);
 			s1_save(i) = s1;
 			s2i_save(i) = s2i;
-			z(i).v(order) = append(s1, (affine<T>)s2i);
+			z(i).v(p.order) = append(s1, (affine<T>)s2i);
 			#endif
 		}
 
-		if (autostep && resized == false) {
+		if (p.autostep && resized == false) {
 			resized = true;
 			m = 0.;
 			for (i=0; i<n; i++) {
@@ -214,36 +212,36 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			if (m > TOL2) m = TOL2;
 			if (m < TOL3) m = TOL3;
 			#endif
-			radius /= std::pow((double)m, 1. / order);
+			radius /= std::pow((double)m, 1. / p.order);
 			continue;
 		}
 
 		w = f(z, t);
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
-			w(i) = setorder(temp, order);
+			w(i) = setorder(temp, p.order);
 		}
 		w = init + w;
 
 		flag = true;
 		for (i=0; i<n; i++) {
 			#ifdef ODE_AFFINE_SIMPLE
-			s2i = to_interval(w(i).v(order));
+			s2i = to_interval(w(i).v(p.order));
 			flag = flag && subset(s2i, s2i_save(i));
 			s2i_save(i) = s2i;
-			w(i).v(order) = (affine<T>)s2i;
+			w(i).v(p.order) = (affine<T>)s2i;
 			#else
-			split(w(i).v(order), maxnum_save, s1, s2);
+			split(w(i).v(p.order), maxnum_save, s1, s2);
 			s2i = to_interval(s2);
 			flag = flag && subset(to_interval(s1 - s1_save(i)) + s2i, s2i_save(i));
 			s1_save(i) = s1;
 			s2i_save(i) = s2i;
-			w(i).v(order) = append(s1, (affine<T>)s2i);
+			w(i).v(p.order) = append(s1, (affine<T>)s2i);
 			#endif
 		}
 		if (flag) break;
 
-		if (!autostep || restart >= RESTART_MAX) {
+		if (!p.autostep || restart >= p.restart_max) {
 			ret_val = 0;
 			break;
 		}
@@ -252,28 +250,28 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	}
 
 	if (ret_val != 0) {
-		for (j=0; j<iter_max; j++) {
+		for (j=0; j<p.iteration; j++) {
 			w = f(w, t);
 			for (i=0; i<n; i++) {
 				temp = integrate(w(i));
-				w(i) = setorder(temp, order);
+				w(i) = setorder(temp, p.order);
 			}
 			w = init + w;
 
 			for (i=0; i<n; i++) {
 				#ifdef ODE_AFFINE_SIMPLE
-				s2i = to_interval(w(i).v(order));
+				s2i = to_interval(w(i).v(p.order));
 				s2i = intersect(s2i, s2i_save(i));
 				s2i_save(i) = s2i;
-				w(i).v(order) = (affine<T>)s2i;
+				w(i).v(p.order) = (affine<T>)s2i;
 				#else
-				split(w(i).v(order), maxnum_save, s1, s2);
+				split(w(i).v(p.order), maxnum_save, s1, s2);
 				s2i = to_interval(s2);
 				// s2i = intersect(to_interval(s1 - s1_save(i)) + s2i, s2i_save(i));
 				s2i = intersect(to_interval(s1 - s1_save(i)) + s2i_save(i), s2i);
 				s1_save(i) = s1;
 				s2i_save(i) = s2i;
-				w(i).v(order) = append(s1, (affine<T>)s2i);
+				w(i).v(p.order) = append(s1, (affine<T>)s2i);
 				#endif
 			}
 		}
@@ -281,7 +279,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		result.resize(n);
 		for (i=0; i<n; i++) {
 			result(i) = eval(w(i), (affine<T>)deltat);
-			if (ep_reduce == 0) {
+			if (p.ep_reduce == 0) {
 				split(result(i), maxnum_save, s1, s2);
 				s2i = to_interval(s2);
 				s1_save(i) = s1;
@@ -289,14 +287,14 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			}
 		}
 
-		if (ep_reduce == 0) {
+		if (p.ep_reduce == 0) {
 			affine<T>::maxnum() = maxnum_save;
 			for (i=0; i<n; i++) {
 				s1_save(i).resize();
 				result(i) = append(s1_save(i), (affine<T>)s2i_save(i));
 			}
 		} else {
-			epsilon_reduce(result, ep_reduce, ep_reduce_limit);
+			epsilon_reduce(result, p.ep_reduce, p.ep_reduce_limit);
 		}
 
 		init = result;
@@ -312,7 +310,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 
 template <class T, class F>
 int
-odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	ub::vector< affine<T> > x;
@@ -322,10 +320,11 @@ odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, int
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 
-		r = ode_affine(f, x, t, t1, order, true, iter_max, ep_reduce, ep_reduce_limit);
+		r = ode_affine(f, x, t, t1, p);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x;
@@ -334,7 +333,7 @@ odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, int
 			return ret_val;
 		}
 		ret_val = 1;
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << to_interval(x) << "\n";
 		}
@@ -348,7 +347,7 @@ odelong_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, int
 
 template <class T, class F>
 int
-odelong_affine(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_affine(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	int i;
@@ -359,7 +358,7 @@ odelong_affine(F f, ub::vector< interval<T> >& init, const interval<T>& start, i
 	affine<T>::maxnum() = 0;
 	x = init;
 
-	r = odelong_affine(f, x, start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+	r = odelong_affine(f, x, start, end2, p);
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));

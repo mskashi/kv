@@ -920,6 +920,7 @@ template <class T> class affine {
 
 		}
 
+		using std::sqrt;
 		a = 1. /(sqrt(l) + sqrt(u));
 		tmp = a;
 		range = 1. / (4. * tmp);
@@ -1045,6 +1046,7 @@ template <class T> class affine {
 		l = I.lower();
 		u = I.upper();
 
+		using std::exp;
 		if (u == l) a = exp(u);
 		else a = (exp(u) - exp(l)) / (u - l);
 		tmp = a;
@@ -1112,6 +1114,7 @@ template <class T> class affine {
 			throw std::range_error("affine: log of nagative value");
 		}
 
+		using std::log;
 		if (u == l) a = 1. / u;
 		else a = (log(u) - log(l)) / (u - l);
 		tmp = a;
@@ -1294,7 +1297,7 @@ template <class T> class ep_reduce_v {
 		int s = v.size();
 		int i, j;
 		T m1, m2, tmp;
-		using namespace std;
+		using std::abs;
 		m1 = abs(v(0));
 		m2 = abs(v(1));
 		if (m2 > m1) {
@@ -1367,7 +1370,7 @@ template <class T> inline void epsilon_reduce(ub::vector< affine<T> >& x, int n,
 		tmp = 0.;
 		rop<T>::begin();
 		for (j=n-s; j<m; j++) {
-			using namespace std;
+			using std::abs;
 #ifdef EP_REDUCE_REVERSE
 			tmp = rop<T>::add_up(tmp, abs(pa[m-1-j]->v(i)));
 #else

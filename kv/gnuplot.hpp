@@ -7,6 +7,14 @@
 
 #include <stdio.h>
 
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#define DEFAULT_GNUPLOT "\"C:\\Program Files (x86)\\gnuplot\\bin\\gnuplot.exe\""
+#else
+#define DEFAULT_GNUPLOT "gnuplot"
+#endif
+
 namespace kv {
 
 class gnuplot {
@@ -14,7 +22,7 @@ class gnuplot {
 
 	FILE *p;
 
-	bool open(const char *s, const char *term=NULL, const char *output=NULL) {
+	bool open(const char *s=DEFAULT_GNUPLOT, const char *term=NULL, const char *output=NULL) {
 		p = popen(s, "w");
 		if (p == NULL) return false;
 		if (term != NULL) {
@@ -42,7 +50,7 @@ class gnuplot {
 	}
 
 	void line(double x1, double y1, double x2, double y2, int t=1) const {
-		fprintf(p, "plot '-' notitle with lines %d\n", t);
+		fprintf(p, "plot '-' notitle with lines linetype %d\n", t);
 		fprintf(p, "%.17f %.17f\n", x1, y1);
 		fprintf(p, "%.17f %.17f\n", x2, y2);
 		#if 0
@@ -54,14 +62,14 @@ class gnuplot {
 	}
 
 	void point(double x, double y, int t=6) const {
-		fprintf(p, "plot '-' notitle with points %d\n", t);
+		fprintf(p, "plot '-' notitle with points linetype %d\n", t);
 		fprintf(p, "%.17f %.17f\n", x, y);
 		fprintf(p, "end\n");
 		fflush(p);
 	}
 
 	void rect(double x1, double y1, double x2, double y2, int t=1) const {
-		fprintf(p, "plot '-' notitle with lines %d\n", t);
+		fprintf(p, "plot '-' notitle with lines linetype %d\n", t);
 		fprintf(p, "%.17f %.17f\n", x1, y1);
 		fprintf(p, "%.17f %.17f\n", x1, y2);
 		fprintf(p, "%.17f %.17f\n", x2, y2);
@@ -72,7 +80,7 @@ class gnuplot {
 	}
 
 	void rectf(double x1, double y1, double x2, double y2, int t=2) const {
-		fprintf(p, "plot '-' notitle with filledcurves %d\n", t);
+		fprintf(p, "plot '-' notitle with filledcurves linetype %d\n", t);
 		fprintf(p, "%.17f %.17f\n", x1, y1);
 		fprintf(p, "%.17f %.17f\n", x1, y2);
 		fprintf(p, "%.17f %.17f\n", x2, y2);
@@ -84,7 +92,7 @@ class gnuplot {
 
 	void ellipse(double cx, double cy, double rx, double ry, int t=1) const {
 		fprintf(p, "set parametric\n");
-		fprintf(p, "plot [0:2*pi] %.17f+%.17f*cos(t), %.17f+%.17f*sin(t) notitle with lines %d\n", cx, rx, cy, ry, t);
+		fprintf(p, "plot [0:2*pi] %.17f+%.17f*cos(t), %.17f+%.17f*sin(t) notitle with lines linetype %d\n", cx, rx, cy, ry, t);
 		fprintf(p, "unset parametric\n");
 		fflush(p);
 	}
@@ -95,7 +103,7 @@ class gnuplot {
 
 	void ellipsef(double cx, double cy, double rx, double ry, int t=2) const {
 		fprintf(p, "set parametric\n");
-		fprintf(p, "plot [0:2*pi] %.17f+%.17f*cos(t), %.17f+%.17f*sin(t) notitle with filledcurves %d\n", cx, rx, cy, ry, t);
+		fprintf(p, "plot [0:2*pi] %.17f+%.17f*cos(t), %.17f+%.17f*sin(t) notitle with filledcurves linetype %d\n", cx, rx, cy, ry, t);
 		fprintf(p, "unset parametric\n");
 		fflush(p);
 	}

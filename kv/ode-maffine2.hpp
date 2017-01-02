@@ -16,9 +16,9 @@
 #include <kv/interval-vector.hpp>
 #include <kv/psa.hpp>
 #include <kv/affine.hpp>
-
 #include <kv/ode.hpp>
 #include <kv/ode-autodif.hpp>
+#include <kv/ode-param.hpp>
 
 
 #ifndef ODE_FAST
@@ -149,7 +149,7 @@ ode_onlytype1(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>
 
 template <class T, class F>
 int
-ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, bool autostep = true, int iter_max = 2, int ep_reduce = 0, int ep_reduce_limit = 0)
+ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int n = init.size();
 	int i, j;
@@ -187,34 +187,34 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 	}
 
 	Idummy = I;
-	r = ode(f, Idummy, start, end2, order, autostep, iter_max, &psa_result);
+	r = ode(f, Idummy, start, end2, p, &psa_result);
 	if (r == 0) return 0;
 
 	deltat = end2 - start;
 	deltat_n = 1.;
-	for (i=0; i<order; i++) deltat_n *= deltat;
+	for (i=0; i<p.order; i++) deltat_n *= deltat;
 
 	I2.resize(n);
 	for (i=0; i<n; i++) {
-		I2(i) = psa_result(i).v(order) * deltat_n;
+		I2(i) = psa_result(i).v(p.order) * deltat_n;
 	}
 
 	Iad = autodif< interval<T> >::init(I);
 	// 自動的にautodif対応のものが呼ばれるはず
-	ode_onlytype1(f, Iad, start, end2, order-1);
+	ode_onlytype1(f, Iad, start, end2, p.order-1);
 
 	fc = c;
-	ode_onlytype1(f, fc, start, end2, order-1);
+	ode_onlytype1(f, fc, start, end2, p.order-1);
 
 	autodif< interval<T> >::split(Iad, result_i, result_d);
 
-	if (ep_reduce == 0) {
+	if (p.ep_reduce == 0) {
 		maxnum_save = affine<T>::maxnum();
 	}
 
 	result = I2 + fc + prod(result_d, init - c);
 
-	if (ep_reduce == 0) {
+	if (p.ep_reduce == 0) {
 		s1_save.resize(n);
 		s2i_save.resize(n);
 		for (i=0; i<n; i++) {
@@ -230,7 +230,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 			result(i) = append(s1_save(i), (affine<T>)s2i_save(i));
 		}
 	} else {
-		epsilon_reduce(result, ep_reduce, ep_reduce_limit);
+		epsilon_reduce(result, p.ep_reduce, p.ep_reduce_limit);
 	}
 
 	init = result;
@@ -241,7 +241,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 
 template <class T, class F>
 int
-odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	ub::vector< affine<T> > x;
@@ -251,10 +251,11 @@ odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, i
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 
-		r = ode_maffine2(f, x, t, t1, order, true, iter_max, ep_reduce, ep_reduce_limit);
+		r = ode_maffine2(f, x, t, t1, p);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x;
@@ -263,7 +264,7 @@ odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, i
 			return ret_val;
 		}
 		ret_val = 1;
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << to_interval(x) << "\n";
 		}
@@ -277,7 +278,7 @@ odelong_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, i
 
 template <class T, class F>
 int
-odelong_maffine2(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_maffine2(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	int i;
@@ -290,7 +291,7 @@ odelong_maffine2(F f, ub::vector< interval<T> >& init, const interval<T>& start,
 	affine<T>::maxnum() = 0;
 	x = init;
 
-	r = odelong_maffine2(f, x, start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+	r = odelong_maffine2(f, x, start, end2, p);
 
 	affine<T>::maxnum() = maxnum_save;
 

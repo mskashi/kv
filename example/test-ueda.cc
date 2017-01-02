@@ -31,17 +31,17 @@ int main()
 
 	Ueda f;
 
-	kv::StroboMap<Ueda,itvd> g1(f, (itvd)0., kv::constants<double>::pi() * 2., 12);
+	kv::StroboMap<Ueda,double> g1(f, (itvd)0., kv::constants<double>::pi() * 2.);
 
-	kv::FixedPoint< kv::StroboMap<Ueda,itvd> > h1(g1);
+	kv::FixedPoint< kv::StroboMap<Ueda,double> > h1(g1);
 
-	kv::StroboMap<Ueda,itvd> g2(f, (itvd)0., kv::constants<double>::pi() * 4., 12);
+	kv::StroboMap<Ueda,double> g2(f, (itvd)0., kv::constants<double>::pi() * 4.);
 
-	kv::FixedPoint< kv::StroboMap<Ueda,itvd> > h2(g2);
+	kv::FixedPoint< kv::StroboMap<Ueda,double> > h2(g2);
 
-	kv::StroboMap<Ueda,itvd> g4(f, (itvd)0., kv::constants<double>::pi() * 8., 12);
+	kv::StroboMap<Ueda,double> g4(f, (itvd)0., kv::constants<double>::pi() * 8.);
 
-	kv::FixedPoint< kv::StroboMap<Ueda,itvd> > h4(g4);
+	kv::FixedPoint< kv::StroboMap<Ueda,double> > h4(g4);
 
 
 #if 0
@@ -52,15 +52,6 @@ int main()
 	// allsol(ix, h1, 2);
 	// allsol(ix, h2, 2);
 	// allsol(ix, h4, 2);
-#endif
-
-#if 0
-	x(0) = 0.074937;
-	x(1) = 0.254889;
-	ix = x;
-	std::cout << h2(ix) << "\n";
-	dx = init_dif(ix);
-	std::cout << h2(dx) << "\n";
 #endif
 
 	// D2

@@ -168,7 +168,8 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a.v * b;
-		r.d = T(b) * a.d;
+		// r.d = b * a.d;
+		r.d = T(b) * a.d; // assist for VC++
 
 		return r;
 	}
@@ -177,7 +178,8 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a * b.v;
-		r.d = T(a) * b.d;
+		// r.d = a * b.d;
+		r.d = T(a) * b.d; // assist for VC++
 
 		return r;
 	}
@@ -189,7 +191,8 @@ template <class T> class autodif {
 
 	template <class C> friend typename boost::enable_if_c< kv::acceptable_n<C, autodif>::value, autodif& >::type operator*=(autodif& a, const C& b) {
 		a.v *= b;
-		a.r *= T(b);
+		// a.r *= b;
+		a.r *= T(b); // assist for VC++
 		return a;
 	}
 
@@ -213,7 +216,8 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a.v / b;
-		r.d = a.d / T(b);
+		// r.d = a.d / b;
+		r.d = a.d / T(b); // assist for VC++
 
 		return r;
 	}
@@ -234,7 +238,8 @@ template <class T> class autodif {
 
 	template <class C> friend typename boost::enable_if_c< kv::acceptable_n<C, autodif>::value, autodif& >::type operator/=(autodif& a, const C& b) {
 		a.v /= b;
-		a.d /= T(b);
+		// a.d /= b;
+		a.d /= T(b); // assist for VC++
 		return a;
 	}
 

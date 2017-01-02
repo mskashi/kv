@@ -32,9 +32,9 @@ int main()
 
 	Oga f;
 
-	kv::StroboMap<Oga,itvd> g(f, (itvd)0., (itvd)10., 12);
+	kv::StroboMap<Oga,double> g(f, (itvd)0., (itvd)10.);
 
-	kv::Shooting_TPBVP< kv::StroboMap<Oga,itvd>, itvd> h(g, (itvd)1., (itvd)0., 1, 0);
+	kv::Shooting_TPBVP< kv::StroboMap<Oga,double>, itvd> h(g, (itvd)1., (itvd)0., 1, 0);
 
 	x.resize(1);
 	// [-0.76536687071596288,-0.76536685441430041]

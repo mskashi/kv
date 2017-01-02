@@ -10,17 +10,6 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1); y(1) = - x(0);
-
-		return y;
-	}
-};
-
 class Lorenz {
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
@@ -34,84 +23,42 @@ class Lorenz {
 	}
 };
 
-class VdP {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = 10000.* (1. - x(0)*x(0))*x(1) - x(0);
-
-		return y;
-	}
-};
-
-class Nobi {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = x(0) - x(0)*x(0)*x(0);
-
-		return y;
-	}
-};
 
 int main()
 {
 	ub::vector< kv::affine<double> > x;
 	bool r;
-	int i, j;
-	itvd tmp;
-
-	itvd start, end;
-
-	// x.resize(2);
-	// x(0) = itvd(1., 1.);
-	// x(1) = itvd(0., 0.);
-
-	x.resize(3);
-	// x(0) = 15.; x(1) = 15.; x(2) = 36.;
-	x(0) = (itvd)15.;
-	x(1) = (itvd)15.;
-	x(2) = (itvd)36.;
-	// x(0) = itvd(15-1e-4, 15+1e-4);
-	// x(1) = itvd(15-1e-4, 15+1e-4);
-	// x(2) = itvd(36-1e-4, 36+1e-4);
-
-	// x.resize(2);
-	// x(0) = (itvd)2.;
-	// x(1) = (itvd)0.;
-
-	// x.resize(2);
-	// x(0) = (itvd)0.;
-	// x(1) = (itvd)4.;
-	// x(0) = itvd(0-0.05, 0+0.05);
-	// x(1) = itvd(4-0.05, 4+0.05);
+	itvd end;
+	int i;
 
 	std::cout.precision(17);
 
-	#if 0
-	start = 0.;
-	while(1) {
-		end = std::numeric_limits<double>::infinity();
-		// r = ode_affine(Lorenz(), x, start, end, 12);
-		r = ode_wrapper(Lorenz(), x, start, end, 12);
-		if (!r) {
-			std::cout << "No Solution\n";
-			break;
+	x.resize(3);
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	end = 1.;
+
+	r = kv::odelong_affine(Lorenz(), x, (itvd)0., end);
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else { 
+		for (i=0; i<x.size(); i++) {
+			std::cout << to_interval(x) << "\n";
 		}
-		std::cout << "t: " << end << "\n";
-		for (j=0; j<x.size(); j++) {
-			tmp = to_interval(x(j));
-			std::cout << tmp << "\n";
-			std::cout << width(tmp) << "\n";
-		}
-		start = end;
+		std::cout << end << "\n";
 	}
-	#endif
-	end = std::numeric_limits<double>::infinity();
-	r = kv::odelong_affine(Lorenz(), x, start, end, 12, 2, 1);
-	r = kv::odelong_wrapper(Lorenz(), x, start, end, 12, 2, 1);
+
+
+	// reset maxnum of affine to speed up
+	kv::affine<double>::maxnum() = 0;
+
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	end = 1.;
+
+	r = kv::odelong_wrapper(Lorenz(), x, (itvd)0., end);
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else { 
+		for (i=0; i<x.size(); i++) {
+			std::cout << to_interval(x) << "\n";
+		}
+		std::cout << end << "\n";
+	}
 }

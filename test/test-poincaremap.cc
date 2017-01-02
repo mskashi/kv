@@ -74,7 +74,7 @@ int main()
 
 	FuncPoincareSection ps;
 
-	kv::PoincareMap<Func,FuncPoincareSection,itvd> po(f, ps, (itvd)0., 12);
+	kv::PoincareMap<Func,FuncPoincareSection,double> po(f, ps, (itvd)0.);
 
 	x.resize(3);
 	x(0) = 0;
@@ -95,7 +95,7 @@ int main()
 
 	VDP vdp;
 	VDPPoincareSection vdpps;
-	kv::PoincareMap<VDP,VDPPoincareSection,itvd> vdppo(vdp, vdpps, (itvd)0., 12);
+	kv::PoincareMap<VDP,VDPPoincareSection,double> vdppo(vdp, vdpps, (itvd)0.);
 
 	x(0) = 0.; 
 	x(1) = 2.;

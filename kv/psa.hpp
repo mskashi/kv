@@ -333,7 +333,8 @@ template <class T> class psa {
 				r.v(i) = a.v(i) * b;
 			}
 		} else {
-			r.v = a.v * b;
+			// r.v = a.v * b;
+			r.v = a.v * T(b); // assist for VC++
 		}
 
 		if (use_history() == true) {
@@ -365,7 +366,8 @@ template <class T> class psa {
 				r.v(i) = a * b.v(i);
 			}
 		} else {
-			r.v = a * b.v;
+			// r.v = a * b.v;
+			r.v = T(a) * b.v; // assist for VC++
 		}
 
 		if (use_history() == true) {
@@ -402,7 +404,8 @@ template <class T> class psa {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value, psa >::type operator/(const psa& a, const C& b) {
 		psa r;
 
-		r.v = a.v / b;
+		// r.v = a.v / b;
+		r.v = a.v / T(b); // assist for VC++
 
 		return r;
 	}

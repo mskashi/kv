@@ -37,7 +37,7 @@ int main()
 	end = std::numeric_limits<double>::infinity();
 
 	// same as ode() in ode.hpp but type of initial value x is "autodif"
-	r = kv::ode(Lorenz(), xd, itvd(0.), end, 24);
+	r = kv::ode(Lorenz(), xd, itvd(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {
@@ -50,7 +50,7 @@ int main()
 	end = 1.;
 
 	// same as odelong() in ode.hpp but type of initial value x is "autodif"
-	r = kv::odelong(Lorenz(), xd, itvd(0.), end, 24);
+	r = kv::odelong(Lorenz(), xd, itvd(0.), end);
 
 	if (!r) std::cout << "can't calculate verified solution\n";
 	else {

@@ -59,26 +59,11 @@ int main()
 
 	Kepler f;
 
-#if 0
-	ix.resize(13);
-	for (i=0; i<12; i++) ix(i) = x(i);
-	ix(12) = 0.;
-	end = std::numeric_limits<double>::infinity();
-
-	r = kv::odelong_maffine(g, ix, itvd(0.), end, 24, 2, 1);
-	if (!r) {
-		std::cout << "No Solution\n";
-	} else {
-		std::cout << ix << "\n";
-		std::cout << end << "\n";
-	}
-#endif
-
 	ix = x;
 	end = std::numeric_limits<double>::infinity();
-	r = kv::odelong_maffine(f, ix, itvd(0.), end, 15, 2, 1);
+	r = kv::odelong_maffine(f, ix, itvd(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

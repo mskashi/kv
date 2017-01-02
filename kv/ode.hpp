@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <cmath>
-#include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -18,21 +17,17 @@
 #include <kv/interval-vector.hpp>
 #include <kv/make-candidate.hpp>
 #include <kv/psa.hpp>
+#include <kv/ode-param.hpp>
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
 #endif
 
-// autostep==trueで失敗した場合のrestartの回数の上限
-#ifndef RESTART_MAX
-#define RESTART_MAX 1
-#endif
-
+#if 0
 #ifndef TOL1
 #define TOL1 0.1
 #endif
 
-#if 0
 #ifndef TOL2
 #define TOL2 100.
 #endif
@@ -50,7 +45,7 @@ namespace kv {
 
 template <class T, class F>
 int
-ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, bool autostep = true, int iter_max = 2, ub::vector< psa< interval<T> > >* result_psa = NULL) {
+ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, const ode_param<T> p = ode_param<T>(), ub::vector< psa< interval<T> > >* result_psa = NULL) {
 	int n = init.size();
 	int i, j;
 
@@ -79,12 +74,14 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 	bool save_mode, save_uh, save_rh;
 
-	m = std::numeric_limits<T>::epsilon();
+	m = p.epsilon;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(init(i)) * std::numeric_limits<T>::epsilon();
+		m_tmp = norm(init(i)) * p.epsilon;
 		if (m_tmp > m) m = m_tmp;
+		#if 0
 		m_tmp = rad(init(i)) * TOL1;
 		if (m_tmp > m) m = m_tmp;
+		#endif
 	}
 	tolerance = m;
 
@@ -102,7 +99,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 	psa< interval<T> >::record_history() = true;
 	psa< interval<T> >::history().clear();
 	#endif
-	for (j=0; j<order; j++) {
+	for (j=0; j<p.order; j++) {
 		#if ODE_FAST == 1
 		if (j == 1) psa< interval<T> >::use_history() = true;
 		#endif
@@ -116,11 +113,11 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		x = init + y;
 	}
 
-	if (autostep) {
+	if (p.autostep) {
 		// 高次の項から順に見て、最初に見付かった2つの非0項を使う。
 		radius = 0.;
 		n_rad = 0;
-		for (j = order; j>=1; j--) {
+		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
 				// m_tmp = norm(x(i).v(j));
@@ -135,7 +132,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			n_rad++;
 			if (n_rad == 2) break;
 		}
-		radius = std::pow((double)tolerance, 1./order) / radius;
+		radius = std::pow((double)tolerance, 1./p.order) / radius;
 	}
 
 	psa< interval<T> >::mode() = 2;
@@ -144,7 +141,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 	resized = false;
 
 	while (true) {
-		if (autostep) {
+		if (p.autostep) {
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
@@ -161,26 +158,26 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		psa< interval<T> >::domain() = interval<T>(0., deltat.upper());
 
 		z = x;
-		t = setorder(torg, order);
+		t = setorder(torg, p.order);
 
 		w = f(z, t);
 
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
-			w(i) = setorder(temp, order);
+			w(i) = setorder(temp, p.order);
 		}
 		w = init + w;
 
 		newton_step.resize(n);
 		for (i=0; i<n; i++) {
-			newton_step(i) = norm(w(i).v(order) - z(i).v(order));
+			newton_step(i) = norm(w(i).v(p.order) - z(i).v(p.order));
 		}
 		make_candidate(newton_step);
 		for (i=0; i<n; i++) {
-			z(i).v(order) += newton_step(i) * interval<T>(-1., 1.);
+			z(i).v(p.order) += newton_step(i) * interval<T>(-1., 1.);
 		}
 
-		if (autostep && resized == false) {
+		if (p.autostep && resized == false) {
 			resized = true;
 			m = 0.;
 			for (i=0; i<n; i++) {
@@ -192,24 +189,24 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			if (m > TOL2) m = TOL2;
 			if (m < TOL3) m = TOL3;
 			#endif
-			radius /= std::pow((double)m, 1. / order);
+			radius /= std::pow((double)m, 1. / p.order);
 			continue;
 		}
 
 		w = f(z, t);
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
-			w(i) = setorder(temp, order);
+			w(i) = setorder(temp, p.order);
 		}
 		w = init + w;
 
 		flag = true;
 		for (i=0; i<n; i++) {
-			flag = flag && subset(w(i).v(order), z(i).v(order));
+			flag = flag && subset(w(i).v(p.order), z(i).v(p.order));
 		}
 		if (flag) break;
 
-		if (!autostep || restart >= RESTART_MAX) {
+		if (!p.autostep || restart >= p.restart_max) {
 			ret_val = 0;
 			break;
 		}
@@ -218,16 +215,16 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 	}
 
 	if (ret_val != 0) {
-		for (j=0; j<iter_max; j++) {
+		for (j=0; j<p.iteration; j++) {
 			z = w;
 			w = f(z, t);
 			for (i=0; i<n; i++) {
 				temp = integrate(w(i));
-				w(i) = setorder(temp, order);
+				w(i) = setorder(temp, p.order);
 			}
 			w = init + w;
 			for (i=0; i<n; i++) {
-				w(i).v(order) = intersect(w(i).v(order), z(i).v(order));
+				w(i).v(p.order) = intersect(w(i).v(p.order), z(i).v(p.order));
 			}
 		}
 
@@ -250,7 +247,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 template <class T, class F>
 int
-odelong(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0) {
+odelong(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>()) {
 
 	ub::vector< interval<T> > x;
 	interval<T> t, t1;
@@ -259,10 +256,11 @@ odelong(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 
-		r = ode(f, x, t, t1, order, true, iter_max);
+		r = ode(f, x, t, t1, p);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x;
@@ -271,7 +269,7 @@ odelong(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval
 			return ret_val;
 		}
 		ret_val = 1;
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << x << "\n";
 		}

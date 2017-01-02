@@ -12,13 +12,14 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 #include <kv/interval-vector.hpp>
 #include <kv/affine.hpp>
 #include <kv/ode.hpp>
 #include <kv/ode-autodif.hpp>
-#include <boost/tuple/tuple.hpp>
+#include <kv/ode-param.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -26,7 +27,7 @@ namespace kv {
 
 template <class T, class F>
 int
-ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, bool autostep = true, int iter_max = 2, int ep_reduce = 0, int ep_reduce_limit = 0, ub::matrix< interval<T> >* mat = NULL, ub::vector< psa< interval<T> > >* result_psa = NULL)
+ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>() , ub::matrix< interval<T> >* mat = NULL, ub::vector< psa< interval<T> > >* result_psa = NULL)
 {
 	int n = init.size();
 	int i, j;
@@ -73,7 +74,7 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 
 	Iad = autodif< interval<T> >::init(I);
 	// 自動的にautodif対応のものが呼ばれるはず
-	r = ode(f, Iad, start, end2, order, autostep, iter_max, result_tmp_p);
+	r = ode(f, Iad, start, end2, p, result_tmp_p);
 	if (r == 0) return 0;
 	ret_val = r;
 
@@ -91,23 +92,23 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	// 上が通れば条件の緩いこちらは通るかと思ったが、
 	// 通らない例があった。本質的には通るはずなので、次数を
 	// 増やしてでも無理矢理通す。
-	int order2 = order;
+	p.set_autostep(false);
 	while (1) {
-		r = ode(f, fc, start, end2, order2, false, iter_max);
+		r = ode(f, fc, start, end2, p);
 		if (r != 0) break;
-		order2++;
-		std::cout << "increase order: " << order2 << "\n";
+		p.order++;
+		std::cout << "increase order: " << p.order << "\n";
 	}
 
 	autodif< interval<T> >::split(Iad, result_i, result_d);
 
-	if (ep_reduce == 0) {
+	if (p.ep_reduce == 0) {
 		maxnum_save = affine<T>::maxnum();
 	}
 
 	result = fc + prod(result_d, init - c);
 
-	if (ep_reduce == 0) {
+	if (p.ep_reduce == 0) {
 		s1_save.resize(n);
 		s2i_save.resize(n);
 		for (i=0; i<n; i++) {
@@ -123,7 +124,7 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 			result(i) = append(s1_save(i), (affine<T>)s2i_save(i));
 		}
 	} else {
-		epsilon_reduce(result, ep_reduce, ep_reduce_limit);
+		epsilon_reduce(result, p.ep_reduce, p.ep_reduce_limit);
 	}
 
 	init = result;
@@ -140,11 +141,7 @@ odelong_maffine(
 	ub::vector< affine<T> >& init,
 	const interval<T>& start,
 	interval<T>& end,
-	int order,
-	int iter_max = 2,
-	int verbose = 0,
-	int ep_reduce = 0,
-	int ep_reduce_limit = 0,
+	ode_param<T> p = ode_param<T>(),
 	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL,
 	ub::matrix< interval<T> >* mat = NULL
 ) {
@@ -175,10 +172,11 @@ odelong_maffine(
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 
-		r = ode_maffine(f, x, t, t1, order, true, iter_max, ep_reduce, ep_reduce_limit, M_p, result_tmp_p);
+		r = ode_maffine(f, x, t, t1, p, M_p, result_tmp_p);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x;
@@ -192,7 +190,7 @@ odelong_maffine(
 		if (result_psa != NULL) {
 			(*result_psa).push_back(boost::make_tuple(t, t1, result_tmp));
 		}
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << to_interval(x) << "\n";
 		}
@@ -212,11 +210,7 @@ odelong_maffine(
 	ub::vector< interval<T> >& init,
 	const interval<T>& start,
 	interval<T>& end,
-	int order,
-	int iter_max = 2,
-	int verbose = 0,
-	int ep_reduce = 0,
-	int ep_reduce_limit = 0,
+	ode_param<T> p = ode_param<T>(),
 	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL
 ) {
 	int s = init.size();
@@ -231,7 +225,7 @@ odelong_maffine(
 
 	x = init;
 
-	r = odelong_maffine(f, x, start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit, result_psa);
+	r = odelong_maffine(f, x, start, end2, p, result_psa);
 
 	affine<T>::maxnum() = maxnum_save;
 
@@ -250,11 +244,7 @@ odelong_maffine(
 	ub::vector< autodif< interval<T> > >& init,
 	const interval<T>& start,
 	interval<T>& end,
-	int order,
-	int iter_max = 2,
-	int verbose = 0,
-	int ep_reduce = 0,
-	int ep_reduce_limit = 0,
+	ode_param<T> p = ode_param<T>(),
 	std::list< boost::tuple< interval<T>, interval<T>, ub::vector< psa< interval<T> > > > >* result_psa = NULL
 ) {
 	int s = init.size();
@@ -274,7 +264,7 @@ odelong_maffine(
 
 	x = xi;
 
-	r = odelong_maffine(f, x, start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit, result_psa, &M_tmp);
+	r = odelong_maffine(f, x, start, end2, p, result_psa, &M_tmp);
 
 	affine<T>::maxnum() = maxnum_save;
 

@@ -5,9 +5,14 @@ int main()
 	kv::gnuplot g;
 
 	// 初期化
-	g.open("/usr/bin/gnuplot");
+	g.open();
+
+	// pathを指定するにはこんな感じ。
+	// g.open("/usr/bin/gnuplot");
+
 	// ファイルに吐くには例えばこちら
 	// g.open("/usr/bin/gnuplot", "postscript eps color", "aaa.eps");
+
 	// teeを使って描画コマンドをファイルに残す方法もある。
 	// g.open("tee aaa.dat | /usr/bin/gnuplot");
 

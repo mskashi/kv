@@ -1,21 +1,11 @@
 #include <kv/ode.hpp>
+#include <kv/ode-autodif.hpp>
 #include <kv/autodif.hpp>
 
 namespace ub = boost::numeric::ublas;
 
 typedef kv::interval<double> itvd;
 
-
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1); y(1) = - x(0);
-
-		return y;
-	}
-};
 
 class Lorenz {
 	public:
@@ -83,36 +73,60 @@ template <class F> class VariationalEq {
 } // namespace kv
 
 
-
 int main()
 {
 	ub::vector<itvd> x;
+	ub::vector< kv::autodif<itvd> > dx;
 	bool r;
-
 	itvd end;
 
-	end = std::numeric_limits<double>::infinity();
+	std::cout.precision(17);
 
-	// x.resize(2);
-	// x(0) = 1.; x(1) = 0.;
+	// standard calculation
 
-	// x.resize(3);
-	// x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	Lorenz f;
+
+	x.resize(3);
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	end = 1.;
+
+	r = kv::ode(f, x, itvd(0.), end);
+
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else {
+		std::cout << x << "\n";
+		std::cout << end << "\n";
+	}
+
+	// using automatic differentiation
+
+	x.resize(3);
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+	dx = kv::autodif<itvd>::init(x);
+	end = 1.;
+
+	r = kv::ode(f, dx, itvd(0.), end);
+
+	if (!r) std::cout << "can't calculate verified solution\n";
+	else {
+		std::cout << dx << "\n";
+		std::cout << end << "\n";
+	}
+
+	// using "variational equation maker"
+
+	kv::VariationalEq<Lorenz> g(f);
+
 	x.resize(3 + 3 * 3);
 	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	x(3) = 1.; x(4) = 0.; x(5) = 0.;
 	x(6) = 0.; x(7) = 1.; x(8) = 0.;
 	x(9) = 0.; x(10) = 0.; x(11) = 1.;
+	end = 1.;
 
-	std::cout.precision(17);
+	r = kv::ode(g, x, itvd(0.), end);
 
-	Lorenz f;
-	kv::VariationalEq<Lorenz> g(f);
-
-	// r = kv::ode(Func(), x, itvd(0.), itvd(1.0), 5);
-	r = kv::ode(g, x, itvd(0.), end, 12);
-
-	if (!r) std::cout << "No Solution\n";
+	if (!r) std::cout << "can't calculate verified solution\n";
 	else {
 		std::cout << x << "\n";
 		std::cout << end << "\n";

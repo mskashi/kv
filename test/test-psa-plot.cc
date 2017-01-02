@@ -11,7 +11,8 @@ int main()
 {
 	kv::psa<itvd> c;
 	kv::gnuplot g;
-	g.open("/usr/bin/gnuplot", "x11");
+	// g.open("/usr/bin/gnuplot", "x11");
+	g.open();
 	g.screen(-0.1,-5,0.3,5);
 
 	c.v.resize(3);

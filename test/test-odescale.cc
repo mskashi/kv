@@ -61,9 +61,9 @@ int main()
 	ix = x;
 	// end = std::numeric_limits<double>::infinity();
 	end = 16.;
-	r = kv::odelong_maffine(f, ix, itvd(0.), end, 15, 2, 1);
+	r = kv::odelong_maffine(f, ix, itvd(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";
@@ -74,9 +74,9 @@ int main()
 	ix(4) = 0.; // start time of original problem
 	// end = std::numeric_limits<double>::infinity();
 	end = 25.3;
-	r = kv::odelong_maffine(g, ix, itvd(0.), end, 15, 2, 1);
+	r = kv::odelong_maffine(g, ix, itvd(0.), end, kv::ode_param<double>().set_order(15).set_verbose(1).set_restart_max(10));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

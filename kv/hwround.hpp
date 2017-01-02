@@ -30,14 +30,14 @@ namespace kv {
 
 // hwround_regs will be initialized before main()
 static struct hwround_reg {
-	unsigned long int near;
+	unsigned long int nearest;
 	unsigned long int down;
 	unsigned long int up;
 	unsigned long int chop;
 
 	hwround_reg() {
 		unsigned long int reg = _mm_getcsr();
-		near = (reg & ~0x00006000) | 0x00000000;
+		nearest = (reg & ~0x00006000) | 0x00000000;
 		down = (reg & ~0x00006000) | 0x00002000;
 		up =   (reg & ~0x00006000) | 0x00004000;
 		chop = (reg & ~0x00006000) | 0x00006000;
@@ -46,7 +46,7 @@ static struct hwround_reg {
 
 struct hwround {
 	static void roundnear() {
-		_mm_setcsr(hwround_regs.near);
+		_mm_setcsr(hwround_regs.nearest);
 	}
 
 	static void rounddown() {

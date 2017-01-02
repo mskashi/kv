@@ -65,9 +65,9 @@ int main()
 
 	// end = std::numeric_limits<double>::infinity();
 	end = 0.5;
-	r = kv::odelong_maffine(DoublePendulum(), ix, itvd(0.), end, 12, 2, 1);
+	r = kv::odelong_maffine(DoublePendulum(), ix, itvd(0.), end, kv::ode_param<double>().set_verbose(1));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		for (i=0; i<ix.size(); i++) {
 			std::cout << ix(i) << "\n";

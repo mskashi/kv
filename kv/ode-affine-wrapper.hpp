@@ -15,7 +15,7 @@ namespace kv {
 
 template <class T, class F>
 int
-ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, bool autostep = 1, int iter_max = 2, int ep_reduce = 0, int ep_reduce_limit = 0) {
+ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>()) {
 	int n = init.size();
 	int i, j;
 	ub::vector<T> init_rad;
@@ -53,8 +53,10 @@ ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		new_init(i) = init(i).a(0) + (affine<T>)(init_rad(i) * interval<T>(-1.,1));
 	}
 
-	// ep_reduceは0でなければならない
-	r = ode_affine(f, new_init, start, end2, order, autostep, iter_max, 0);
+	// ep_reduce must be 0
+	ode_param<T> p2 = p;
+	p2.ep_reduce = 0;
+	r = ode_affine(f, new_init, start, end2, p2);
 	if (r == 0) {
 		affine<T>::maxnum() = maxnum_save;
 		return 0;
@@ -85,7 +87,7 @@ ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		result2(i) += (affine<T>)result_i(i);
 	}
 
-	if (ep_reduce == 0) {
+	if (p.ep_reduce == 0) {
 		s1_save.resize(n);
 		s2i_save.resize(n);
 		for (i=0; i<n; i++) {
@@ -100,7 +102,7 @@ ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 			result2(i) = append(s1_save(i), (affine<T>)s2i_save(i));
 		}
 	} else {
-		epsilon_reduce(result, ep_reduce, ep_reduce_limit);
+		epsilon_reduce(result, p.ep_reduce, p.ep_reduce_limit);
 	}
 
 	init = result2;
@@ -110,7 +112,7 @@ ode_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 
 template <class T, class F>
 int
-odelong_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	ub::vector< affine<T> > x;
@@ -120,10 +122,11 @@ odelong_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, in
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 
-		r = ode_wrapper(f, x, t, t1, order, true, iter_max, ep_reduce, ep_reduce_limit);
+		r = ode_wrapper(f, x, t, t1, p);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x;
@@ -132,7 +135,7 @@ odelong_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, in
 			return ret_val;
 		}
 		ret_val = 1;
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << to_interval(x) << "\n";
 		}
@@ -146,7 +149,7 @@ odelong_wrapper(F f, ub::vector< affine<T> >& init, const interval<T>& start, in
 
 template <class T, class F>
 int
-odelong_wrapper(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, int ep_reduce = 0, int ep_reduce_limit = 0)
+odelong_wrapper(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	int i;
@@ -157,7 +160,7 @@ odelong_wrapper(F f, ub::vector< interval<T> >& init, const interval<T>& start, 
 	affine<T>::maxnum() = 0;
 	x = init;
 
-	r = odelong_wrapper(f, x, start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+	r = odelong_wrapper(f, x, start, end2, p);
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));

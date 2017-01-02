@@ -71,9 +71,9 @@ int main()
 	std::cout.precision(17);
 
 	end = 2.8;
-	r = kv::odelong_maffine2(Neher(), ix, itvd(0.), end, 20, 2, 1);
+	r = kv::odelong_maffine2(Neher(), ix, itvd(0.), end);
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";
@@ -85,9 +85,9 @@ int main()
 	ix(2) = itvd(0.999, 1.001);
 
 	end = 100.;
-	r = kv::odelong_maffine2(Neher2(), ix, itvd(0.), end, 20, 2, 1);
+	r = kv::odelong_maffine2(Neher2(), ix, itvd(0.), end);
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

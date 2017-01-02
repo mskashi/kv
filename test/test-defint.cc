@@ -1,7 +1,6 @@
 #include <iostream>
 #include <kv/defint.hpp>
 
-namespace bn = boost::numeric;
 namespace ub = boost::numeric::ublas;
 
 typedef kv::interval<double> itvd;

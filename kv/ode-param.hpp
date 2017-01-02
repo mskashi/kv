@@ -1,63 +1,62 @@
 #ifndef ODE_PARAM_HPP
 #define ODE_PARAM_HPP
 
-#include <cmath>
 #include <limits>
 
 namespace kv {
 
 
 template <class T> struct ode_param {
-	int order_v;
-	bool autostep_v;
-	T tolerance_v;
-	int iteration_v;
-	int verbose_v;
-	int ep_reduce_v;
-	int ep_reduce_limit_v;
-	int restart_max_v;
+	int order;
+	bool autostep;
+	T epsilon;
+	int iteration;
+	int verbose;
+	int ep_reduce;
+	int ep_reduce_limit;
+	int restart_max;
 
 	ode_param() :
-		order_v(24),
-		autostep_v(true),
-		tolerance_v(std::numeric_limits<T>::epsilon()),
-		iteration_v(2),
-		verbose_v(0),
-		ep_reduce_v(0),
-		ep_reduce_limit_v(0),
-		restart_max_v(1)
+		order(24),
+		autostep(true),
+		epsilon(std::numeric_limits<T>::epsilon()),
+		iteration(2),
+		verbose(0),
+		ep_reduce(0),
+		ep_reduce_limit(0),
+		restart_max(1)
 	{}
 
 	ode_param& set_order(int x) {
-		order_v = x;
+		order = x;
 		return *this;
 	}
 	ode_param& set_autostep(bool x) {
-		autostep_v = x;
+		autostep = x;
 		return *this;
 	}
-	ode_param& set_tolerance(T x) {
-		tolerance_v = x;
+	ode_param& set_epsilon(T x) {
+		epsilon = x;
 		return *this;
 	}
 	ode_param& set_iteration(int x) {
-		iteration_v = x;
+		iteration = x;
 		return *this;
 	}
 	ode_param& set_verbose(int x) {
-		verbose_v = x;
+		verbose = x;
 		return *this;
 	}
 	ode_param& set_ep_reduce(int x) {
-		ep_reduce_v = x;
+		ep_reduce = x;
 		return *this;
 	}
 	ode_param& set_ep_reduce_limit(int x) {
-		ep_reduce_limit_v = x;
+		ep_reduce_limit = x;
 		return *this;
 	}
 	ode_param& set_restart_max(int x) {
-		restart_max_v = x;
+		restart_max = x;
 		return *this;
 	}
 };

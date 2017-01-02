@@ -12,6 +12,7 @@
 #ifdef USE_MAFFINE2
 #include <kv/ode-maffine2.hpp>
 #endif
+#include <kv/ode-param.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -35,62 +36,36 @@ namespace kv {
 //   odelong_maffine (autodif版)
 // を呼び出している。(-DUSE_MAFFINE2ならmaffine2)
 
-template <class F, class TT> class StroboMap {
+template <class F, class T> class StroboMap {
 	public:
 	F f;
-	TT start, end;
-	int order;
-	int iter_max;
-	int verbose;
-	int ep_reduce;
-	int ep_reduce_limit;
+	interval<T> start, end;
+	ode_param<T> p;
 
-	StroboMap(F f_v, TT start_v, TT end_v, int order_v, int iter_max_v = 2, int verbose_v = 0, int ep_reduce_v = 0, int ep_reduce_limit_v = 0)
-	: f(f_v), start(start_v), end(end_v), order(order_v), iter_max(iter_max_v), verbose(verbose_v), ep_reduce(ep_reduce_v), ep_reduce_limit(ep_reduce_limit_v) {
-	}
+	StroboMap(F f_v, interval<T> start_v, interval<T> end_v, ode_param<T> p_v = ode_param<T>())
+	: f(f_v), start(start_v), end(end_v), p(p_v) {}
 
-	// mid_ifnecessary<T1,T2>(x)は、T2からT1に変換可能ならxそのまま、
-	// 不可能ならmid(x)を返す。
-
-	#include <boost/utility/enable_if.hpp>
-
-	template <class T1, class T2> T1 inline static mid_ifnecessary(T2& x, typename boost::enable_if_c< convertible<T2, T1>::value >::type* =0) {
-		return T1(x);
-	}
-
-	template <class T1, class T2> T1 inline static mid_ifnecessary(T2& x, typename boost::enable_if_c< ! convertible<T2, T1>::value >::type* =0) {
-		return T1(mid(x));
-	}
-
-	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
+	ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> result;
-		T start2, end2;
-
-		start2 = mid_ifnecessary<T,TT>(start);
-		end2 = mid_ifnecessary<T,TT>(end);
 
 		result = x;
 
-		odelong_nv(f, result, start2, end2, order, verbose);
+		odelong_nv(f, result, mid(start), mid(end), p);
 
 		return result;
 	}
 
-	template <class T> ub::vector< autodif<T> > operator() (const ub::vector< autodif<T> >& x){
+	ub::vector< autodif<T> > operator() (const ub::vector< autodif<T> >& x){
 		ub::vector< autodif<T> > result;
-		T start2, end2;
-
-		start2 = mid_ifnecessary<T,TT>(start);
-		end2 = mid_ifnecessary<T,TT>(end);
 
 		result = x;
 
-		odelong_nv(f, result, start2, end2, order, verbose);
+		odelong_nv(f, result, mid(start), mid(end), p);
 
 		return result;
 	}
 
-	template <class T> ub::vector< interval<T> > operator() (const ub::vector< interval<T> >& x){
+	ub::vector< interval<T> > operator() (const ub::vector< interval<T> >& x){
 		ub::vector< interval<T> > result;
 		interval<T> end2;
 		int r;
@@ -99,9 +74,9 @@ template <class F, class TT> class StroboMap {
 		end2 = end;
 
 		#ifdef USE_MAFFINE2
-		r = odelong_maffine2(f, result, (interval<T>)start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+		r = odelong_maffine2(f, result, start, end2, p);
 		#else
-		r = odelong_maffine(f, result, (interval<T>)start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+		r = odelong_maffine(f, result, start, end2, p);
 		#endif
 
 		if (r != 2) {
@@ -111,7 +86,7 @@ template <class F, class TT> class StroboMap {
 		return result;
 	}
 
-	template <class T> ub::vector< affine<T> > operator() (const ub::vector< affine<T> >& x){
+	ub::vector< affine<T> > operator() (const ub::vector< affine<T> >& x){
 		ub::vector< affine<T> > result;
 		interval<T> end2;
 		int r;
@@ -120,9 +95,9 @@ template <class F, class TT> class StroboMap {
 		end2 = end;
 
 		#ifdef USE_MAFFINE2
-		r = odelong_maffine2(f, result, (interval<T>)start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+		r = odelong_maffine2(f, result, start, end2, p);
 		#else
-		r = odelong_maffine(f, result, (interval<T>)start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+		r = odelong_maffine(f, result, start, end2, p);
 		#endif
 
 		if (r != 2) {
@@ -132,7 +107,7 @@ template <class F, class TT> class StroboMap {
 		return result;
 	}
 
-	template <class T> ub::vector< autodif< interval<T> > > operator() (const ub::vector< autodif< interval<T> > >& x){
+	ub::vector< autodif< interval<T> > > operator() (const ub::vector< autodif< interval<T> > >& x){
 		ub::vector< autodif< interval<T> > > result;
 		interval<T> end2;
 		int r;
@@ -140,7 +115,7 @@ template <class F, class TT> class StroboMap {
 		result = x;
 		end2 = end;
 
-		r = odelong_maffine(f, result, (interval<T>)start, end2, order, iter_max, verbose, ep_reduce, ep_reduce_limit);
+		r = odelong_maffine(f, result, start, end2, p);
 		if (r != 2) {
 			throw std::range_error("StroboMap(): cannot calculate validated solution.");
 		}

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 
+#include <kv/ode-maffine.hpp>
 #include <kv/ode-maffine2.hpp>
 
 namespace ub = boost::numeric::ublas;
@@ -29,20 +30,25 @@ int main()
 	int i;
 	ub::vector<itvd> ix;
 	bool r;
-
 	itvd end;
+	kv::ode_param<double> p;
+
+	std::cout.precision(17);
 
 	ix.resize(2);
 	ix(0) = itvd(1., 1.01);
 	ix(1) = itvd(1., 1.01);
-
-	std::cout.precision(17);
-
 	end = 5000.;
-	r = kv::odelong_maffine2(VDP(), ix, itvd(0.), end, 18, 2, 1, 1000, 1100);
-	// r = odelong_maffine(VDP(), ix, itvd(0.), end, 12, 2, 1, 100, 200);
+
+	p.set_verbose(1);
+	p.set_order(18);
+	p.set_ep_reduce(1000);
+	p.set_ep_reduce_limit(1100);
+	// r = kv::odelong_maffine2(VDP(), ix, itvd(0.), end, p);
+	r = odelong_maffine(VDP(), ix, itvd(0.), end, p);
+
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

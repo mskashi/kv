@@ -4,10 +4,10 @@
 typedef kv::interval<double> itvd;
 typedef kv::affine<double> afd;
 
-main()
+int main()
 {
 	kv::gnuplot g;
-	g.open("/usr/bin/gnuplot");
+	g.open();
 	g.screen(-3,-3,3,3);
 	g.send_command("set size ratio -1");
 

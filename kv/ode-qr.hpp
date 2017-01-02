@@ -16,9 +16,9 @@
 #include <kv/interval-vector.hpp>
 #include <kv/qr.hpp>
 #include <kv/vleq.hpp>
-
 #include <kv/ode.hpp>
 #include <kv/ode-autodif.hpp>
+#include <kv/ode-param.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -28,7 +28,7 @@ namespace kv {
 
 template <class T, class F>
 int
-odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0, ub::matrix< interval<T> >* mat = NULL)
+odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::matrix< interval<T> >* mat = NULL)
 {
 	int s = init.size();
 	int i, j;
@@ -62,12 +62,15 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	y = x - c;
 	Q = ub::identity_matrix<T>(s);
 
+	ode_param<T> p2;
 
 	while (1) {
 		t1 = end;
 		Iad = autodif< interval<T> >::init(x);
+		p2 = p;
+		p2.set_autostep(true);
 		// 自動的にautodif対応のものが呼ばれるはず
-		r = ode(f, Iad, t, t1, order, true, iter_max);
+		r = ode(f, Iad, t, t1, p2);
 		if (r == 0) break;
 
 		fc = c;
@@ -75,12 +78,13 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 		// 上が通れば条件の緩いこちらは通るかと思ったが、
 		// 通らない例があった。本質的には通るはずなので、次数を
 		// 増やしてでも無理矢理通す。
-		int order2 = order;
+		p2 = p;
+		p2.set_autostep(false);
 		while (1) {
-			r2 = ode(f, fc, t, t1, order2, false, iter_max);
+			r2 = ode(f, fc, t, t1, p2);
 			if (r2 != 0) break;
-			order2++;
-			std::cout << "increase order: " << order2 << "\n";
+			p2.order++;
+			std::cout << "increase order: " << p2.order << "\n";
 		}
 
 		autodif< interval<T> >::split(Iad, result_i, result_d);
@@ -114,7 +118,7 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 
 		if (mat != NULL) M = prod(result_d, M);
 
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << x << "\n";
 		}
@@ -141,7 +145,7 @@ odelong_qr(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 
 template <class T, class F>
 int
-odelong_qr(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, int order, int iter_max = 2, int verbose = 0)
+odelong_qr(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>())
 {
 	int s = init.size();
 	int i, j;
@@ -153,7 +157,7 @@ odelong_qr(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 	autodif< interval<T> >::split(init, x, M);
 	int s2 = M.size2();
 
-	r = odelong_qr(f, x, start, end2, order, iter_max, verbose, &M_tmp);
+	r = odelong_qr(f, x, start, end2, p, &M_tmp);
 
 	if (r == 0) return 0;
 

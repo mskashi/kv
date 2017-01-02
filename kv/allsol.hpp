@@ -626,7 +626,8 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 #if USE_MIGSKIP >= 1
 #if USE_MIGSKIP == 1
 		// Inflationが行われなくなるのを防ぐためにやや条件を緩く
-		mvf = fc + prod(mig(fdi), (1. + EDGE_RATIO) * (I - C));
+		// interval<T> が無いと場合によってはcompile error
+		mvf = fc + prod(mig(fdi), interval<T>(1. + EDGE_RATIO) * (I - C));
 #else
 		// 手加減無し
 		mvf = fc + prod(mig(fdi), I - C);

@@ -9,17 +9,6 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1); y(1) = - x(0);
-
-		return y;
-	}
-};
-
 class Lorenz {
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
@@ -33,29 +22,6 @@ class Lorenz {
 	}
 };
 
-class VdP {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = 10000.* (1. - x(0)*x(0))*x(1) - x(0);
-
-		return y;
-	}
-};
-
-class Nobi {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = x(0) - x(0)*x(0)*x(0);
-
-		return y;
-	}
-};
 
 int main()
 {
@@ -75,7 +41,7 @@ int main()
 
 	ax = x;
 	end = std::numeric_limits<double>::infinity();
-	r = kv::ode_maffine2(Lorenz(), ax, itvd(0.), end, 12);
+	r = kv::ode_maffine2(Lorenz(), ax, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -88,7 +54,7 @@ int main()
 	kv::affine<double>::maxnum() = 0;
 	ax = x;
 	end = 1.;
-	r = kv::odelong_maffine2(Lorenz(), ax, itvd(0.), end, 12);
+	r = kv::odelong_maffine2(Lorenz(), ax, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -100,7 +66,7 @@ int main()
 
 	ix = x;
 	end = 1.;
-	r = kv::odelong_maffine2(Lorenz(), ix, itvd(0.), end, 12);
+	r = kv::odelong_maffine2(Lorenz(), ix, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

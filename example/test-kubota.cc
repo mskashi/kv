@@ -42,8 +42,9 @@ int main()
 	ub::vector<double> x;
 	ub::vector<itvd> ix;
 	bool r;
-
 	itvd end;
+
+	std::cout.precision(17);
 
 	x.resize(4);
 	x(0) = -0.9;
@@ -51,15 +52,13 @@ int main()
 	x(2) = 0.01;
 	x(3) = 0.4;
 
-	std::cout.precision(17);
-
 	Kepler f;
 
 	ix = x;
 	end = std::numeric_limits<double>::infinity();
-	r = kv::odelong_maffine2(f, ix, itvd(0.), end, 20, 2, 1, 1000, 1100);
+	r = kv::odelong_maffine2(f, ix, itvd(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10).set_ep_reduce(1000).set_ep_reduce_limit(1100));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

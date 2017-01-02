@@ -4,17 +4,6 @@
 
 namespace ub = boost::numeric::ublas;
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1); y(1) = - x(0);
-
-		return y;
-	}
-};
-
 class Lorenz {
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
@@ -32,22 +21,21 @@ int main()
 {
 	ub::vector<double> x;
 
-	// x.resize(2);
-	// x(0) = 1.; x(1) = 0.;
-
-	x.resize(3);
-	x(0) = 15.; x(1) = 15.; x(2) = 36.;
-
 	std::cout.precision(17);
 
+	x.resize(3);
+
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
 	double end = std::numeric_limits<double>::infinity();
 
-	// ode_nv(Func(), x, 0., end, 10);
-	kv::ode_nv(Lorenz(), x, 0., end, 12);
+	kv::ode_nv(Lorenz(), x, 0., end);
 
 	std::cout << x << "\n";
 	std::cout << end << "\n";
 
-	kv::odelong_nv(Lorenz(), x, 0., 1., 12);
+	x(0) = 15.; x(1) = 15.; x(2) = 36.;
+
+	kv::odelong_nv(Lorenz(), x, 0., 1.);
 	std::cout << x << "\n";
+	std::cout << 1. << "\n";
 }

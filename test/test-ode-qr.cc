@@ -9,17 +9,6 @@ namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itvd;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1); y(1) = - x(0);
-
-		return y;
-	}
-};
-
 class Lorenz {
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
@@ -33,29 +22,6 @@ class Lorenz {
 	}
 };
 
-class VdP {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = 10000.* (1. - x(0)*x(0))*x(1) - x(0);
-
-		return y;
-	}
-};
-
-class Nobi {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
-		ub::vector<T> y(2);
-
-		y(0) = x(1);
-		y(1) = x(0) - x(0)*x(0)*x(0);
-
-		return y;
-	}
-};
 
 int main()
 {
@@ -74,9 +40,9 @@ int main()
 
 	ix = x;
 	end = 1.;
-	r = kv::odelong_qr(Lorenz(), ix, itvd(0.), end, 12, 2, 1);
+	r = kv::odelong_qr(Lorenz(), ix, itvd(0.), end);
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";
@@ -85,9 +51,9 @@ int main()
 	ix = x;
 	dx = kv::autodif<itvd>::init(ix);
 	end = 1.;
-	r = kv::odelong_qr(Lorenz(), dx, itvd(0.), end, 12, 2, 1);
+	r = kv::odelong_qr(Lorenz(), dx, itvd(0.), end);
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << dx << "\n";
 		std::cout << end << "\n";

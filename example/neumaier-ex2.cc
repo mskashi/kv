@@ -39,9 +39,9 @@ int main()
 	// end = std::numeric_limits<double>::infinity();
 	// end = 30;
 	end = 300;
-	r = kv::odelong_maffine(NeuEX2(), ix, itvd(0.), end, 10, 2, 1);
+	r = kv::odelong_maffine(NeuEX2(), ix, itvd(0.), end, kv::ode_param<double>().set_verbose(1).set_order(18));
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		for (i=0; i<ix.size(); i++) {
 			std::cout << ix(i) << "\n";

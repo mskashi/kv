@@ -55,9 +55,9 @@ int main()
 	// maffineなどの高度な解法は途中経過が初期値に依存しないので意味が無い
 	// r = odelong(g, ix, itvd(1.), itvd(3), 12);
 	end = 3.;
-	r = kv::odelong(DefintByODE<Func>(Func()), ix, itvd(1.), end, 12);
+	r = kv::odelong(DefintByODE<Func>(Func()), ix, itvd(1.), end);
 	if (!r) {
-		std::cout << "No Solution\n";
+		std::cout << "can't calculate verified solution\n";
 	} else {
 		std::cout << ix << "\n";
 		std::cout << end << "\n";

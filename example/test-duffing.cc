@@ -35,9 +35,9 @@ int main()
 
 	Duffing<double> f(3.5);
 
-	kv::StroboMap<Duffing<double>,itvd> g(f, (itvd)0., kv::constants<double>::pi() * 2., 20);
+	kv::StroboMap<Duffing<double>,double> g(f, (itvd)0., kv::constants<double>::pi() * 2.);
 
-	kv::FixedPoint< kv::StroboMap<Duffing<double>,itvd> > h(g);
+	kv::FixedPoint< kv::StroboMap<Duffing<double>,double> > h(g);
 
 	ix.resize(2);
 	ix(0) = itvd(-5., 5.);

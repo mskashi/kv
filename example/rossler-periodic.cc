@@ -46,7 +46,7 @@ int main()
 
 	Rossler<double> f(2.2);
 	RosslerPoincareSection g;
-	kv::PoincareMap<Rossler<double>,RosslerPoincareSection,itvd> h(f, g, (itvd)0., 12);
+	kv::PoincareMap<Rossler<double>,RosslerPoincareSection,double> h(f, g, (itvd)0.);
 
 	x.resize(4);
 
@@ -64,7 +64,7 @@ int main()
 	}
 
 	f = Rossler<double>(5.7);
-	h = kv::PoincareMap<Rossler<double>,RosslerPoincareSection,itvd>(f, g, (itvd)0., 12);
+	h = kv::PoincareMap<Rossler<double>,RosslerPoincareSection,double>(f, g, (itvd)0.);
 	x(0) = 0.; 
 	x(1) = -8.38;
 	x(2) = 0.0296;

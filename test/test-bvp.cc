@@ -32,9 +32,9 @@ int main()
 
 	Func f;
 
-	kv::StroboMap<Func,itvd> g(f, (itvd)0., (itvd)1., 12);
+	kv::StroboMap<Func,double> g(f, (itvd)0., (itvd)1.);
 
-	kv::Shooting_TPBVP< kv::StroboMap<Func,itvd>, double> h(g, 0., 0., 0, 0);
+	kv::Shooting_TPBVP< kv::StroboMap<Func,double>, double> h(g, 0., 0., 0, 0);
 
 	ix.resize(1);
 	ix(0) = itvd(-700., 700.);
@@ -58,6 +58,6 @@ int main()
 	ix2(0) = 0.;
 	ix2(1) = ix(0);
 	end = 1.;
-	kv::odelong_maffine(f, ix2, itvd(0.), end, 12, 2, 1);
+	kv::odelong_maffine(f, ix2, itvd(0.), end);
 	#endif
 }

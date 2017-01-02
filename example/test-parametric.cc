@@ -72,7 +72,7 @@ int main()
 	ix(0) = 1.;
 
 	end = 1.;
-	r = kv::odelong_maffine(Func(), ix, itvd(0.), end, 12);
+	r = kv::odelong_maffine(Func(), ix, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -85,7 +85,7 @@ int main()
 	ix(1) = -itvd(4.9,5.1);
 
 	end = 1.;
-	r = kv::odelong_maffine(Func2(), ix, itvd(0.), end, 12);
+	r = kv::odelong_maffine(Func2(), ix, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -98,7 +98,7 @@ int main()
 	ix(1) = 1.1;
 
 	end = 10.;
-	r = kv::odelong_maffine(LotkaVolterra(), ix, itvd(0.), end, 12);
+	r = kv::odelong_maffine(LotkaVolterra(), ix, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -113,7 +113,7 @@ int main()
 	ix(3) = itvd(0.99, 1.01);
 
 	end = 10.;
-	r = kv::odelong_maffine(LotkaVolterra2(), ix, itvd(0.), end, 12);
+	r = kv::odelong_maffine(LotkaVolterra2(), ix, itvd(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

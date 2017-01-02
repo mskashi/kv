@@ -9,12 +9,12 @@
 
 #include <iostream>
 #include <cmath>
-#include <limits>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <kv/psa.hpp>
 #include <kv/autodif.hpp>
+#include <kv/ode-param.hpp>
 
 
 #ifndef ODE_FAST
@@ -30,7 +30,7 @@ namespace kv {
 
 template <class T, class F>
 void
-ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, bool autostep = true) {
+ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, ode_param<T> p = ode_param<T>()) {
 	int n = init.size();
 	int i, j, k, km;
 
@@ -53,14 +53,14 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, b
 
 	new_init = autodif<T>::compress(init, save);
 
-	m = std::numeric_limits<T>::epsilon();
+	m = p.epsilon;
 	for (i=0; i<n; i++) {
 		using std::abs;
-		m_tmp = abs(new_init(i).v) * std::numeric_limits<T>::epsilon();
+		m_tmp = abs(new_init(i).v) * p.epsilon;
 		if (m_tmp > m) m = m_tmp;
 		new_init(i).d.resize(n);
 		for (j=0; j<n; j++) {
-			m_tmp = abs(new_init(i).d(j)) * std::numeric_limits<T>::epsilon();
+			m_tmp = abs(new_init(i).d(j)) * p.epsilon;
 			if (m_tmp > m) m = m_tmp;
 		}
 	}
@@ -80,10 +80,10 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, b
 	psa< autodif<T> >::record_history() = true;
 	psa< autodif<T> >::history().clear();
 	#endif
-	for (j=0; j<order; j++) {
+	for (j=0; j<p.order; j++) {
 		#if ODE_FAST == 1
 		if (j == 1) psa< autodif<T> >::use_history() = true;
-		if (j == order - 1) psa< autodif<T> >::record_history() = false;
+		if (j == p.order - 1) psa< autodif<T> >::record_history() = false;
 		#endif
 		t = setorder(torg, j);
 		y = f(x, t);
@@ -94,10 +94,10 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, b
 		x = new_init + y;
 	}
 
-	if (autostep) {
+	if (p.autostep) {
 		radius = 0.;
 		n_rad = 0;
-		for (j = order; j>=1; j--) {
+		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
 				m_tmp = (x(i).v(j).v >= 0.) ? x(i).v(j).v : -x(i).v(j).v;
@@ -115,12 +115,12 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, b
 			n_rad++;
 			if (n_rad == 2) break;
 		}
-		radius = std::pow((double)tolerance, 1./order) / radius;
+		radius = std::pow((double)tolerance, 1./p.order) / radius;
 	}
 
 	deltat = end - start;
 
-	if (autostep && radius < deltat) {
+	if (p.autostep && radius < deltat) {
 		end = start + radius;
 		deltat = end - start;
 	}
@@ -142,20 +142,21 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, int order, b
 
 template <class T, class F>
 void
-odelong_nv(F f, ub::vector< autodif<T> >& init, const T& start, const T& end, int order, int verbose = 0) {
+odelong_nv(F f, ub::vector< autodif<T> >& init, const T& start, const T& end, ode_param<T> p = ode_param<T>()) {
 
 	ub::vector< autodif<T> > x;
 	T t, t1;
 
 	x = init;
 	t = start;
+	p.set_autostep(true);
 	while (1) {
 		t1 = end;
 		if (t == t1) break;
 
-		ode_nv(f, x, t, t1, order, true);
+		ode_nv(f, x, t, t1, p);
 
-		if (verbose == 1) {
+		if (p.verbose == 1) {
 			std::cout << "t: " << t1 << "\n";
 			std::cout << x << "\n";
 		}

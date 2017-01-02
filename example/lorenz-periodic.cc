@@ -42,7 +42,7 @@ int main()
 
 	Lorenz lo;
 	LorenzPoincareSection lops;
-	kv::PoincareMap<Lorenz,LorenzPoincareSection,itvd> lopo(lo, lops, (itvd)0., 12);
+	kv::PoincareMap<Lorenz,LorenzPoincareSection,double> lopo(lo, lops, (itvd)0.);
 
 	x.resize(4);
 
@@ -77,8 +77,8 @@ int main()
 	x(2) = 27.;
 	x(3) = 3.82;
 
-	// 40次くらいないと通らない。
-	lopo = kv::PoincareMap<Lorenz,LorenzPoincareSection,itvd>(lo, lops, (itvd)0., 40);
+	// 50次くらいないと通らない。
+	lopo = kv::PoincareMap<Lorenz,LorenzPoincareSection,double>(lo, lops, (itvd)0., kv::ode_param<double>().set_order(50));
 
 	newton(x, lopo);
 
