@@ -35,6 +35,8 @@ template <class T> class autodif {
 	T v;
 	ub::vector<T> d;
 
+	typedef T base_type;
+
 	autodif() {
 		v = 0.;
 		d.resize(0);

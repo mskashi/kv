@@ -4,8 +4,6 @@
 namespace ub = boost::numeric::ublas;
 
 
-// 円と直線の交点
-
 class Func {
 	public:
 	template <class T> ub::vector<T> operator() (ub::vector<T> x){
@@ -19,10 +17,7 @@ class Func {
 };
 
 
-// エサキダイオードの怪しい回路。
-// ほんとは11.8をちゃんと書く必要あり。
-
-class Func2 {
+class Yamamura1 {
 	template <class T> T g(T x){
 		return 2.5 * x*x*x - 10.5 * x*x + 11.8 * x;
 	}
@@ -30,8 +25,8 @@ class Func2 {
 	template <class T> ub::vector<T> operator() (ub::vector<T> x){
 		int n = x.size();
 		ub::vector<T> y(n);
-		int i;
 		T s;
+		int i;
 
 		s = 0.;
 		for (i=0; i<n; i++) s += x(i);
@@ -45,34 +40,25 @@ class Func2 {
 };
 
 
-class Func3 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
-		int n = x.size();
-		ub::vector<T> y(n);
-		int i;
-
-		T z = x(0) * x(0) * x(0);
-		for (i=1; i<n; i++) z = z + x(i) * x(i) * x(i);
-
-		for (i=0; i<n; i++) {
-			y(i) = x(i) - (z + (i+1.)) * (1./(2.*n));
-		}
-
-		return y;
-	}
-};
-
 int main()
 {
 	int i;
 	boost::timer t;
 	ub::vector< kv::interval<double> > I;
 
+	std::cout.precision(17);
+
+	I.resize(2);
+	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
+
+	t.restart();
+	allsol(I, Func());
+	std::cout << t.elapsed() << " sec\n";
+
 	I.resize(5);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
 
 	t.restart();
-	allsol(I, Func2());
+	allsol(I, Yamamura1());
 	std::cout << t.elapsed() << " sec\n";
 }

@@ -137,8 +137,16 @@ int main()
 	// comparison with string
 	std::cout << ("0.20001" > x) << "\n";
 
-	// numeric constants
+	// numeric constants (interval)
+	std::cout << kv::constants<itvd>::pi() << "\n";
+	std::cout << kv::constants<itvd>::e() << "\n";
+	std::cout << kv::constants<itvd>::ln2() << "\n";
+	std::cout << kv::constants<itvd>::str("0.1") << "\n";
+	std::cout << kv::constants<itvd>::str("0.1", "0.2") << "\n";
+
+	// numeric constants (double)
 	std::cout << kv::constants<double>::pi() << "\n";
 	std::cout << kv::constants<double>::e() << "\n";
 	std::cout << kv::constants<double>::ln2() << "\n";
+	std::cout << kv::constants<double>::str("0.1") << "\n";
 }

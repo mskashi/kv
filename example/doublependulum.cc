@@ -50,7 +50,7 @@ int main()
 
 	itvd end;
 
-	itvd p = kv::constants<double>::pi();
+	itvd p = kv::constants<itvd>::pi();
 
 	ix.resize(4);
 	ix(0) = itvd(0.99, 1.01) * 3 * p / 4;

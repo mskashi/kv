@@ -25,4 +25,9 @@ int main()
 	std::cout << std::boolalpha;
 	std::cout << (z < 0.2) << "\n";
 	std::cout << (z < "0.100001") << "\n";
+
+	std::cout << kv::constants<dd>::pi() << "\n";
+	std::cout << kv::constants<dd>::e() << "\n";
+	std::cout << kv::constants<dd>::ln2() << "\n";
+	std::cout << kv::constants<dd>::str("0.1") << "\n";
 }

@@ -30,6 +30,8 @@ template <class T> class complex {
 
 	public:
 
+	typedef T base_type;
+
 	complex() {
 		re = 0.;
 		im = 0.;

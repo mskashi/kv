@@ -31,15 +31,15 @@ int main()
 
 	Ueda f;
 
-	kv::StroboMap<Ueda,double> g1(f, (itvd)0., kv::constants<double>::pi() * 2.);
+	kv::StroboMap<Ueda,double> g1(f, (itvd)0., kv::constants<itvd>::pi() * 2.);
 
 	kv::FixedPoint< kv::StroboMap<Ueda,double> > h1(g1);
 
-	kv::StroboMap<Ueda,double> g2(f, (itvd)0., kv::constants<double>::pi() * 4.);
+	kv::StroboMap<Ueda,double> g2(f, (itvd)0., kv::constants<itvd>::pi() * 4.);
 
 	kv::FixedPoint< kv::StroboMap<Ueda,double> > h2(g2);
 
-	kv::StroboMap<Ueda,double> g4(f, (itvd)0., kv::constants<double>::pi() * 8.);
+	kv::StroboMap<Ueda,double> g4(f, (itvd)0., kv::constants<itvd>::pi() * 8.);
 
 	kv::FixedPoint< kv::StroboMap<Ueda,double> > h4(g4);
 

@@ -17,6 +17,7 @@
 #include <cstdlib>
 
 #include <kv/convert.hpp>
+#include <kv/constants.hpp>
 #include <kv/fpu53.hpp>
 
 

@@ -500,7 +500,7 @@ class Math_Maple {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(0., kv::constants<T>::pi().upper() * 2.);
+			x(i).assign(0., kv::constants< kv::interval<T> >::pi().upper() * 2.);
 		}
 	}
 };

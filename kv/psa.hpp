@@ -36,6 +36,8 @@ template <class T> class psa {
 	public:
 	ub::vector<T> v;
 
+	typedef T base_type;
+
 	static int& mode() {
 		static int m = 1;
 		#pragma omp threadprivate (m)

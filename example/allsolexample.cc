@@ -79,4 +79,10 @@ int main()
 	t.restart();
 	allsol(I, Heihachiro());
 	cout << t.elapsed() << " sec\n";
+
+	Yamamura2().range(7, I);
+	std::cout << "Yamamura2(7)\n";
+	t.restart();
+	allsol(I, Yamamura2());
+	cout << t.elapsed() << " sec\n";
 }

@@ -334,3 +334,38 @@ class Heihachiro {
 	}
 };
 
+
+//
+// 山村先生の論文によく出てくる区分線形な方程式
+//
+
+class Yamamura2 {
+	public:
+	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+		int n = x.size();
+		ub::vector<T> y(n);
+		T s;
+		int i;
+
+		s = 0.;
+		for (i=0; i<n; i++) {
+			s += pow(x(i), 3);
+		}
+
+		for (i=0; i<n; i++) {
+			y(i) = x(i) - (s + (i + 1.)) / (2. * n);
+		}
+
+		return y;
+	}
+
+	template<class T>
+	void range(int n, ub::vector< kv::interval<T> >& x) {
+		int i;
+
+		x.resize(n);
+		for (i=0; i<n; i++) {
+			x(i).assign(-2.5, 2.5);
+		}
+	}
+};

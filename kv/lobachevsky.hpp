@@ -91,7 +91,7 @@ interval<T> loba_origin(const interval<T>& x) {
 
 template <class T>
 interval<T> loba_point(const interval<T>& x) {
-	static const interval<T> pi = constants<T>::pi();
+	static const interval<T> pi = constants< interval<T> >::pi();
 
 	if (x.lower() >= (pi * 0.5).upper()) {
 		return loba_point(x - pi);
@@ -109,7 +109,7 @@ interval<T> loba_point(const interval<T>& x) {
 
 template <class T>
 interval<T> loba(const interval<T>& x) {
-	static const interval<T> pi = constants<T>::pi();
+	static const interval<T> pi = constants< interval<T> >::pi();
 	static const interval<T> pi12 = pi * 0.5;
 	static const interval<T> pi16 = pi / 6.;
 	static const interval<T> pi56 = pi16 * 5.;

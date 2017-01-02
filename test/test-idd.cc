@@ -110,7 +110,8 @@ int main()
 	x += "0.1";
 	std::cout << ("0.20001" > x) << "\n";
 
-	std::cout << kv::constants<kv::dd>::pi() << "\n";
-	std::cout << kv::constants<kv::dd>::e() << "\n";
-	std::cout << kv::constants<kv::dd>::ln2() << "\n";
+	std::cout << kv::constants<itvd>::pi() << "\n";
+	std::cout << kv::constants<itvd>::e() << "\n";
+	std::cout << kv::constants<itvd>::ln2() << "\n";
+	std::cout << kv::constants<itvd>::str("0.1") << "\n";
 }

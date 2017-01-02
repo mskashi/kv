@@ -12,6 +12,7 @@
 #include <string>
 
 #include <kv/convert.hpp>
+#include <kv/constants.hpp>
 
 
 namespace kv {
@@ -100,13 +101,13 @@ template <class C, class T> struct acceptable_s<C, interval<T> > {
 };
 
 
-template <class T> class constants;
-
 template <class T> class interval {
 	T inf;
 	T sup;
 
 	public:
+
+	typedef T base_type;
 
 	interval() {
 		inf = 0.;
@@ -938,7 +939,7 @@ template <class T> class interval {
 			return interval(0.);
 		}
 
-		remainder = interval((1./sqrt(constants<T>::e())).lower(), sqrt(constants<T>::e()).upper());
+		remainder = interval((1./sqrt(constants<interval>::e())).lower(), sqrt(constants<interval>::e()).upper());
 
 		using std::floor;
 		if (x >= 0.) {
@@ -971,9 +972,9 @@ template <class T> class interval {
 		}
 
 		if (x_i >= 0.) {
-			r *= pow(constants<T>::e(), (int)x_i);
+			r *= pow(constants<interval>::e(), (int)x_i);
 		} else {
-			r /= pow(constants<T>::e(), -(int)x_i);
+			r /= pow(constants<interval>::e(), -(int)x_i);
 		}
 
 		return r;
@@ -987,7 +988,7 @@ template <class T> class interval {
 		interval r, y, remainder;
 		int i;
 
-		remainder = interval((1./sqrt(constants<T>::e())).lower(), sqrt(constants<T>::e()).upper());
+		remainder = interval((1./sqrt(constants<interval>::e())).lower(), sqrt(constants<interval>::e()).upper());
 
 		r = 0.;
 		y = 1.;
@@ -1077,7 +1078,7 @@ template <class T> class interval {
 			}
 		}
 
-		r += constants<T>::ln2() * p;
+		r += constants<interval>::ln2() * p;
 
 		if (round == -1) return r.lower();
 		else return r.upper();
@@ -1187,7 +1188,7 @@ template <class T> class interval {
 	}
 
 	static interval sin_point(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 		const T mpi = mid(pi);
 
 		if (I.lower() >= mpi) {
@@ -1219,7 +1220,7 @@ template <class T> class interval {
 	}
 
 	static interval cos_point(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 		const T mpi = mid(pi);
 
 		if (I.lower() >= mpi) {
@@ -1251,7 +1252,7 @@ template <class T> class interval {
 	}
 
 	friend interval sin(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 		const interval pi2 = pi * 2.;
 
 		T n;
@@ -1298,7 +1299,7 @@ template <class T> class interval {
 	}
 
 	friend interval cos(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 		const interval pi2 = pi * 2.;
 
 		T n;
@@ -1353,7 +1354,7 @@ template <class T> class interval {
 	}
 
 	friend interval tan(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 		const interval pih = pi * 0.5;
 
 		T n;
@@ -1409,7 +1410,7 @@ template <class T> class interval {
 	}
 
 	static interval atan_point(const T& x) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 
 		interval I = interval(x);
 
@@ -1433,7 +1434,7 @@ template <class T> class interval {
 	}
 
 	static interval asin_point(const T& x) {
-		const interval pih = constants<T>::pi() * 0.5;
+		const interval pih = constants<interval>::pi() * 0.5;
 
 		if (x == 1) return pih;
 		if (x == -1) return -pih;
@@ -1454,7 +1455,7 @@ template <class T> class interval {
 	}
 
 	static interval pih_m_atan_point(const interval& I) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 
 		if (I.lower() < -(std::sqrt(2.) + 1.)) {
 			return pi + atan_origin(1. / I);
@@ -1472,7 +1473,7 @@ template <class T> class interval {
 	}
 
 	static interval acos_point(const T& x) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 
 		if (x == 1.) return interval(0.);
 		if (x == -1.) return pi;
@@ -1493,7 +1494,7 @@ template <class T> class interval {
 	}
 
 	static interval atan2_point(const T& y, const T& x) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 
 		interval Ix = interval(x);
 		interval Iy = interval(y);
@@ -1515,7 +1516,7 @@ template <class T> class interval {
 	}
 
 	friend interval atan2(const interval& Iy, const interval& Ix) {
-		const interval pi = constants<T>::pi();
+		const interval pi = constants<interval>::pi();
 
 		if (zero_in(Ix)) {
 			if (zero_in(Iy)) {
@@ -1554,7 +1555,7 @@ template <class T> class interval {
 
 	static interval sinh_origin(const T& x) {
 		// cosh(0.5) = (exp(0.5)+exp(-0.5))/2
-		const interval exph = sqrt(constants<T>::e());
+		const interval exph = sqrt(constants<interval>::e());
 		const interval coshh = (exph + 1. / exph) * 0.5;
 
 		interval tmp;
@@ -1661,9 +1662,8 @@ template <class T> class interval {
 	}
 };
 
-template <class T> class constants {
-	public:
 
+template <class T> struct constants< interval<T> > {
 	static interval<T> pi() {
 		// static is used so that string is evaluated only "one time"
 		static const interval<T> tmp(
@@ -1686,6 +1686,14 @@ template <class T> class constants {
 			"0.69314718055994530941723212145817656807550013436025",
 			"0.69314718055994530941723212145817656807550013436026"
 		);
+		return tmp;
+	}
+	static interval<T> str(const std::string& s) {
+		static const interval<T> tmp(s, s);
+		return tmp;
+	}
+	static interval<T> str(const std::string& s1, const std::string& s2) {
+		static const interval<T> tmp(s1, s2);
 		return tmp;
 	}
 };
