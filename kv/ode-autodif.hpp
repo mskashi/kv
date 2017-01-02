@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -23,20 +24,6 @@
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
-#endif
-
-#if 0
-#ifndef TOL1
-#define TOL1 0.1
-#endif
-
-#ifndef TOL2
-#define TOL2 100.
-#endif
-
-#ifndef TOL3
-#define TOL3 0.01
-#endif
 #endif
 
 
@@ -61,7 +48,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 	autodif< interval<T> > evalz;
 
 	psa< autodif< interval<T> > > temp;
-	T m, m_tmp;
+	T m;
 	ub::vector<T> newton_step;
 
 	bool flag, resized;
@@ -83,25 +70,15 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 
 	new_init = autodif< interval<T> >::compress(init, save);
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(new_init(i).v) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
-		#if 0
-		m_tmp = rad(new_init(i).v) * TOL1;
-		if (m_tmp > m) m = m_tmp;
-		#endif
+		m = std::max(m, norm(new_init(i).v));
 		new_init(i).d.resize(n);
 		for (j=0; j<n; j++) {
-			m_tmp = norm(new_init(i).d(j)) * p.epsilon;
-			if (m_tmp > m) m = m_tmp;
-			#if 0
-			m_tmp = rad(new_init(i).d(j)) * TOL1;
-			if (m_tmp > m) m = m_tmp;
-			#endif
+			m = std::max(m, norm(new_init(i).d(j)));
 		}
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = new_init;
 	torg.v.resize(2);
@@ -136,18 +113,17 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m_tmp = norm(x(i).v(j).v);
-				m_tmp = mid(x(i).v(j).v);
-				if (m_tmp < 0.) m_tmp = -m_tmp;
-				if (m_tmp > m) m = m_tmp;
+				// m = std::max(m, norm(x(i).v(j).v));
+				using std::abs;
+				m = std::max(m, abs(mid(x(i).v(j).v)));
 				// 微分項は考慮しない手もある。
 				#ifdef IGNORE_DIF_PART
 				#else
 				km = x(i).v(j).d.size();
 				for (k=0; k<km; k++) {
-					// m_tmp = norm(x(i).v(j).d(k));
-					m_tmp = mid(x(i).v(j).d(k));
-					if (m_tmp > m) m = m_tmp;
+					// m = std::max(m, norm(x(i).v(j).d(k)));
+					using std::abs;
+					m = std::max(m, abs(mid(x(i).v(j).d(k))));
 				}
 				#endif
 			}
@@ -185,7 +161,19 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		z = x;
 		t = setorder(torg, p.order);
 
-		w = f(z, t);
+		try {
+			w = f(z, t);
+		} catch (std::range_error& e) {
+			if (restart < p.restart_max) {
+				psa< autodif< interval<T> > >::use_history() = false;
+				radius *= 0.5;
+				restart++;
+				continue;
+                        } else {
+				throw std::range_error("ode: evaluation error");
+                        }
+
+		}
 
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
@@ -219,20 +207,18 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			m = 0.;
 			for (i=0; i<n; i++) {
 				evalz = eval(z(i), autodif< interval<T> >(deltat));
-				m_tmp = rad(evalz.v) - rad(new_init(i).v);
-				if (m_tmp > m) m = m_tmp;
+				m = std::max(m, rad(evalz.v) - rad(new_init(i).v));
 				evalz.d.resize(n);
 				for (j=0; j<n; j++) {
-					m_tmp = rad(evalz.d(j)) - rad(new_init(i).d(j));
-					if (m_tmp > m) m = m_tmp;
+					m = std::max(m, rad(evalz.d(j)) - rad(new_init(i).d(j)));
 				}
 			}
 			m = m / tolerance;
-			#if 0
-			if (m > TOL2) m = TOL2;
-			if (m < TOL3) m = TOL3;
-			#endif
-			radius /= std::pow((double)m, 1. / p.order);
+			if (restart > 0) {
+				radius /= std::max(1., std::pow((double)m, 1. / p.order));
+			} else {
+				radius /= std::pow((double)m, 1. / p.order);
+			}
 			continue;
 		}
 

@@ -1,20 +1,16 @@
 #include <iostream>
 #include <kv/defint.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 typedef kv::interval<double> itvd;
 
 
-class Func {
-	public:
+struct Func {
 	template <class T> T operator() (T x) {
 		return 1./x;
 	}
 };
 
-class Kahaner10 {
-	public:
+struct Kahaner10 {
 	template <class T> T operator() (T x) {
 		return 1./(1. + x);
 	}

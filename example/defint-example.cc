@@ -1,17 +1,23 @@
 #include <iostream>
 #include <kv/defint.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 typedef kv::interval<double> itvd;
+
+
+// simple constant problem
+
+struct Constant_Example {
+	template <class T> T operator() (T x) {
+		return (T)1.;
+	}
+};
 
 /*
  *  Knut Petras: "Principles of verified numerical integration".
  * QUADPACK returns wrong solution.
  */
 
-class Petras {
-	public:
+struct Petras {
 	template <class T> T operator() (T x) {
 		return 5. * sin(x) + (9.*x-4.)*(9*x-8.)*(3*x-4.)*(9.*x-10.)*(kv::constants<T>::pi() - 2.*x)/(1.+(90.*x-110.)*(90.*x-110.)*(90.*x-110.)*(90.*x-110.));
 	}
@@ -21,16 +27,14 @@ class Petras {
  *  http://www.ti3.tuhh.de/intlab/demos/html/dtaylor.html
  */
 
-class DTaylor {
-	public:
+struct DTaylor {
 	template <class T> T operator() (T x) {
 		static T pi(kv::constants<itvd>::pi());
 		return sin(pi * x) - sin(x);
 	}
 };
 
-class Sqrt {
-	public:
+struct Sqrt {
 	template <class T> T operator() (T x) {
 		return sqrt(x);
 	}
@@ -40,8 +44,7 @@ class Sqrt {
  *  \int_{-1}^1 f(x)dx = pi - 2
  */
 
-class Func1 {
-	public:
+struct Func1 {
 	template <class T> T operator() (T x) {
 		return (1. - x * x) / (1 + x * x);
 	}
@@ -53,15 +56,13 @@ class Func1 {
  * p.86
  */
 
-class Rump1 {
-	public:
+struct Rump1 {
 	template <class T> T operator() (T x) {
 		return sin(x + exp(x));
 	}
 };
 
-class Nanbu {
-	public:
+struct Nanbu {
 	template <class T> T operator() (T x) {
 		return log(cos(sqrt(6. * pow(x, 4) + 2. * pow(x, 3) + 1)) + x) / exp(sin(sqrt(pow(x, 2) + 4. * x)) + pow(x, 2));
 	}
@@ -71,6 +72,7 @@ class Nanbu {
 int main() {
 	std::cout.precision(17);
 
+	std::cout << kv::defint_autostep(Constant_Example(), (itvd)0., (itvd)1., 12) << "\n";
 	std::cout << kv::defint_autostep(Petras(), (itvd)0., kv::constants<itvd>::pi(), 12) << "\n";
 	std::cout << kv::defint_autostep(DTaylor(), (itvd)0., (itvd)20., 12) << "\n";
 	std::cout << kv::defint_autostep(Sqrt(), (itvd)"0.0001", (itvd)2., 12) << "\n";

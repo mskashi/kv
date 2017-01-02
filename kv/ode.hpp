@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_HPP
@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -21,20 +22,6 @@
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
-#endif
-
-#if 0
-#ifndef TOL1
-#define TOL1 0.1
-#endif
-
-#ifndef TOL2
-#define TOL2 100.
-#endif
-
-#ifndef TOL3
-#define TOL3 0.01
-#endif
 #endif
 
 
@@ -56,7 +43,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 	ub::vector< psa< interval<T> > > z, w;
 
 	psa< interval<T> > temp;
-	T m, m_tmp;
+	T m;
 	ub::vector<T> newton_step;
 
 	bool flag, resized;
@@ -74,16 +61,11 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 	bool save_mode, save_uh, save_rh;
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(init(i)) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
-		#if 0
-		m_tmp = rad(init(i)) * TOL1;
-		if (m_tmp > m) m = m_tmp;
-		#endif
+		m = std::max(m, norm(init(i)));
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = init;
 	torg.v.resize(2);
@@ -120,10 +102,9 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m_tmp = norm(x(i).v(j));
-				m_tmp = mid(x(i).v(j));
-				if (m_tmp < 0.) m_tmp = -m_tmp;
-				if (m_tmp > m) m = m_tmp;
+				// m = std::max(m, norm(x(i).v(j)));
+				using std::abs;
+				m = std::max(m, abs(mid(x(i).v(j))));
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);
@@ -160,7 +141,18 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		z = x;
 		t = setorder(torg, p.order);
 
-		w = f(z, t);
+		try {
+			w = f(z, t);
+		} catch (std::range_error& e) {
+			if (restart < p.restart_max) {
+				psa< interval<T> >::use_history() = false;
+				radius *= 0.5;
+				restart++;
+				continue;
+			} else {
+				throw std::range_error("ode: evaluation error");
+			}
+		}
 
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
@@ -181,15 +173,14 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			resized = true;
 			m = 0.;
 			for (i=0; i<n; i++) {
-				m_tmp = rad(eval(z(i), deltat)) - rad(init(i));
-				if (m_tmp > m) m = m_tmp;
+				m = std::max(m, rad(eval(z(i), deltat)) - rad(init(i)));
 			}
 			m = m / tolerance;
-			#if 0
-			if (m > TOL2) m = TOL2;
-			if (m < TOL3) m = TOL3;
-			#endif
-			radius /= std::pow((double)m, 1. / p.order);
+			if (restart > 0) {
+				radius /= std::max(1., std::pow((double)m, 1. / p.order));
+			} else {
+				radius /= std::pow((double)m, 1. / p.order);
+			}
 			continue;
 		}
 

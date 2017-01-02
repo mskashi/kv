@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_LOHNER_HPP
@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -25,11 +26,6 @@
 #define ODE_FAST 1
 #endif
 
-#if 0
-#ifndef TOL1
-#define TOL1 0.1
-#endif
-#endif
 
 namespace ub = boost::numeric::ublas;
 
@@ -50,7 +46,7 @@ ode_lohner(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	ub::vector< psa< interval<T> > > z, w;
 
 	psa< interval<T> > temp;
-	T m, m_tmp;
+	T m;
 	ub::vector<T> newton_step;
 
 	bool flag;
@@ -71,16 +67,11 @@ ode_lohner(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 	ub::vector< interval<T> > V, V2;
 	interval<T> tste;
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(init(i)) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
-		#if 0
-		m_tmp = rad(init(i)) * TOL1;
-		if (m_tmp > m) m = m_tmp;
-		#endif
+		m = std::max(m, norm(init(i)));
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = init;
 	torg.v.resize(2);
@@ -115,10 +106,9 @@ ode_lohner(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 		for (j = p.order-1; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m_tmp = norm(x(i).v(j));
-				m_tmp = mid(x(i).v(j));
-				if (m_tmp < 0.) m_tmp = -m_tmp;
-				if (m_tmp > m) m = m_tmp;
+				// m = std::max(m, norm(x(i).v(j)));
+				using std::abs;
+				m = std::max(m, abs(mid(x(i).v(j))));
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);
@@ -242,7 +232,7 @@ ode_lohner(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 	ub::vector< psa< autodif< interval<T> > > > z, w;
 
 	psa< autodif< interval<T> > > temp;
-	T m, m_tmp;
+	T m;
 	ub::vector<T> newton_step;
 
 	bool flag;
@@ -268,25 +258,15 @@ ode_lohner(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 
 	new_init = autodif< interval<T> >::compress(init, save);
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
-		m_tmp = norm(new_init(i).v) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
-		#if 0
-		m_tmp = rad(new_init(i).v) * TOL1;
-		if (m_tmp > m) m = m_tmp;
-		#endif
+		m = std::max(m, norm(new_init(i).v));
 		new_init(i).d.resize(n);
 		for (j=0; j<n; j++) {
-			m_tmp = norm(new_init(i).d(j)) * p.epsilon;
-			if (m_tmp > m) m = m_tmp;
-			#if 0
-			m_tmp = rad(new_init(i).d(j)) * TOL1;
-			if (m_tmp > m) m = m_tmp;
-			#endif
+			m = std::max(m, norm(new_init(i).d(j)));
 		}
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = new_init;
 	torg.v.resize(2);
@@ -321,16 +301,15 @@ ode_lohner(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 		for (j = p.order-1; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m_tmp = norm(x(i).v(j));
-				m_tmp = mid(x(i).v(j).v);
-				if (m_tmp < 0.) m_tmp = -m_tmp;
-				if (m_tmp > m) m = m_tmp;
+				// m = std::max(m, norm(x(i).v(j)));
+				using std::abs;
+				m = std::max(m, abs(mid(x(i).v(j).v)));
 				#ifdef IGNORE_DIF_PART
 				#else
 				km = x(i).v(j).d.size();
 				for (k=0; k<km; k++) {
-					m_tmp = mid(x(i).v(j).d(k));
-					if (m_tmp > m) m = m_tmp;
+					using std::abs;
+					m = std::max(m, abs(mid(x(i).v(j).d(k))));
 				}
 				#endif
 			}

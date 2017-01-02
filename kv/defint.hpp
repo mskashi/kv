@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 #include <kv/psa.hpp>
@@ -20,10 +21,8 @@ namespace ub = boost::numeric::ublas;
 #define DEFINT_FAST 1
 #endif
 
-#if 0
-#ifndef TOL1
-#define TOL1 0.1
-#endif
+#ifndef RESTART_MAX
+#define RESTART_MAX 10
 #endif
 
 
@@ -89,16 +88,18 @@ defint(F f, interval<T> start, interval<T> end, int order, int n) {
 
 template <class T, class F>
 interval<T>
-defint_autostep(F f, interval<T> start, interval<T> end, int order) {
+defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = std::numeric_limits<T>::epsilon()) {
 	interval<T> t, t1, z, step, result;
 	psa< interval<T> > x, y;
 	int i;
 	bool flag;
 	bool save_mode, save_uh, save_rh;
 
-	T radius, radius_tmp, m, m_tmp;
+	T radius, radius_tmp, m;
 	T tolerance;
 	int n_rad;
+	bool resized;
+	int restart;
 
 	save_mode = psa< interval<T> >::mode();
 	save_uh = psa< interval<T> >::use_history();
@@ -115,16 +116,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order) {
 	result = 0.;
 
 	while (1) {
-		flag = false;
-
-		m = std::numeric_limits<T>::epsilon();
-		m_tmp = norm(result) * std::numeric_limits<T>::epsilon();
-		if (m_tmp > m) m = m_tmp;
-		#if 0
-		m_tmp = rad(result) * TOL1;
-		if (m_tmp > m) m = m_tmp;
-		#endif
-		tolerance = m;
+		tolerance = std::max(1., norm(result)) * epsilon;
 
 		x.v(0) = t;
 		psa< interval<T> >::mode() = 1;
@@ -150,33 +142,61 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order) {
 		}
 		radius = std::pow((double)tolerance, 1./order) / radius;
 
-		step = end - t;
-
-		if (subset(step, interval<T>(-radius, radius))) {
-			t1 = end;
-			flag = true;
-		} else {
-			if (step.lower() > 0.) {
-				t1 = mid(t + radius);
-			} else {
-				t1 = mid(t - radius);
-			}
-			step = t1 - t;
-		}
-
-		// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
-		psa< interval<T> >::domain() = interval<T>::hull(0., step);
-
-		x.v(0) = t;
+		// x.v(0) = t;
 		psa< interval<T> >::mode() = 2;
 		#if DEFINT_FAST == 1
 		psa< interval<T> >::use_history() = true;
-		psa< interval<T> >::record_history() = false;
+		// psa< interval<T> >::record_history() = false;
 		#endif
-		y = integrate(f(x));
-		// z = eval(y, step) - eval(y, 0.);
-		// eval(y, 0.) == 0のはず
-		z = eval(y, step);
+
+		resized = false;
+		restart = 0;
+		while (true) {
+			step = end - t;
+
+			if (subset(step, interval<T>(-radius, radius))) {
+				flag = true;
+				t1 = end;
+			} else {
+				flag = false;
+				if (step.lower() > 0.) {
+					t1 = mid(t + radius);
+				} else {
+					t1 = mid(t - radius);
+				}
+				step = t1 - t;
+			}
+
+			// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
+			psa< interval<T> >::domain() = interval<T>::hull(0., step);
+
+			try {
+				y = integrate(f(x));
+			} catch (std::range_error& e) {
+				if (restart < RESTART_MAX) {
+					psa< interval<T> >::use_history() = false;
+					radius *= 0.5;
+					restart++;
+					continue;
+				} else {
+					throw std::range_error("defint_autostep: evaluation error");
+				}
+			}
+
+			// z = eval(y, step) - eval(y, 0.);
+			// eval(y, 0.) == 0のはず
+			z = eval(y, step);
+
+			if (resized == true) break;
+
+			resized = true;
+			m = rad(z) / tolerance;
+			if (restart > 0) {
+				radius /= std::max(1., std::pow((double)m, 1. / order));
+			} else {
+				radius /= std::pow((double)m, 1. / order);
+			}
+		}
 		result += z;
 		if (flag) break;
 		t = t1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef GAMMA_HPP
@@ -7,7 +7,7 @@
 
 #include <kv/defint.hpp>
 
-// Lobachevsky function
+// gamma function
 
 namespace kv {
 
@@ -35,7 +35,7 @@ template <class T, class F>
 interval<T>
 defint_power(F f, interval<T> start, interval<T> end, int order, interval<T> power) {
 	int i;
-	interval<T> step, c, result, tx, tp;
+	interval<T> step, result, tx, tp;
 	psa< interval<T> > x, y;
 	bool save_mode, save_uh, save_rh;
 
@@ -50,9 +50,8 @@ defint_power(F f, interval<T> start, interval<T> end, int order, interval<T> pow
 
 	psa< interval<T> >::domain() = interval<T>::hull(0, step);
 
-	c = start;
 	x.v.resize(2);
-	x.v(0) = c;
+	x.v(0) = start;
 	x.v(1) = 1;
 	x = setorder(x, order);
 

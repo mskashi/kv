@@ -460,8 +460,10 @@ template <class T> class psa {
 		r = 1./a;
 		hn = 1.;
 		xn = 1./a;
-		range = evalrange(x);
-		xn2 = 1./range;
+		if (mode() == 2) {
+			range = evalrange(x);
+			xn2 = 1./range;
+		}
 		if (use_history() == true) {
 			old_size = history().front().v.size();
 		}
@@ -481,7 +483,9 @@ template <class T> class psa {
 			} else {
 				hn *= h;
 				xn = -xn / a;
-				xn2 = -xn2 / range;
+				if (mode() == 2) {
+					xn2 = -xn2 / range;
+				}
 				r += xn * hn;
 			}
 		}
@@ -664,8 +668,10 @@ template <class T> class psa {
 		r = sqrt_a;
 		hn = 1.;
 		xn = 1./(2. * sqrt_a);
-		range = evalrange(x);
-		xn2 = 1./(2. * sqrt(range));
+		if (mode() == 2) {
+			range = evalrange(x);
+			xn2 = 1./(2. * sqrt(range));
+		}
 		if (use_history() == true) {
 			old_size = history().front().v.size();
 		}
@@ -685,7 +691,9 @@ template <class T> class psa {
 				hn *= h;
 				r += xn * hn;
 				xn *= (1./2. - i) / a / (i + 1.);
-				xn2 *= (1./2. - i) / range / (i + 1.);
+				if (mode() == 2) {
+					xn2 *= (1./2. - i) / range / (i + 1.);
+				}
 			}
 		}
 		if (recover_uh) use_history() = true;
@@ -709,8 +717,10 @@ template <class T> class psa {
 		r = log(a);
 		hn = 1.;
 		xn = -1.;
-		range = evalrange(x);
-		xn2 = -1.;
+		if (mode() == 2) {
+			range = evalrange(x);
+			xn2 = -1.;
+		}
 		if (use_history() == true) {
 			old_size = history().front().v.size();
 		}
@@ -730,7 +740,9 @@ template <class T> class psa {
 			} else {
 				hn *= h;
 				xn = -xn / a;
-				xn2 = -xn2 / range;
+				if (mode() == 2) {
+					xn2 = -xn2 / range;
+				}
 				r += xn / (double)i * hn;
 			}
 		}
