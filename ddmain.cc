@@ -1,4 +1,5 @@
 #include "interval.hpp"
+#include "rdouble.hpp"
 #include "dd.hpp"
 #include "rdd.hpp"
 

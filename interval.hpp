@@ -13,8 +13,7 @@
 
 namespace kv {
 
-template <class T> class rop {
-	public:
+template <class T> struct rop {
 
 	static T add_up(const T& x, const T& y) {
 		return x + y;
@@ -1538,7 +1537,7 @@ template <class T> class constants {
 	public:
 
 	static interval<T> pi() {
-		// static is used for evaluating string "one time"
+		// static is used so that string is evaluated only "one time"
 		static const interval<T> tmp(
 			"3.1415926535897932384626433832795028841971693993751",
 			"3.1415926535897932384626433832795028841971693993752"

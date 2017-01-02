@@ -1,74 +1,52 @@
 #ifndef RDD_HPP
 #define RDD_HPP
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <float.h>
-#else
-#include <fenv.h>
-#endif
+#include "hwround.hpp"
 
 
 namespace kv {
 
-template <> class rop <dd> {
-	public:
+template <> struct rop <dd> {
 
-	static void roundnear() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_NEAR, _MCW_RC);
-		#else
-		fesetround(FE_TONEAREST);
-		#endif
-	}
+	static void safe_split(const double& a, double& x, double& y) {
+		static const double th = ldexp(1., 996);
+		static const double c1 = ldexp(1., -28);
+		static const double c2 = ldexp(1., 28);
 
-	static void rounddown() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_DOWN, _MCW_RC);
-		#else
-		fesetround(FE_DOWNWARD);
-		#endif
-	}
-
-	static void roundup() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_UP, _MCW_RC);
-		#else
-		fesetround(FE_UPWARD);
-		#endif
-	}
-
-	static void roundchop() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_UP, _MCW_RC);
-		#else
-		fesetround(FE_TOWARDZERO);
-		#endif
+		if (-th <= a && a <= th) {
+			dd::split(a, x, y);
+		} else {
+			double a1 = a * c1;
+			dd::split(a1, x, y);
+			x *= c2;
+			y *= c2;
+		}
 	}
 
 	static void twoproduct_up(const double& a, const double& b, double& x, double& y) {
 		double a1, a2, b1, b2;
 		volatile double v1, v2, v3, v4, v5, v6;
 		x = a * b;
-		dd::split(a, a1, a2);
-		dd::split(b, b1, b2);
-		roundup();
+		safe_split(a, a1, a2);
+		safe_split(b, b1, b2);
+		hwround::roundup();
 		v1 = x; v3 = a1; v4 = a2; v5 =b1; v6 = b2; 
 		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) + v4 * v6;
 		y = v2;
-		roundnear();
+		hwround::roundnear();
 	}
 
 	static void twoproduct_down(const double& a, const double& b, double& x, double& y) {
 		double a1, a2, b1, b2;
 		volatile double v1, v2, v3, v4, v5, v6;
 		x = a * b;
-		dd::split(a, a1, a2);
-		dd::split(b, b1, b2);
-		rounddown();
+		safe_split(a, a1, a2);
+		safe_split(b, b1, b2);
+		hwround::rounddown();
 		v1 = x; v3 = a1; v4 = a2; v5 =b1; v6 = b2; 
 		v2 = (((v3 * v5 - v1) + v4 * v5) + v3 * v6) + v4 * v6;
 		y = v2;
-		roundnear();
+		hwround::roundnear();
 	}
 
 	static dd add_up(const dd& x, const dd& y) {
@@ -76,11 +54,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3;
 
 		dd::twosum(x.a1, y.a1, z1, z2);
-		roundup();
+		hwround::roundup();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 + v3;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -91,11 +69,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3;
 
 		dd::twosum(x.a1, y.a1, z1, z2);
-		rounddown();
+		hwround::rounddown();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 + v3;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -106,11 +84,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3;
 
 		dd::twosum(x.a1, -y.a1, z1, z2);
-		roundup();
+		hwround::roundup();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 - v3;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -121,11 +99,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3;
 
 		dd::twosum(x.a1, -y.a1, z1, z2);
-		rounddown();
+		hwround::rounddown();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 - v3;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -136,11 +114,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3, v4, v5;
 
 		twoproduct_up(x.a1, y.a1, z1, z2);
-		roundup();
+		hwround::roundup();
 		v1 = z2; v2 = x.a1; v3 = x.a2; v4 = y.a1; v5 = y.a2;
 		v1 += v2 * v5 + v3 * v4 + v3 * v5;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -151,11 +129,11 @@ template <> class rop <dd> {
 		volatile double v1, v2, v3, v4, v5;
 
 		twoproduct_down(x.a1, y.a1, z1, z2);
-		rounddown();
+		hwround::rounddown();
 		v1 = z2; v2 = x.a1; v3 = x.a2; v4 = y.a1; v5 = y.a2;
 		v1 += v2 * v5 + v3 * v4 + v3 * v5;
 		z2 = v1;
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -170,22 +148,22 @@ template <> class rop <dd> {
 
 		if (y >= 0.) {
 			twoproduct_up(-z1, y.a1, z3, z4);
-			rounddown();
+			hwround::rounddown();
 			v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 			tmp =  v7 + v8;
-			roundup();
+			hwround::roundup();
 			v2 = ((((v3 + v5) + (-v1) * v8) + v6) + v4) / tmp;
 			z2 = v2;
 		} else {
 			twoproduct_down(-z1, y.a1, z3, z4);
-			roundup();
+			hwround::roundup();
 			v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 			tmp =  v7 + v8;
-			rounddown();
+			hwround::rounddown();
 			v2 = ((((v3 + v5) + (-v1) * v8) + v6) + v4) / tmp;
 			z2 = v2;
 		}
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -200,22 +178,22 @@ template <> class rop <dd> {
 
 		if (y >= 0.) {
 			twoproduct_down(-z1, y.a1, z3, z4);
-			roundup();
+			hwround::roundup();
 			v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 			tmp =  v7 + v8;
-			rounddown();
+			hwround::rounddown();
 			v2 = ((((v3 + v5) + (-v1) * v8) + v6) + v4) / tmp;
 			z2 = v2;
 		} else {
 			twoproduct_up(-z1, y.a1, z3, z4);
-			rounddown();
+			hwround::rounddown();
 			v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 			tmp =  v7 + v8;
-			roundup();
+			hwround::roundup();
 			v2 = ((((v3 + v5) + (-v1) * v8) + v6) + v4) / tmp;
 			z2 = v2;
 		}
-		roundnear();
+		hwround::roundnear();
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);

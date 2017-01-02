@@ -1,7 +1,7 @@
 #ifndef AUTODIF_HPP
 #define AUTODIF_HPP
 
-// Automatic Differentiation
+// Automatic Differentiation by bottom up algorithm
 
 #include <iostream>
 #include <boost/numeric/ublas/vector.hpp>
@@ -22,9 +22,9 @@ template <class T> class autodif {
 	autodif() {
 	}
 
-	// CからTへ暗黙の型変換が可能であるようなCに対してのみ生成される。
 	template <class C> autodif(const C& x, typename boost::enable_if< boost::is_convertible<C, T> >::type* =0) {
 		v = x;
+		d.resize(0);
 	}
 
 	friend autodif operator+(const autodif& a, const autodif& b) {
@@ -43,7 +43,6 @@ template <class T> class autodif {
 		return r;
 	}
 
-	// CからTへ暗黙の型変換が可能であるようなCに対してのみ生成される。
 	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, autodif >::type operator+(const autodif& a, const C& b) {
 		autodif r;
 
@@ -62,24 +61,13 @@ template <class T> class autodif {
 		return r;
 	}
 
-#if 0
 	friend autodif& operator+=(autodif& a, const autodif& b) {
-		a.v += b.v;
-
-		if (a.d.size() == 0) {
-			a.d = b.d;
-		} else if (b.d.size() == 0) {
-		} else {
-			a.d += b.d;
-		}
-
+		a = a + b;
 		return a;
 	}
-#endif
 
-	// Cからautodifへ暗黙の型変換が可能であるようなCに対してのみ生成される。
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, autodif>, autodif& >::type operator+=(autodif& a, const C& b) {
-		a = a + b;
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, autodif& >::type operator+=(autodif& a, const C& b) {
+		a.v += b;
 		return a;
 	}
 
@@ -117,23 +105,13 @@ template <class T> class autodif {
 		return r;
 	}
 
-#if 0
 	friend autodif& operator-=(autodif& a, const autodif& b) {
-		a.v -= b.v;
-
-		if (a.d.size() == 0) {
-			a.d = -b.d;
-		} else if (b.d.size() == 0) {
-		} else {
-			a.d -= b.d;
-		}
-
+		a = a - b;
 		return a;
 	}
-#endif
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, autodif>, autodif& >::type operator-=(autodif& a, const C& b) {
-		a = a - b;
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, autodif& >::type operator-=(autodif& a, const C& b) {
+		a.v -= b;
 		return a;
 	}
 
@@ -166,7 +144,7 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a.v * b;
-		r.d = b * a.d;
+		r.d = T(b) * a.d;
 
 		return r;
 	}
@@ -175,13 +153,19 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a * b.v;
-		r.d = a * b.d;
+		r.d = T(a) * b.d;
 
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, autodif>, autodif& >::type operator*=(autodif& a, const C& b) {
+	friend autodif& operator*=(autodif& a, const autodif& b) {
 		a = a * b;
+		return a;
+	}
+
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, autodif& >::type operator*=(autodif& a, const C& b) {
+		a.v *= b;
+		a.r *= T(b);
 		return a;
 	}
 
@@ -205,7 +189,7 @@ template <class T> class autodif {
 		autodif r;
 
 		r.v = a.v / b;
-		r.d = a.d / b;
+		r.d = a.d / T(b);
 
 		return r;
 	}
@@ -219,8 +203,14 @@ template <class T> class autodif {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if< boost::is_convertible<C, autodif>, autodif& >::type operator/=(autodif& a, const C& b) {
+	friend autodif& operator/=(autodif& a, const autodif& b) {
 		a = a / b;
+		return a;
+	}
+
+	template <class C> friend typename boost::enable_if< boost::is_convertible<C, T>, autodif& >::type operator/=(autodif& a, const C& b) {
+		a.v /= b;
+		a.d /= T(b);
 		return a;
 	}
 
@@ -436,25 +426,5 @@ expand_dif
 
 	return out;
 }
-
-#if 0
-template<class T> inline autodif<T> sin (const autodif<T>& x) {
-	autodif<T> r;
-
-	r.v = sin(x.v);
-	r.d = cos(x.v) * x.d;
-
-	return r;
-}
-
-template<class T> inline autodif<T> cos (const autodif<T>& x) {
-	autodif<T> r;
-
-	r.v = cos(x.v);
-	r.d = -sin(x.v) * x.d;
-
-	return r;
-}
-#endif
 
 #endif //AUTODIF_HPP

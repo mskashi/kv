@@ -1,12 +1,6 @@
 #ifndef RDOUBLE_HPP
 #define RDOUBLE_HPP
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <float.h>
-#else
-#include <fenv.h>
-#endif
-
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -16,43 +10,11 @@
 #include <limits>
 #include <cmath>
 #include <cstdlib>
+#include "hwround.hpp"
 
 namespace kv {
 
-template <> class rop <double> {
-	public:
-
-	static void roundnear() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_NEAR, _MCW_RC);
-		#else
-		fesetround(FE_TONEAREST);
-		#endif
-	}
-
-	static void rounddown() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_DOWN, _MCW_RC);
-		#else
-		fesetround(FE_DOWNWARD);
-		#endif
-	}
-
-	static void roundup() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_UP, _MCW_RC);
-		#else
-		fesetround(FE_UPWARD);
-		#endif
-	}
-
-	static void roundchop() {
-		#if defined(_WIN32) || defined(_WIN64)
-		_controlfp(_RC_CHOP, _MCW_RC);
-		#else
-		fesetround(FE_TOWARDZERO);
-		#endif
-	}
+template <> struct rop <double> {
 
 	static double add_up(const double& x, const double& y) {
 		volatile double r, x1 = x, y1 = y;
@@ -110,9 +72,9 @@ template <> class rop <double> {
 
 	static double sqrt_down(const double& x) {
 		volatile double r, x1 = x;
-		rounddown();
+		hwround::rounddown();
 		r = sqrt(x1);
-		roundup();
+		hwround::roundup();
 
 		#if 0
 		volatile double r, x1 = x, tmp;
@@ -124,11 +86,11 @@ template <> class rop <double> {
 	}
 
 	static void begin() {
-		roundup();
+		hwround::roundup();
 	}
 
 	static void finish() {
-		roundnear();
+		hwround::roundnear();
 	}
 
 	/*

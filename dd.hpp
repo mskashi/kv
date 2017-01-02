@@ -40,7 +40,7 @@ class dd {
 	}
 
 	static void split(const double& a, double& x, double& y) {
-		const double sigma = (double)((1L << 27) + 1);
+		static const double sigma = (double)((1L << 27) + 1);
 		double tmp;
 		tmp = a * sigma;
 		x = tmp - (tmp - a);

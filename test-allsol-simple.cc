@@ -1,5 +1,6 @@
 #include "allsol-simple.hpp"
 #include "interval.hpp"
+#include "rdouble.hpp"
 #include "dd.hpp"
 #include "rdd.hpp"
 #include <boost/timer.hpp>
@@ -25,7 +26,7 @@ class Func {
 
 class Yamamura {
 	template <class T> T g(T x){
-		static T v118("11.8");
+		static const T v118 = "11.8";
 		return 2.5 * x*x*x - 10.5 * x*x + v118 * x;
 	}
 	public:
