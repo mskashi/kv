@@ -14,8 +14,6 @@
 #include <kv/rdouble.hpp>
 #include <kv/psa.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 #ifndef DEFINT_FAST
 #define DEFINT_FAST 1
@@ -27,7 +25,6 @@ namespace ub = boost::numeric::ublas;
 
 
 namespace kv {
-
 
 template <class T, class F>
 interval<T>
@@ -116,7 +113,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 	result = 0.;
 
 	while (1) {
-		tolerance = std::max(1., norm(result)) * epsilon;
+		tolerance = std::max((T)1., norm(result)) * epsilon;
 
 		x.v(0) = t;
 		psa< interval<T> >::mode() = 1;
@@ -127,7 +124,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 		#endif
 		y = integrate(f(x));
 
-		// 念のため
+		// set order preparing for constant function
 		y = setorder(y, order);
 
 		radius = 0.;
@@ -184,7 +181,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			}
 
 			// z = eval(y, step) - eval(y, 0.);
-			// eval(y, 0.) == 0のはず
+			// eval(y, 0.) should be 0
 			z = eval(y, step);
 
 			if (resized == true) break;

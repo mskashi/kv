@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE2_HPP
@@ -27,10 +27,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -205,7 +204,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 	}
 
 	Iad = autodif< interval<T> >::init(I);
-	// 自動的にautodif対応のものが呼ばれるはず
+	// NOTICE: below must be autodif version
 	ode_onlytype1(f, Iad, start, end2, p.order-1);
 
 	fc = c;

@@ -10,10 +10,11 @@
 #include <kv/affine.hpp>
 #include <kv/gnuplot.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
+
 
 template<class T>
 void jointrange(const affine<T>& x, const affine<T>& y, const gnuplot& g, int t=1)
@@ -34,9 +35,17 @@ void jointrange(const affine<T>& x, const affine<T>& y, const gnuplot& g, int t=
 	vy.resize(n+1);
 #endif
 
-	for (i=0; i<=n; i++) {
+	for (i=0; i<x.a.size(); i++) {
 		vx(i) = x.a(i);
+	}
+	for (i=x.a.size(); i<=n; i++) {
+		vx(i) = 0.;
+	}
+	for (i=0; i<y.a.size(); i++) {
 		vy(i) = y.a(i);
+	}
+	for (i=y.a.size(); i<=n; i++) {
+		vy(i) = 0.;
 	}
 
 #if AFFINE_SIMPLE >= 1

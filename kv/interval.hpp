@@ -961,6 +961,7 @@ template <class T> class interval {
 
 		while (i != 0.) {
 			i *= 0.5;
+			using std::floor;
 			tmp = floor(i);
 			if (tmp != i) {
 				i = tmp;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_HPP
@@ -27,10 +27,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -116,7 +115,6 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 				// m = std::max(m, norm(x(i).v(j).v));
 				using std::abs;
 				m = std::max(m, abs(mid(x(i).v(j).v)));
-				// 微分項は考慮しない手もある。
 				#ifdef IGNORE_DIF_PART
 				#else
 				km = x(i).v(j).d.size();

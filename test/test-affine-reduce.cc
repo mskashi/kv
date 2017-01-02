@@ -1,5 +1,6 @@
 #include <kv/affine.hpp>
 
+namespace ub = boost::numeric::ublas;
 typedef kv::affine<double> afd;
 
 int main()

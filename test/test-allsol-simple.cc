@@ -1,19 +1,19 @@
 #include <kv/allsol-simple.hpp>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
+#include <boost/timer.hpp>
+#ifdef TEST_DD
 #include <kv/dd.hpp>
 #include <kv/rdd.hpp>
-#include <boost/timer.hpp>
+#endif
 
 using namespace std;
 
 namespace ub = boost::numeric::ublas;
 
-// 円と直線の交点
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * x(0) + x(1) * x(1) - 1.;
@@ -24,14 +24,11 @@ class Func {
 };
 
 
-class Yamamura {
-	template <class T> T g(T x){
-		static const T v118("11.8");
-		return 2.5 * x*x*x - 10.5 * x*x + v118 * x;
-		// return 2.5 * x*x*x - 10.5 * x*x + "11.8" * x;
+struct Yamamura {
+	template <class T> T g(const T& x){
+		return 2.5 * x*x*x - 10.5 * x*x + 11.8 * x;
 	}
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int n = x.size();
 		ub::vector<T> y(n);
 		T s;
@@ -48,13 +45,20 @@ class Yamamura {
 	}
 };
 
+#ifdef TEST_DD
 typedef kv::interval<kv::dd> itv;
-// typedef kv::interval<double> itv;
+#else
+typedef kv::interval<double> itv;
+#endif
 
 
 int main()
 {
+#ifdef TEST_DD
 	std::cout.precision(33);
+#else
+	std::cout.precision(17);
+#endif
 
 	int i;
 	boost::timer t;
@@ -66,7 +70,7 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	kv::allsol(I, f1, 1);
+	kv::allsol_simple(I, f1, 1);
 	cout << t.elapsed() << " sec\n";
 
 
@@ -76,6 +80,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	kv::allsol(I, f2, 1);
+	kv::allsol_simple(I, f2, 1);
 	cout << t.elapsed() << " sec\n";
 }

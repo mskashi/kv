@@ -28,17 +28,30 @@
  *  ------------------------------------------+---+---+---
  *   add dummy epsilin on linear operation    | o | x | x
  *   add dummy epsilin on nonlinear operation | o | o | x
+ *
+ *  default: 1
  */
 
 #ifndef AFFINE_SIMPLE
 #define AFFINE_SIMPLE 1
 #endif
 
+/*
+ * select the method for multiplication
+ *
+ *  0: Stolfi's simple method (default, O(n))
+ *  1: better multiplication (give smaller extra epsilon but slow, O(n^2))
+ *  2: best multiplication (give smallest extra epsilon but slow, O(n^2))
+ */
 
-namespace ub = boost::numeric::ublas;
+#ifndef AFFINE_MULT
+#define AFFINE_MULT 0
+#endif
 
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T> class affine;
@@ -257,8 +270,9 @@ template <class T> class affine {
 		return r;
 	}
 
-	// operator+と同じだが、epsilonの追加をしない。
-	// 共通の0でないepsilonを持たない物同士を加えるときに使う。
+	// same as operator+, but do not add extra epsilon.
+	// This function can be used for adding affine variables
+	// which have no common epsilons.
 
 	friend affine append(const affine& x, const affine& y) {
 		affine r;
@@ -642,6 +656,104 @@ template <class T> class affine {
 		return affine(x) * y;
 	}
 
+
+	#if AFFINE_MULT >= 1
+
+	static interval<T> bestmult_error(const affine& x, const affine& y)
+	{
+		int n, i, j, s;
+		bool f1, f2;
+		ub::vector<T> vx, vy;
+		kv::interval<T> tmp, C, D, E, X, Y;
+
+		n = std::max(x.a.size(), y.a.size()) - 1;
+
+		#if AFFINE_SIMPLE >= 1
+		vx.resize(n+3);
+		vy.resize(n+3);
+		#else
+		vx.resize(n+1);
+		vy.resize(n+1);
+		#endif
+
+		for (i=0; i<x.a.size(); i++) {
+			vx(i) = x.a(i);
+		}
+		for (i=x.a.size(); i<=n; i++) {
+			vx(i) = 0.;
+		}
+		for (i=0; i<y.a.size(); i++) {
+			vy(i) = y.a(i);
+		}
+		for (i=y.a.size(); i<=n; i++) {
+			vy(i) = 0.;
+		}
+
+		#if AFFINE_SIMPLE >= 1
+		vx(n+1) = x.er;
+		vy(n+1) = 0.;
+		vx(n+2) = 0.;
+		vy(n+2) = y.er;
+		n += 2;
+		#endif
+
+		E = 0.;
+
+		#if AFFINE_MULT == 1
+		for (i=1; i<=n; i++) {
+			X = vx(i);
+			Y = vy(i);
+			E += X * Y * interval<T>(0., 1.);
+			for (j=i+1; j<=n; j++) {
+				tmp = X * vy(j) + Y * vx(j);
+				E += tmp * interval<T>(-1., 1.);
+			}
+		}
+		#else // AFFINE_MULT == 1
+
+		for (i=1; i<=n; i++) {
+			X = vx(i);
+			Y = vy(i);
+			if (X == 0. && Y == 0.) continue;
+			C = D = 0.;
+			for (j=1; j<=n; j++) {
+				if (j == i) continue;
+				if (vy(j) == 0. && vx(j) == 0.) continue;
+				tmp = X * vy(j) - Y * vx(j);
+				if (tmp.lower() >= 0.) {
+					C += vx(j);
+					D += vy(j);
+				} else if (tmp.upper() <= 0.) {
+					C -= vx(j);
+					D -= vy(j);
+				} else {
+					if ((X.upper() > 0. && vx(j) < 0.)
+					|| (X.lower() < 0. && vx(j) > 0.)) {
+						X -= vx(j);
+						Y -= vy(j);
+					} else {
+						X += vx(j);
+						Y += vy(j);
+					}
+				}
+			}
+			E = interval<T>::hull(E, X * Y + (X * D + Y * C) + C * D);
+			E = interval<T>::hull(E, X * Y - (X * D + Y * C) + C * D);
+			if (!zero_in(X * Y) ){
+				tmp = -0.5 * (X * D + Y * C) / (X * Y);
+				if (overlap(tmp, interval<T>(-1., 1.))) {
+					E = interval<T>::hull(E, X * Y * tmp * tmp + (X * D + Y * C) * tmp + C * D);
+				}
+			}
+		}
+
+		#endif // AFFINE_MULT == 1
+
+		return E;
+	}
+
+	#endif // AFFINE_MULT >= 1
+
 	friend affine operator*(const affine& x, const affine& y) {
 		affine r;
 		int i, j, xs, ys;
@@ -650,25 +762,22 @@ template <class T> class affine {
 
 		// if (&x == &y) return square(x);
 
-		#if AFFINE_SIMPLE != 2
-		maxnum()++;
-		r.a.resize(maxnum()+1);
-		#endif
-
 		xs = x.a.size();
 		ys = y.a.size();
 
 		#if AFFINE_SIMPLE != 2
+		maxnum()++;
+		r.a.resize(maxnum()+1);
+		#else
+		r.a.resize(std::max(xs, ys));
+		#endif
+
 		rop<T>::begin();
 		r.a(0) = rop<T>::mul_down(x.a(0), y.a(0));
 		err = rop<T>::sub_up(rop<T>::mul_up(x.a(0), y.a(0)), r.a(0));
 		rop<T>::end();
-		#endif
 
 		if (xs > ys) {
-			#if AFFINE_SIMPLE == 2
-			r.a.resize(xs);
-			#endif
 			rop<T>::begin();
 			for (i=1; i<ys; i++) {
 				r.a(i) = rop<T>::add_down(rop<T>::mul_down(y.a(0), x.a(i)), rop<T>::mul_down(x.a(0), y.a(i)));
@@ -689,9 +798,6 @@ template <class T> class affine {
 			}
 			#endif
 		} else {
-			#if AFFINE_SIMPLE == 2
-			r.a.resize(ys);
-			#endif
 			rop<T>::begin();
 			for (i=1; i<xs; i++) {
 				r.a(i) = rop<T>::add_down(rop<T>::mul_down(y.a(0), x.a(i)), rop<T>::mul_down(x.a(0), y.a(i)));
@@ -713,23 +819,30 @@ template <class T> class affine {
 			#endif
 		}
 
-		#if AFFINE_SIMPLE == 2
+		#if AFFINE_MULT >= 1
+
+		interval<T> E;
+		E = r.a(0) + bestmult_error(x, y);
 		rop<T>::begin();
-		r.a(0) = rop<T>::mul_down(x.a(0), y.a(0));
-		err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(0), y.a(0)), r.a(0)));
+		r.a(0) = rop<T>::mul_up(rop<T>::add_up(E.upper(), E.lower()), 0.5);
+		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), E.lower()));
 		rop<T>::end();
-		#endif
+
+		#else // AFFINE_MULT >= 1
 
 		tmp_l = rad(x);
 		tmp_u = rad(y);
-
 		rop<T>::begin();
-		#if AFFINE_SIMPLE >= 1
-		err = rop<T>::add_up(err, rop<T>::add_up(rop<T>::add_up(rop<T>::mul_up(tmp_l, tmp_u), rop<T>::mul_up((y.a(0) >= 0.) ? y.a(0) : -y.a(0), x.er)), rop<T>::mul_up((x.a(0) >= 0.) ? x.a(0) : -x.a(0), y.er)));
-		#else
 		err = rop<T>::add_up(err, rop<T>::mul_up(tmp_l, tmp_u));
-		#endif
 		rop<T>::end();
+
+		#endif // AFFINE_MULT >= 1
+
+		#if AFFINE_SIMPLE >= 1
+		rop<T>::begin();
+		err = rop<T>::add_up(err, rop<T>::add_up(rop<T>::mul_up((y.a(0) >= 0.) ? y.a(0) : -y.a(0), x.er), rop<T>::mul_up((x.a(0) >= 0.) ? x.a(0) : -x.a(0), y.er)));
+		rop<T>::end();
+		#endif
 
 		#if AFFINE_SIMPLE == 2
 		r.er = err;
@@ -1341,10 +1454,20 @@ template <class T> inline ub::vector< interval<T> > to_interval(const ub::vector
 	return r;
 }
 
-// epsilonの最大数をnに圧縮する。
-// n-s個の「意味のある」epsilonを残し、残りをs次元超直方体にまとめてしまう。
 
-// 縦ベクトルとその「重要度」を格納するクラス。
+/*
+ * epsilon_reduce(x, n, n_limit)
+ *  x: vector of affine (overwrited)
+ *  reduce the number of epsilons to n if the number of epsilons > n_limit.
+ *  
+ *  s: size of x
+ *  keep n-s "important" epsilons and convert other "non-important" epsilons
+ *  to s-dimensional rectangular.
+ */
+
+
+// a class to store column vector and its "importance"
+
 template <class T> class ep_reduce_v {
 	public:
 	ub::vector<T> v;
@@ -1371,6 +1494,9 @@ template <class T> class ep_reduce_v {
 		else score = (m1*m2)/(m1+m2);
 	}
 };
+
+
+// function to sort column vector by score
 
 template <class T> inline bool ep_reduce_cmp(ep_reduce_v<T>* a, ep_reduce_v<T>* b) {
 #ifdef EP_REDUCE_REVERSE

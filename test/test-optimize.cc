@@ -4,8 +4,7 @@
 namespace ub = boost::numeric::ublas;
 
 
-class Func {
-	public:
+struct Func {
 	template <class T> T operator() (ub::vector<T> x){
 		T tmp, tmp2;
 		tmp = x(0) - 1.;
@@ -15,10 +14,9 @@ class Func {
 };
 
 
+// example found in
 // http://www.msi.co.jp/nuopt/products/derivation/global/index.html
-// にあった例
-class Func2 {
-	public:
+struct Func2 {
 	template <class T> T operator() (ub::vector<T> in){
 		T x, y, z, w;
 
@@ -34,8 +32,7 @@ class Func2 {
 	}
 };
 
-class Rosenbrock {
-	public:
+struct Rosenbrock {
 	template <class T> T operator() (ub::vector<T> x){
 		T tmp, tmp2;
 		tmp = 1. - x(0);

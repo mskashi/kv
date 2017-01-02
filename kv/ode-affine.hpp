@@ -28,10 +28,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -271,7 +270,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		}
 
 		if (result_psa != NULL) {
-			// w をintervalに変換し *result_psaに格納
+			// convert w to interval and store it to *result_psa
 			(*result_psa).resize(n);
 			for (i=0; i<n; i++) {
 				(*result_psa)(i).v.resize(w(i).v.size());

@@ -4,9 +4,8 @@
 namespace ub = boost::numeric::ublas;
 
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * x(0) + x(1) * x(1) - 1.;
@@ -17,12 +16,11 @@ class Func {
 };
 
 
-class Yamamura1 {
-	template <class T> T g(T x){
+struct Yamamura {
+	template <class T> T g(const T& x){
 		return 2.5 * x*x*x - 10.5 * x*x + 11.8 * x;
 	}
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int n = x.size();
 		ub::vector<T> y(n);
 		T s;
@@ -59,6 +57,6 @@ int main()
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
 
 	t.restart();
-	allsol(I, Yamamura1());
+	allsol(I, Yamamura());
 	std::cout << t.elapsed() << " sec\n";
 }

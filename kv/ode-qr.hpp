@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_QR_HPP
@@ -21,10 +21,10 @@
 #include <kv/ode-param.hpp>
 #include <kv/ode-callback.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -83,15 +83,16 @@ odelong_qr(
 		Iad = autodif< interval<T> >::init(x1);
 		p2 = p;
 		p2.set_autostep(true);
-		// 自動的にautodif対応のものが呼ばれるはず
+		// NOTICE: below must be autodif version of ode
 		r = ode(f, Iad, t, t1, p2, &result_tmp);
 		if (r == 0) break;
 
 		fc = c;
-		// step幅は上のodeと同じでないとまずい。
-		// 上が通れば条件の緩いこちらは通るかと思ったが、
-		// 通らない例があった。本質的には通るはずなので、次数を
-		// 増やしてでも無理矢理通す。
+		// Step size should be same as above ode call.
+		// Because above ode call is with autodif and interval input and
+		// below ode call is without autodif and point input,
+		// below ode call is supposed to be easier to succeed than above.
+		// If below ode call fails, force success by increasing order.
 		p2 = p;
 		p2.set_autostep(false);
 		while (1) {
@@ -126,8 +127,13 @@ odelong_qr(
 		if (bo == false) break;
 		y = y1 + y2;
 		x1 = prod(Q2, y) + c;
-		// 入れるとわずかに効果があるが、理論的によく分からんのでcomment out
+
+		// below seems to have some efficiency.
+		// we comment out below because we have not study it
+		// theoretically yet.
+
 		// x1 = intersect(x1, result_i);
+
 		Q = Q2;
 
 		ret_val = 1;
@@ -139,7 +145,7 @@ odelong_qr(
 			std::cout << x1 << "\n";
 		}
 
-		// result_tmpからautodif情報を外し、result_psaに格納。
+		// store result_tmp to result_psa without autodif information
 		result_psa.resize(s);
 		for (i=0; i<s; i++) {
 			result_psa(i).v.resize(result_tmp(i).v.size());

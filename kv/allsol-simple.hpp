@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ALLSOL_HPP
@@ -16,12 +16,14 @@
 #include <kv/matrix-inversion.hpp>
 #include <kv/autodif.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
 
+namespace ub = boost::numeric::ublas;
 
-// 最大幅の成分を与える
+namespace allsol_simple_sub {
+
+// return index of I_i which has maximum width
 
 template <class T> int search_maxwidth (const ub::vector< interval<T> >& I) {
 	int s = I.size();
@@ -39,7 +41,7 @@ template <class T> int search_maxwidth (const ub::vector< interval<T> >& I) {
 	return mi;
 }
 
-// 区間ベクトルの幅の比を成分毎に計算し、その最大値
+// return max width(I_i) / width(J_i)
 
 template <class T> T widthratio_max (const ub::vector< interval<T> >& I, const ub::vector< interval<T> >& J) {
 	int s = I.size();
@@ -56,7 +58,7 @@ template <class T> T widthratio_max (const ub::vector< interval<T> >& I, const u
 	return r;
 }
 
-// 区間ベクトルの幅の比を成分毎に計算し、その最小値
+// return min width(I_i) / width(J_i)
 
 template <class T> T widthratio_min (const ub::vector< interval<T> >& I, const ub::vector< interval<T> >& J) {
 	int s = I.size();
@@ -73,22 +75,23 @@ template <class T> T widthratio_min (const ub::vector< interval<T> >& I, const u
 	return r;
 }
 
+} // namespace allsol_simple_sub
 
-// 全解探索 中身はallsol_list
+// find all solution of f in I
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
-allsol (const ub::vector< interval<T> >& init, F f, int verbose=1)
+allsol_simple (const ub::vector< interval<T> >& I, F f, int verbose=1)
 {
 	std::list< ub::vector < interval<T> > > targets;
-	targets.push_back(init);
-	return allsol_list(targets, f, verbose);
+	targets.push_back(I);
+	return allsol_list_simple(targets, f, verbose);
 }
 
 
-// 初期区間をリストで複数与えるallsol
+// find all solution of f in targets (list of intervals)
 
 template <class T, class F> std::list< ub::vector< interval<T> > >
-allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
+allsol_list_simple (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 {
 	int s = (targets.front()).size();
 	ub::vector< interval<T> > I, fc, fi, C, CK, K, mvf, I1, I2;
@@ -116,7 +119,7 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 		targets.pop_front();
 		count_unknown--;
 
-		// 以下、非存在テスト
+		// non-existence test
 
 		count_ne_test++;
 
@@ -147,7 +150,7 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 			continue;
 		}
 
-		// 以下、存在テスト
+		// existence test
 
 		L = mid(fdi);
 
@@ -164,7 +167,7 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 			continue;
 		}
 		if (proper_subset(K, I)) {
-			// 以下、既に見付かっている解との重複チェック
+			// check whether the solution is already found or not
 			flag = true;
 			p = solutions.begin();
 			p2 = solutions_big.begin();
@@ -198,15 +201,15 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 				p++;
 				p2++;
 			}
-			if (flag) { // 新しい解が見付かった
+			if (flag) { // new solution found
 				if (verbose >= 1) std::cout << I << "(ex)\n";
 				solutions_big.push_back(I);
-				// 反復改良
+				// iterative refinement
 				while (1) {
 					C = mid(K);
 					I1 = C - prod(R, f(C)) + prod(M, K - C);
 					I1 = intersect(K, I1);
-					tmp = widthratio_min(I1, K);
+					tmp = allsol_simple_sub::widthratio_min(I1, K);
 					K = I1;
 					if (tmp > 0.9) break;
 				}
@@ -217,9 +220,10 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 			continue;
 		}
 
-		// 解が境界またはその近くに有るかも知れないケース
-		// Kをそのまま次回のテスト区間に使う。
-		if (widthratio_max(K, I) < 0.9) {
+		// check the case that solution may exist near boundary.
+		// If so, use K as next interval
+
+		if (allsol_simple_sub::widthratio_max(K, I) < 0.9) {
 			targets.push_back(K);
 			count_unknown++;
 			continue;
@@ -229,9 +233,9 @@ allsol_list (std::list< ub::vector< interval<T> > > targets, F f, int verbose=1)
 
 		label:
 
-		// どの成分で分割するか選択
+		// divide interval
 
-		mi = search_maxwidth(I);
+		mi = allsol_simple_sub::search_maxwidth(I);
 
 		tmp = mid(I(mi));
 		if (tmp == I(mi).lower() || tmp == I(mi).upper()) {

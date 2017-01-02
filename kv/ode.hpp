@@ -25,10 +25,10 @@
 #endif
 
 
+namespace kv {
+
 namespace ub = boost::numeric::ublas;
 
-
-namespace kv {
 
 template <class T, class F>
 int
@@ -89,14 +89,14 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		y = f(x, t);
 		for (i=0; i<n; i++) {
 			y(i) = integrate(y(i));
-			// 定数関数などの特殊な状況に備えてorderを設定しておく
+			// set order preparing for constant function
 			y(i) = setorder(y(i), j+1);
 		}
 		x = init + y;
 	}
 
 	if (p.autostep) {
-		// 高次の項から順に見て、最初に見付かった2つの非0項を使う。
+		// use two non-zero coefficients of higher order term
 		radius = 0.;
 		n_rad = 0;
 		for (j = p.order; j>=1; j--) {

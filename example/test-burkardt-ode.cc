@@ -551,7 +551,7 @@ int main()
 	}
 
 
-	// Duffing。なぜか答えが全く違うので要確認
+	// Duffing。なぜか答えが全く違うので要確認--
 	P36 p36;
 
 	p36.initial_value(x);
@@ -569,7 +569,7 @@ int main()
 	}
 
 
-	// Duffing。こっちも全然違う。
+	// Duffing。こっちも全然違う。--
 	P37 p37;
 
 	p37.initial_value(x);
@@ -586,8 +586,8 @@ int main()
 		std::cout << end << "\n";
 	}
 
-	// 全く進めない。厳しい。
-	// restartするようにしたら、restart一回で簡単に進めた。
+	// 全く進めない。厳しい。--
+	// restartするようにしたら、restart一回で簡単に進めた。--
 	P38 p38;
 
 	p38.initial_value(x);

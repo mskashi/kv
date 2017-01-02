@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_NV_HPP
@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -22,10 +23,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -41,7 +41,7 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, ode_param<T>
 	T deltat;
 	ub::vector< autodif<T> > result, new_init;
 
-	T m, m_tmp;
+	T m;
 
 	T radius, radius_tmp;
 	T tolerance;
@@ -53,18 +53,17 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, ode_param<T>
 
 	new_init = autodif<T>::compress(init, save);
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
 		using std::abs;
-		m_tmp = abs(new_init(i).v) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
+		m = std::max(m, abs(new_init(i).v));
 		new_init(i).d.resize(n);
 		for (j=0; j<n; j++) {
-			m_tmp = abs(new_init(i).d(j)) * p.epsilon;
-			if (m_tmp > m) m = m_tmp;
+			using std::abs;
+			m = std::max(m, abs(new_init(i).d(j)));
 		}
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = new_init;
 	torg.v.resize(2);
@@ -100,14 +99,16 @@ ode_nv(F f, ub::vector< autodif<T> >& init, const T& start, T& end, ode_param<T>
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				m_tmp = (x(i).v(j).v >= 0.) ? x(i).v(j).v : -x(i).v(j).v;
-				if (m_tmp > m) m = m_tmp;
-				// 微分項は考慮しない手もある。
+				using std::abs;
+				m = std::max(m, abs(x(i).v(j).v));
+				#ifdef IGNORE_DIF_PART
+				#else
 				km = x(i).v(j).d.size();
 				for (k=0; k<km; k++) {
-					m_tmp = (x(i).v(j).d(k) >= 0) ? x(i).v(j).d(k) : -x(i).v(j).d(k);
-					if (m_tmp > m) m = m_tmp;
+					using std::abs;
+					m = std::max(m, abs(x(i).v(j).d(k)));
 				}
+				#endif
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);

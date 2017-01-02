@@ -15,10 +15,9 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <kv/convert.hpp>
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T> class psa;
@@ -305,7 +304,8 @@ template <class T> class psa {
 			}
 
 			if (mode() == 2) {
-				// tmpの中身もhistoryが利用できそうだが、保留
+				// history may be able to be used for
+				// calculating tmp, but we do not use yet.
 				ub::vector<T> tmp(s);
 				tmp(0) = r.v(s-1);
 				for (i=1; i<s; i++) {

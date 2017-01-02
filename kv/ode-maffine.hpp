@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE_HPP
@@ -22,9 +22,11 @@
 #include <kv/ode-param.hpp>
 #include <kv/ode-callback.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
+
 
 template <class T, class F>
 int
@@ -66,7 +68,7 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		c(i) = mid(I(i));
 	}
 
-	// result_psaの情報が必要なら準備
+	// prepare for result_psa if needed
 	if (result_psa != NULL) {
 		result_tmp_p = &result_tmp;
 	} else {
@@ -74,12 +76,12 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	}
 
 	Iad = autodif< interval<T> >::init(I);
-	// 自動的にautodif対応のものが呼ばれるはず
+	// NOTICE: below must be autodif version of ode
 	r = ode(f, Iad, start, end2, p, result_tmp_p);
 	if (r == 0) return 0;
 	ret_val = r;
 
-	// result_tmpからautodif情報を外し、*result_psaに格納。
+	// store result_tmp to *result_psa without autodif information
 	if (result_psa != NULL) {
 		(*result_psa).resize(n);
 		for (i=0; i<n; i++) {
@@ -91,10 +93,11 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	}
 
 	fc = c;
-	// step幅は上のodeと同じでないとまずい。
-	// 上が通れば条件の緩いこちらは通るかと思ったが、
-	// 通らない例があった。本質的には通るはずなので、次数を
-	// 増やしてでも無理矢理通す。
+	// Step size should be same as above ode call.
+	// Because above ode call is with autodif and interval input and
+	// below ode call is without autodif and point input,
+	// below ode call is supposed to be easier to succeed than above.
+	// If below ode call fails, force success by increasing order.
 	p.set_autostep(false);
 	while (1) {
 		r = ode(f, fc, start, end2, p);
