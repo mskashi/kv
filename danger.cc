@@ -1,4 +1,5 @@
 #include "interval.hpp"
+#include "rdouble2.hpp"
 
 typedef kv::interval<double> itvd;
 
