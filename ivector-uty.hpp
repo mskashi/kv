@@ -16,7 +16,7 @@ template <class T> ub::vector<T> mid (const ub::vector< kv::interval<T> >& I) {
 	ub::vector<T> r(s);
 
 	for (i=0; i<s; i++) {
-		r(i) = (I(i).lower() + I(i).upper()) / 2;
+		r(i) = (I(i).lower() + I(i).upper()) / 2.;
 	}
 
 	return r;
@@ -30,7 +30,7 @@ template <class T> ub::matrix<T> mid (const ub::matrix< kv::interval<T> >& I) {
 
 	for (i=0; i<s1; i++) {
 		for (j=0; j<s2; j++) {
-			r(i,j) = (I(i,j).lower() + I(i,j).upper()) / 2;
+			r(i,j) = (I(i,j).lower() + I(i,j).upper()) / 2.;
 		}
 	}
 

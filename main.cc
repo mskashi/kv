@@ -1,5 +1,5 @@
 #include "interval.hpp"
-#include "rdouble2.hpp"
+#include "rdouble.hpp"
 
 typedef kv::interval<double> itvd;
 
@@ -84,4 +84,7 @@ int main()
 	std::cout << asinh(itvd(-0.25, 0.25)) << "\n";
 	std::cout << acosh(itvd(1.5, 2.)) << "\n";
 	std::cout << atanh(itvd(-0.25, 0.25)) << "\n";
+
+	x = itvd("0.1");
+	std::cout << x << "\n";
 }

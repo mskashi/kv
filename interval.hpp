@@ -5,6 +5,7 @@
 #include <limits>
 #include <stdexcept>
 #include <cmath>
+#include <string>
 #include <fenv.h>
 
 #include <boost/type_traits.hpp>
@@ -60,6 +61,28 @@ template <class T> class rop {
 
 	static void finish() {
 	}
+
+	static void print_up(const T& x, std::ostream& s) {
+		s << x;
+	}
+
+	static void print_down(const T& x, std::ostream& s) {
+		s << x;
+	}
+
+	static T fromstring_up(const std::string& s) {
+		std::istringstream is(s);
+		T r;
+		is >> r;
+		return r;
+	}
+
+	static T fromstring_down(const std::string& s) {
+		std::istringstream is(s);
+		T r;
+		is >> r;
+		return r;
+	}
 };
 
 template <class T> class constants;
@@ -81,6 +104,16 @@ template <class T> class interval {
 	template <class C1, class C2> interval(const C1& x, const C2& y, typename boost::enable_if_c< boost::is_convertible<C1, T>::value && boost::is_convertible<C2, T>::value >::type* =0) {
 		inf = x;
 		sup = y;
+	}
+
+	interval(const std::string& x) {
+		inf = rop<T>::fromstring_down(x);
+		sup = rop<T>::fromstring_up(x);
+	}
+
+	interval(const std::string& x, const std::string& y) {
+		inf = rop<T>::fromstring_down(x);
+		sup = rop<T>::fromstring_up(y);
 	}
 
 	friend interval operator+(const interval& x, const interval& y) {
@@ -365,7 +398,11 @@ template <class T> class interval {
 	}
 
 	friend std::ostream& operator<<(std::ostream& s, const interval& x) {
-		s << '[' << x.inf << ',' << x.sup << "]";
+		s << '[';
+		rop<T>::print_down(x.inf, s);
+		s << ',';
+		rop<T>::print_up(x.sup, s);
+		s << ']';
 		return s;
 	}
 
@@ -749,9 +786,9 @@ template <class T> class interval {
 		}
 
 		if (x_i >= 0.) {
-			r *= pow(constants<T>::e(), x_i);
+			r *= pow(constants<T>::e(), (int)x_i);
 		} else {
-			r /= pow(constants<T>::e(), -x_i);
+			r /= pow(constants<T>::e(), -(int)x_i);
 		}
 
 		return r;
@@ -1403,27 +1440,24 @@ template <class T> class interval {
 };
 
 template <class T> class constants {
-};
-
-template <> class constants<double> {
 	public:
 
-	static interval<double> pi() {
-		return interval<double>(
+	static interval<T> pi() {
+		return interval<T>(
 			7074237752028440. / 2251799813685248., // 3.1415926535897931
 			7074237752028441. / 2251799813685248. // 3.1415926535897936
 		);
 	}
 
-	static interval<double> e() {
-		return interval<double>(
+	static interval<T> e() {
+		return interval<T>(
 			6121026514868073. / 2251799813685248., // 2.7182818284590451
 			6121026514868074. / 2251799813685248. // 2.7182818284590455
 		);
 	}
 
-	static interval<double> ln2() {
-		return interval<double>(
+	static interval<T> ln2() {
+		return interval<T>(
 			6243314768165360. / 9007199254740992., // 0.6931471805599454
 			6243314768165359. / 9007199254740992. // 0.69314718055994529
 		);
