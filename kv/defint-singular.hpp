@@ -65,21 +65,24 @@ template <class T> psa<T> div_reduce(const psa<T>& x, const psa<T>& y, int n) {
 
 // The function f(x) = x
 struct Defint_x {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return x;
 	}
 };
 
+#if 0
+// Not Used
 // The function f(x) = -x
 struct Defint_mx {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return -x;
 	}
 };
+#endif
 
 // The function f(x) = 1
 struct Defint_1 {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return (T)1.;
 	}
 };
@@ -89,11 +92,12 @@ template <class F> class Defint_Reverse {
 	F f;
 	public:
 	Defint_Reverse(F f) : f(f) {}
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return f(-x);
 	}
 };
 
+#if 0
 // Not Used
 template <class F1, class F2, class TT> class Defint_power_func {
 	F1 f;
@@ -101,21 +105,24 @@ template <class F1, class F2, class TT> class Defint_power_func {
 	TT p;
 	public:
 	Defint_power_func(F1 f, F2 g, TT p) : f(f), g(g), p(p) {}
-	template <class T> T operator() (T& x) {
+	template <class T> T operator() (const T& x) {
 		return pow(f(x), (T)p) * g(x);
 	}
 };
+#endif
 
+#if 0
 // Not Used
 template <class F1, class F2> class Defint_log_func {
 	F1 f;
 	F2 g;
 	public:
 	Defint_log_func(F1 f, F2 g) : f(f), g(g) {}
-	template <class T> T operator() (T& x) {
+	template <class T> T operator() (const T& x) {
 		return log(f(x)) * g(x);
 	}
 };
+#endif
 
 
 /*
@@ -351,8 +358,8 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 	psa< interval<T> >::record_history() = true;
 	psa< interval<T> >::history().clear();
 	#endif
-	y = pow(div_tn(f(x), singularity_order), power) * g(x);
 
+	y = pow(div_tn(f(x), singularity_order), power) * g(x);
 	// set order preparing for constant function
 	y = setorder(y, order);
 
@@ -719,7 +726,7 @@ defint_power3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, inter
 template <class T, class F>
 interval<T>
 defint_power_r(F f, interval<T> start, interval<T> end, int order, interval<T> power) {
-	return defint_power3(Defint_mx(), Defint_Reverse<F>(f), -end, -start, order, power, 1);
+	return defint_power3(Defint_x(), Defint_Reverse<F>(f), -end, -start, order, power, 1);
 }
 
 template <class T, class F>
@@ -737,7 +744,7 @@ defint_log3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, int sin
 template <class T, class F>
 interval<T>
 defint_log_r(F f, interval<T> start, interval<T> end, int order) {
-	return defint_log3(Defint_mx(), Defint_Reverse<F>(f), -end, -start, order, 1);
+	return defint_log3(Defint_x(), Defint_Reverse<F>(f), -end, -start, order, 1);
 }
 
 template <class T, class F>
@@ -761,7 +768,7 @@ defint_power3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, i
 template <class T, class F1, class F2>
 interval<T>
 defint_power_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, interval<T> power, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_power3_autostep(Defint_Reverse<F1>(f1), Defint_mx(), Defint_Reverse<F2>(f2), -end, -start, order, power, 1, epsilon);
+	return defint_power3_autostep(Defint_Reverse<F1>(f1), Defint_x(), Defint_Reverse<F2>(f2), -end, -start, order, power, 1, epsilon);
 }
 
 template <class T, class F1, class F2>
@@ -779,7 +786,7 @@ defint_log3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 template <class T, class F1, class F2>
 interval<T>
 defint_log_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_log3_autostep(Defint_Reverse<F1>(f1), Defint_mx(), Defint_Reverse<F2>(f2), -end, -start, order, 1, epsilon);
+	return defint_log3_autostep(Defint_Reverse<F1>(f1), Defint_x(), Defint_Reverse<F2>(f2), -end, -start, order, 1, epsilon);
 }
 
 template <class T, class F1, class F2>

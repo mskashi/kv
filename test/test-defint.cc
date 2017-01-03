@@ -5,13 +5,13 @@ typedef kv::interval<double> itv;
 
 
 struct Func {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return 1./x;
 	}
 };
 
 struct Kahaner10 {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return 1./(1. + x);
 	}
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DOUBLE_HPP
@@ -32,8 +32,8 @@ struct conv_double {
 	static int get_exponent(double x) {
 		int i;
 
-		if (x >= ldexp(1., 1023)) return 1023;
-		if (x < ldexp(1., -1074)) return -1075;
+		if (x >= std::ldexp(1., 1023)) return 1023;
+		if (x < std::ldexp(1., -1074)) return -1075;
 
 		std::frexp(x, &i);
 
@@ -57,7 +57,7 @@ struct conv_double {
 		if (x != x) return "nan";
 
 		sign = get_sign_double(x);
-		absx = fabs(x);
+		absx = std::fabs(x);
 
 		if (absx == 0.) {
 			if (sign == -1) {
@@ -83,7 +83,7 @@ struct conv_double {
 		double dtmp, dtmp2;
 
 		dtmp = absx;
-		dtmp2 = ldexp(1., ex);
+		dtmp2 = std::ldexp(1., ex);
 
 		for (i=0; i<=52; i++) {
 			if (dtmp >= dtmp2) {
@@ -601,25 +601,25 @@ struct conv_double {
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += ldexp(1., i+1);
+							r += std::ldexp(1., i+1);
 						}
 					} else {
-						r += ldexp(1., i+1);
+						r += std::ldexp(1., i+1);
 					}
 				} else {
 					if (mode == -1) {
-						r += ldexp(1., i+1);
+						r += std::ldexp(1., i+1);
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += ldexp(1., i+1);
+							r += std::ldexp(1., i+1);
 						}
 					} else {
 					}
 				}
 				break;
 			}
-			r += ldexp((double)result[offset2 + i], i);
+			r += std::ldexp((double)result[offset2 + i], i);
 		}
 
 		return sign * r;

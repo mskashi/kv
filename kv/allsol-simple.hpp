@@ -2,8 +2,8 @@
  * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
-#ifndef ALLSOL_HPP
-#define ALLSOL_HPP
+#ifndef ALLSOL_SIMPLE_HPP
+#define ALLSOL_SIMPLE_HPP
 
 #include <iostream>
 #include <list>
@@ -260,4 +260,4 @@ allsol_list_simple (F f, std::list< ub::vector< interval<T> > > targets, int ver
 
 } // namespace kv
 
-#endif // ALLSOL_HPP
+#endif // ALLSOL_SIMPLE_HPP

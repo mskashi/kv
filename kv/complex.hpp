@@ -189,11 +189,11 @@ template <class T> class complex {
 		complex r;
 		T tmp, tmp2;
 
-		#if 0
 		tmp = y.re * y.re + y.im * y.im;
 		r.re = (y.re * x.re + y.im * x.im) / tmp;
 		r.im = (y.re * x.im - x.re * y.im) / tmp;
-		#endif
+
+		#if 0
 		using std::abs;
 		if (abs(y.re) > abs(y.im)) {
 			tmp2 = y.im / y.re;
@@ -206,6 +206,7 @@ template <class T> class complex {
 			r.re = (tmp2 * x.re + x.im) / tmp;
 			r.im = (tmp2 * x.im - x.re) / tmp;
 		}
+		#endif
 
 		return r;
 	}

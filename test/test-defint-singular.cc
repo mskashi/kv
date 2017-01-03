@@ -9,13 +9,13 @@ typedef kv::interval<double> itv;
  */
 
 struct Sinc {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sin(x) / x;
 	}
 };
 
 struct Sinc_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return div_tn(sin(x), 1);
 		// return div_reduce(sin(x), x, 1);
 	}
@@ -30,13 +30,13 @@ struct Sinc_s {
  */
 
 struct RemSing {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return x * x / (1 - cos(x));
 	}
 };
 
 struct RemSing_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return div_reduce(x * x, 1 - cos(x), 2);
 	}
 };
@@ -50,13 +50,13 @@ struct RemSing_s {
  */
 
 struct Func1 {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return sqrt(x) * cos(x);
 	}
 };
 
 struct Func1_s {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return cos(x);
 	}
 };
@@ -70,13 +70,13 @@ struct Func1_s {
  */
 
 struct SqrtSin {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sqrt(sin(x));
 	}
 };
 
 struct SqrtSin_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sin(x);
 	}
 };
@@ -90,13 +90,13 @@ struct SqrtSin_s {
  */
 
 struct Func2 {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sqrt(1 - cos(x));
 	}
 };
 
 struct Func2_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return 1 - cos(x);
 	}
 };
@@ -110,21 +110,21 @@ struct Func2_s {
  */
 
 struct Tanaka_f {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		static const T p = kv::constants<T>::pi();
 		return 10 * sin(p * x) + sin(3 * p * x);
 	}
 };
 
 struct Tanaka_g {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		static const T p = kv::constants<T>::pi();
 		return sin(p * x);
 	}
 };
 
 struct Tanaka {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		static const T p = kv::constants<T>::pi();
 		return pow(10 * sin(p * x) + sin(3 * p * x), 1.5) * sin(p * x);
 	}
@@ -139,19 +139,19 @@ struct Tanaka {
  */
 
 struct Func3_f {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sin(x);
 	}
 };
 
 struct Func3_g {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return cos(x);
 	}
 };
 
 struct Func3 {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sqrt(sin(x)) * cos(x);
 	}
 };
@@ -165,13 +165,13 @@ struct Func3 {
  */
 
 struct LogF {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return log(x) / (x + 1);
 	}
 };
 
 struct LogF_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return 1 / (x + 1);
 	}
 };
@@ -185,13 +185,13 @@ struct LogF_s {
  */
 
 struct LogSin {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return log(sin(x));
 	}
 };
 
 struct LogSin_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sin(x);
 	}
 };
@@ -204,13 +204,13 @@ struct LogSin_s {
  */
 
 struct LogCos {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return log(1-cos(x));
 	}
 };
 
 struct LogCos_s {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return 1-cos(x);
 	}
 };
@@ -224,19 +224,19 @@ struct LogCos_s {
  */
 
 struct LogSinCos {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return log(sin(x)) * cos(x);
 	}
 };
 
 struct LogSinCos_f {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return sin(x);
 	}
 };
 
 struct LogSinCos_g {
-	template <class T> T operator()(T& x) {
+	template <class T> T operator()(const T& x) {
 		return cos(x);
 	}
 };
@@ -250,13 +250,13 @@ struct LogSinCos_g {
  */
 
 struct Quadrant {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return sqrt(1 - x * x);
 	}
 };
 
 struct Quadrant_s {
-	template <class T> T operator() (T x) {
+	template <class T> T operator() (const T& x) {
 		return 1 - x * x;
 	}
 };

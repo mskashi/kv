@@ -35,7 +35,7 @@ static T inline eval_polynomial (const ub::vector<T>& p, const T& x)
 // Durand Kerner Aberth algorithm
 
 template <class T>
-bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T epsilon = std::numeric_limits<T>::epsilon())
+bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsilon = std::numeric_limits<T>::epsilon())
 {
 	int i, j;
 	int s = p.size();
@@ -45,12 +45,11 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 	ub::vector<T> b;
 	T r, tmp, norm1, norm2;
 	ub::vector<T> db;
-	ub::vector< complex<T> > x(n), dx(n);
+	ub::vector< complex<T> > dx(n);
 	T pi = boost::math::constants::pi<T>();
 	complex<T> f, df;
-	bool flag;
 
-	if (p(n).real() == 0. && p(n).imag() == 0.) {
+	if (p(n).real() * p(n).real() + p(n).imag() * p(n).imag() == 0.) {
 		return false;
 	}
 
@@ -94,6 +93,8 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 	}
 
 	// set Aberth's initial values
+
+	x.resize(n);
 	for (i=0; i<n; i++) {
 		x(i) = c + r * exp((2. * i * pi / n + pi / (2. * n)) * complex<T>::i());
 	}
@@ -108,9 +109,10 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 				if (j == i) continue;
 				df *= x(i) - x(j);
 			}
-			dx(i) = f / df;
-			if (dx(i).real() != dx(i).real() && dx(i).imag() != dx(i).imag()) { // NaN check
+			if (df.real() * df.real() + df.imag() * df.imag() == 0.) {
 				dx(i) = 0.;
+			} else {
+				dx(i) = f / df;
 			}
 		}
 
@@ -125,7 +127,6 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 		if (norm2 <= n * norm1 * epsilon) break;
 	}
 
-	result = x;
 	return true;
 }
 
@@ -138,9 +139,8 @@ ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< inte
 	int s = p.size();
 	int n = s - 1;
 	ub::vector< complex< interval<T> > > x2, x3(n);
-	complex< interval<T> > f, df, tmp;
+	complex< interval<T> > f, df;
 	T err;
-	bool flag;
 
 	x2 = x;
 
@@ -151,7 +151,7 @@ ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< inte
 			if (j == i) continue;
 			df *= x2(i) - x2(j);
 		}
-		if (zero_in(df.real()) && zero_in(df.imag())) {
+		if (zero_in(df.real() * df.real() + df.imag() * df.imag())) {
 			err = std::numeric_limits<T>::infinity();
 		} else {
 			err = abs(n * f / df).upper();
@@ -173,7 +173,7 @@ bool vdka(const ub::vector< complex< interval<T> > >& p, ub::vector< complex< in
 	int n = s - 1;
 	ub::vector< complex< T > > p2(s), x2;
 
-	if (zero_in(p(n).real()) && zero_in(p(n).imag())) {
+	if (zero_in(p(n).real() * p(n).real() + p(n).imag() * p(n).imag())) {
 		return false;
 	}
 

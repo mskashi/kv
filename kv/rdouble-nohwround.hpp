@@ -36,7 +36,7 @@ template <> struct rop <double> {
 	}
 
 	static void split(const double& a, double& x, double& y) {
-		static const double sigma = ldexp(1., 27) + 1.;
+		static const double sigma = std::ldexp(1., 27) + 1.;
 		double tmp;
 
 		tmp = a * sigma;
@@ -45,10 +45,10 @@ template <> struct rop <double> {
 	}
 
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
-		static const double th = ldexp(1., 996);
-		static const double c1 = ldexp(1., -28);
-		static const double c2 = ldexp(1., 28);
-		static const double th2 = ldexp(1., 1023);
+		static const double th = std::ldexp(1., 996);
+		static const double c1 = std::ldexp(1., -28);
+		static const double c2 = std::ldexp(1., 28);
+		static const double th2 = std::ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 
@@ -81,12 +81,12 @@ template <> struct rop <double> {
 	// succ and pred by Rump
 
 	static double succ(const double& x) {
-		static const double th1 = ldexp(1., -969);
-		static const double th2 = ldexp(1., -1021);
-		static const double c1 = ldexp(1., -53) + ldexp(1., -105);
-		static const double c2 = ldexp(1., -1074);
-		static const double c3 = ldexp(1., 53);
-		static const double c4 = ldexp(1., -53);
+		static const double th1 = std::ldexp(1., -969);
+		static const double th2 = std::ldexp(1., -1021);
+		static const double c1 = std::ldexp(1., -53) + std::ldexp(1., -105);
+		static const double c2 = std::ldexp(1., -1074);
+		static const double c3 = std::ldexp(1., 53);
+		static const double c4 = std::ldexp(1., -53);
 
 		double a, c, e;
 
@@ -99,12 +99,12 @@ template <> struct rop <double> {
 	}
 
 	static double pred(const double& x) {
-		static const double th1 = ldexp(1., -969);
-		static const double th2 = ldexp(1., -1021);
-		static const double c1 = ldexp(1., -53) + ldexp(1., -105);
-		static const double c2 = ldexp(1., -1074);
-		static const double c3 = ldexp(1., 53);
-		static const double c4 = ldexp(1., -53);
+		static const double th1 = std::ldexp(1., -969);
+		static const double th2 = std::ldexp(1., -1021);
+		static const double c1 = std::ldexp(1., -53) + std::ldexp(1., -105);
+		static const double c2 = std::ldexp(1., -1074);
+		static const double c3 = std::ldexp(1., 53);
+		static const double c4 = std::ldexp(1., -53);
 
 		double a, c, e;
 
@@ -205,8 +205,8 @@ template <> struct rop <double> {
 		double r, r2;
 		double x1, y1;
 		double s, s2, t;
-		static const double th = ldexp(1., -969); // -1074 + 106 - 1
-		static const double c = ldexp(1., 537); // 1074 / 2
+		static const double th = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double c = std::ldexp(1., 537); // 1074 / 2
 
 		// if (x == 0. || y == 0.) return x * y;
 
@@ -221,7 +221,7 @@ template <> struct rop <double> {
 			}
 		}
 
-		if (fabs(r) >= th) {
+		if (std::fabs(r) >= th) {
 			if (r2 > 0.) return succ(r);
 			return r;
 		} else {
@@ -238,8 +238,8 @@ template <> struct rop <double> {
 		double r, r2;
 		double x1, y1;
 		double s, s2, t;
-		static const double th = ldexp(1., -969); // -1074 + 106 - 1
-		static const double c = ldexp(1., 537); // 1074 / 2
+		static const double th = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double c = std::ldexp(1., 537); // 1074 / 2
 
 		// if (x == 0. || y == 0.) return x * y;
 
@@ -254,7 +254,7 @@ template <> struct rop <double> {
 			return r;
 		}
 
-		if (fabs(r) >= th) {
+		if (std::fabs(r) >= th) {
 			if (r2 < 0.) return pred(r);
 			return r;
 		} else {
@@ -270,10 +270,10 @@ template <> struct rop <double> {
 	static double div_up(const double& x, const double& y) {
 		double r, r2;
 		double xn, yn, d;
-		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
-		static const double th2 = ldexp(1., 918); // 1023 - 105
-		static const double c1 = ldexp(1., 105); // -969 - (-1074)
-		static const double c2 = ldexp(1., -1074);
+		static const double th1 = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double th2 = std::ldexp(1., 918); // 1023 - 105
+		static const double c1 = std::ldexp(1., 105); // -969 - (-1074)
+		static const double c2 = std::ldexp(1., -1074);
 
 		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
 			return x / y;
@@ -287,8 +287,8 @@ template <> struct rop <double> {
 			yn = y;
 		}
 
-		if (fabs(xn) < th1) {
-			if (fabs(yn) < th2) {
+		if (std::fabs(xn) < th1) {
+			if (std::fabs(yn) < th2) {
 				xn *= c1;
 				yn *= c1;
 			} else {
@@ -315,10 +315,10 @@ template <> struct rop <double> {
 	static double div_down(const double& x, const double& y) {
 		double r, r2;
 		double xn, yn, d;
-		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
-		static const double th2 = ldexp(1., 918); // 1023 - 105
-		static const double c1 = ldexp(1., 105); // -969 - (-1074)
-		static const double c2 = ldexp(1., -1074);
+		static const double th1 = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double th2 = std::ldexp(1., 918); // 1023 - 105
+		static const double c1 = std::ldexp(1., 105); // -969 - (-1074)
+		static const double c2 = std::ldexp(1., -1074);
 
 		if (x == 0. || y == 0. || std::fabs(x) == std::numeric_limits<double>::infinity() || std::fabs(y) == std::numeric_limits<double>::infinity() || x != x  || y != y) {
 			return x / y;
@@ -332,8 +332,8 @@ template <> struct rop <double> {
 			yn = y;
 		}
 
-		if (fabs(xn) < th1) {
-			if (fabs(yn) < th2) {
+		if (std::fabs(xn) < th1) {
+			if (std::fabs(yn) < th2) {
 				xn *= c1;
 				yn *= c1;
 			} else {
@@ -359,11 +359,11 @@ template <> struct rop <double> {
 
 	static double sqrt_up(const double& x) {
 		double r, r2, d;
-		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
-		static const double c1 = ldexp(1., 106); // -969 - (-1074) + 1
-		static const double c2 = ldexp(1., 53); // sqrt(c1)
+		static const double th1 = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double c1 = std::ldexp(1., 106); // -969 - (-1074) + 1
+		static const double c2 = std::ldexp(1., 53); // sqrt(c1)
 
-		d = sqrt(x);
+		d = std::sqrt(x);
 
 		if (x < th1) {
 			double d2, x2;
@@ -385,11 +385,11 @@ template <> struct rop <double> {
 
 	static double sqrt_down(const double& x) {
 		double r, r2, d;
-		static const double th1 = ldexp(1., -969); // -1074 + 106 - 1
-		static const double c1 = ldexp(1., 106); // -969 - (-1074) + 1
-		static const double c2 = ldexp(1., 53); // sqrt(c1)
+		static const double th1 = std::ldexp(1., -969); // -1074 + 106 - 1
+		static const double c1 = std::ldexp(1., 106); // -969 - (-1074) + 1
+		static const double c2 = std::ldexp(1., 53); // sqrt(c1)
 
-		d = sqrt(x);
+		d = std::sqrt(x);
 
 		if (x < th1) {
 			double d2, x2;

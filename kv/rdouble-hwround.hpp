@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_HWROUND_HPP
@@ -78,19 +78,19 @@ template <> struct rop <double> {
 
 	static double sqrt_up(const double& x) {
 		volatile double r, x1 = x;
-		r = sqrt(x1);
+		r = std::sqrt(x1);
 		return r;
 	}
 
 	static double sqrt_down(const double& x) {
 		volatile double r, x1 = x;
 		hwround::rounddown();
-		r = sqrt(x1);
+		r = std::sqrt(x1);
 		hwround::roundup();
 
 		#if 0
 		volatile double r, x1 = x, tmp;
-		tmp = -sqrt(x1);
+		tmp = -std::sqrt(x1);
 		r = -(x1 / tmp);
 		#endif
 
