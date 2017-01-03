@@ -42,9 +42,9 @@
 #include <kv/ode-autodif.hpp>
 #include <kv/ode-callback.hpp>
 #include <kv/ode-lohner.hpp>
+#include <kv/ode-maffine0.hpp>
 #include <kv/ode-maffine.hpp>
 #include <kv/ode-maffine2.hpp>
-#include <kv/ode-maffine3.hpp>
 #include <kv/ode-nv.hpp>
 #include <kv/ode-param.hpp>
 #include <kv/ode-qr-lohner.hpp>

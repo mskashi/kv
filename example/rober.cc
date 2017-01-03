@@ -1,7 +1,7 @@
 #include <iostream>
+#include <kv/ode-maffine0.hpp>
 #include <kv/ode-maffine.hpp>
 #include <kv/ode-maffine2.hpp>
-#include <kv/ode-maffine3.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -62,10 +62,10 @@ int main()
 	std::cout.precision(17);
 
 	end = 1.;
-	// odelong_maffine: slow
+	// odelong_maffine0: slow
+	// odelong_maffine: fast
 	// odelong_maffine2: very fast but cannot calculate derivative w.r.t initial value
-	// odelong_maffine3: fast
-	r = kv::odelong_maffine3(Rober(), ix, itv(0.), end, p.set_verbose(0).set_restart_max(10).set_order(24));
+	r = kv::odelong_maffine(Rober(), ix, itv(0.), end, p.set_verbose(0).set_restart_max(10).set_order(24));
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

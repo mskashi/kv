@@ -115,7 +115,7 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 	// double tol=1e-15; // Little bit strong!!!
 	T tol = std::numeric_limits<T>::epsilon();
 	int n = H.size1();
-	// % p indicates the ‘active’ matrix size
+	// % p indicates the 'active' matrix size
 	int p = n, q, r;
 	T s,t,x,y,z,beta;
 	ub::matrix<T> v, mat_tmp, mat_tmp2, mat_T;

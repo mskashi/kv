@@ -31,6 +31,11 @@
 #define ODE_RESTART_RATIO 1
 #endif
 
+#ifndef ODE_COEF_MID
+#define ODE_CORF_MID 0
+#endif
+
+
 
 namespace kv {
 
@@ -120,9 +125,12 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m = std::max(m, norm(to_interval(x(i).v(j))));
+				#if ODE_COEF_MID == 1
 				using std::abs;
 				m = std::max(m, abs(x(i).v(j).get_mid()));
+				#else
+				m = std::max(m, norm(to_interval(x(i).v(j))));
+				#endif
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);

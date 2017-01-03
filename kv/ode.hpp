@@ -28,6 +28,10 @@
 #define ODE_RESTART_RATIO 1
 #endif
 
+#ifndef ODE_COEF_MID
+#define ODE_CORF_MID 0
+#endif
+
 
 namespace kv {
 
@@ -109,9 +113,12 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m = std::max(m, norm(x(i).v(j)));
+				#if ODE_COEF_MID == 1
 				using std::abs;
 				m = std::max(m, abs(mid(x(i).v(j))));
+				#else
+				m = std::max(m, norm(x(i).v(j)));
+				#endif
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);

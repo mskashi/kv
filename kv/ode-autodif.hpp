@@ -30,6 +30,11 @@
 #define ODE_RESTART_RATIO 1
 #endif
 
+#ifndef ODE_COEF_MID
+#define ODE_CORF_MID 0
+#endif
+
+
 
 namespace kv {
 
@@ -119,16 +124,22 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				// m = std::max(m, norm(x(i).v(j).v));
+				#if ODE_COEF_MID == 1
 				using std::abs;
 				m = std::max(m, abs(mid(x(i).v(j).v)));
+				#else
+				m = std::max(m, norm(x(i).v(j).v));
+				#endif
 				#ifdef IGNORE_DIF_PART
 				#else
 				km = x(i).v(j).d.size();
 				for (k=0; k<km; k++) {
-					// m = std::max(m, norm(x(i).v(j).d(k)));
+					#if ODE_COEF_MID == 1
 					using std::abs;
 					m = std::max(m, abs(mid(x(i).v(j).d(k))));
+					#else
+					m = std::max(m, norm(x(i).v(j).d(k)));
+					#endif
 				}
 				#endif
 			}

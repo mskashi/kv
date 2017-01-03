@@ -1,7 +1,7 @@
 #include <iostream>
 #include <limits>
 
-#include <kv/ode-maffine3.hpp>
+#include <kv/ode-maffine0.hpp>
 
 
 namespace ub = boost::numeric::ublas;
@@ -41,7 +41,7 @@ int main()
 
 	ax = x;
 	end = std::numeric_limits<double>::infinity();
-	r = kv::ode_maffine3(Lorenz(), ax, itv(0.), end);
+	r = kv::ode_maffine0(Lorenz(), ax, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -54,7 +54,7 @@ int main()
 	kv::affine<double>::maxnum() = 0;
 	ax = x;
 	end = 1.;
-	r = kv::odelong_maffine3(Lorenz(), ax, itv(0.), end);
+	r = kv::odelong_maffine0(Lorenz(), ax, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -66,7 +66,7 @@ int main()
 
 	ix = x;
 	end = 1.;
-	r = kv::odelong_maffine3(Lorenz(), ix, itv(0.), end);
+	r = kv::odelong_maffine0(Lorenz(), ix, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -77,7 +77,7 @@ int main()
 	ix = x;
 	dx = kv::autodif<itv>::init(ix);
 	end = 1.;
-	r = kv::odelong_maffine3(Lorenz(), dx, itv(0.), end);
+	r = kv::odelong_maffine0(Lorenz(), dx, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

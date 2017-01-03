@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <kv/ode-nv.hpp>
 #include <kv/ode-autodif-nv.hpp>
-#include <kv/ode-maffine3.hpp>
+#include <kv/ode-maffine.hpp>
 #ifdef USE_MAFFINE2
 #include <kv/ode-maffine2.hpp>
 #endif
@@ -31,9 +31,9 @@ namespace ub = boost::numeric::ublas;
 // as argument. In each case,
 //   odelong_nv in ode-nv.hpp,
 //   odelong_nv in ode-autodif-nv.hpp,
-//   odelong_maffine3 in ode-maffine3.hpp (interval version)
-//   odelong_maffine3 in ode-maffine3.hpp (affine version),
-//   odelong_maffine3 in ode-maffine3.hpp (autodif version)
+//   odelong_maffine in ode-maffine.hpp (interval version)
+//   odelong_maffine in ode-maffine.hpp (affine version),
+//   odelong_maffine in ode-maffine.hpp (autodif version)
 // is called inside.
 // (If -DUSE_MAFFINE2 then ode-maffine2.hpp is used instead.)
 
@@ -77,7 +77,7 @@ template <class F, class T> class StroboMap {
 		#ifdef USE_MAFFINE2
 		r = odelong_maffine2(f, result, start, end2, p);
 		#else
-		r = odelong_maffine3(f, result, start, end2, p);
+		r = odelong_maffine(f, result, start, end2, p);
 		#endif
 
 		if (r != 2) {
@@ -98,7 +98,7 @@ template <class F, class T> class StroboMap {
 		#ifdef USE_MAFFINE2
 		r = odelong_maffine2(f, result, start, end2, p);
 		#else
-		r = odelong_maffine3(f, result, start, end2, p);
+		r = odelong_maffine(f, result, start, end2, p);
 		#endif
 
 		if (r != 2) {
@@ -116,7 +116,7 @@ template <class F, class T> class StroboMap {
 		result = x;
 		end2 = end;
 
-		r = odelong_maffine3(f, result, start, end2, p);
+		r = odelong_maffine(f, result, start, end2, p);
 		if (r != 2) {
 			throw std::domain_error("StroboMap(): cannot calculate validated solution.");
 		}

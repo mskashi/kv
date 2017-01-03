@@ -1,7 +1,6 @@
 #include <iostream>
 #include <kv/ode-maffine.hpp>
 #include <kv/ode-maffine2.hpp>
-#include <kv/ode-maffine3.hpp>
 
 namespace ub = boost::numeric::ublas;
 
@@ -69,7 +68,7 @@ int main()
 
 	ix = x;
 	end = 70.;
-	r = kv::odelong_maffine2(f, ix, itv(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10));
+	r = kv::odelong_maffine(f, ix, itv(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10));
 	if (!r) {
 		std::cout << "can't calculate verified solution\n";
 	} else {

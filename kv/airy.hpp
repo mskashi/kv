@@ -8,7 +8,7 @@
 // Airy function
 
 #include <iostream>
-#include <kv/ode-maffine3.hpp>
+#include <kv/ode-maffine.hpp>
 #include <kv/gamma.hpp>
 
 
@@ -82,7 +82,7 @@ template <class T> interval<T> airy(const interval<T>& x, int mode = 0, bool d =
 		tx = ix;
 		end = x;
 		if (end.lower() < 0.) end.lower() = 0.;
-		r = odelong_maffine3(Airy_p(), tx, kv::interval<T>(0.), end);
+		r = odelong_maffine(Airy_p(), tx, kv::interval<T>(0.), end);
 		if (r != 2) {
 			throw std::domain_error("airy(): cannot calculate verified solution.");
 		}
@@ -95,7 +95,7 @@ template <class T> interval<T> airy(const interval<T>& x, int mode = 0, bool d =
 		end = x;
 		if (end.upper() > 0.) end.upper() = 0.;
 		end = -end;
-		r = odelong_maffine3(Airy_m(), tx, kv::interval<T>(0.), end);
+		r = odelong_maffine(Airy_m(), tx, kv::interval<T>(0.), end);
 		if (r != 2) {
 			throw std::domain_error("airy(): cannot calculate verified solution.");
 		}
