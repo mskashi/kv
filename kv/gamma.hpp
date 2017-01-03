@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef GAMMA_HPP
@@ -64,21 +64,22 @@ interval<T> gamma_point(const interval<T>& x) {
 
 	y = floor(x.lower());
 
-	if (y >= 2.) {
-		r = gamma_r(x - (y - 1.));
+	if (y == 1.) {
+		return gamma_r(x);
+	}
+
+	r = gamma_r(x - (y - 1.));
+	if (y > 1.) {
 		for (i=y-1; i>=1; i--) {
 			r *= x - i;
 		}
-		return r;
-	} else if (y <= 0.) {
-		r = gamma_r(x - (y - 1.));
-		for (i=0.; i>=y; i--) {
+	} else {
+		for (i=0; i>=y; i--) {
 			r /= x - i;
 		}
-		return r;
-	} else {
-		return gamma_r(x);
 	}
+
+	return r;
 }
 
 template <class T> interval<T> digamma_zero(T x);
@@ -105,7 +106,7 @@ interval<T> gamma(const interval<T>& x) {
 	if (floor(x.lower()) != floor(x.upper())) {
 		return interval<T>::whole();
 	}
-	if (floor(x.lower()) == x.lower()) {
+	if (floor(x.lower()) == x.lower()) { // integer
 		return interval<T>::whole();
 	}
 
@@ -129,21 +130,23 @@ interval<T> lgamma_point(const interval<T>& x) {
 
 	y = floor(x.lower());
 
-	if (y >= 2.) {
-		r = log(gamma_r(x - (y - 1.)));
+	if (y == 1.) {
+		return log(gamma_r(x));
+	}
+
+	r = log(gamma_r(x - (y - 1.)));
+
+	if (y > 1.) {
 		for (i=y-1; i>=1; i--) {
 			r += log(x - i);
 		}
-		return r;
-	} else if (y <= 0.) {
-		r = log(gamma_r(x - (y - 1.)));
-		for (i=0.; i>=y; i--) {
+	} else {
+		for (i=0; i>=y; i--) {
 			r -= log(abs(x - i));
 		}
-		return r;
-	} else {
-		return log(gamma_r(x));
 	}
+
+	return r;
 }
 
 template <class T>
@@ -166,10 +169,37 @@ interval<T> lgamma(const interval<T>& x) {
 	}
 
 	if (floor(x.lower()) != floor(x.upper())) {
-		return interval<T>::whole();
+		m = digamma_zero(x.lower());
+		if (zero_in(m)) { // error
+			return interval<T>::whole();
+		}
+		tmp = interval<T>::hull(lgamma_point(interval<T>(x.lower())), lgamma_point(interval<T>(x.upper())));
+		if (overlap(x, m)) {
+			tmp =  interval<T>::hull(tmp, lgamma_point(m));
+		}
+		m = digamma_zero((x+1).lower());
+		if (zero_in(m)) { // error
+			return interval<T>::whole();
+		}
+		tmp = interval<T>::hull(lgamma_point(interval<T>(x.lower())), lgamma_point(interval<T>(x.upper())));
+		if (overlap(x, m)) {
+			tmp =  interval<T>::hull(tmp, lgamma_point(m));
+		}
+		if (x.upper() > 0.) {
+			m = digamma_zero(1.5);
+			if (zero_in(m)) { // error
+				m = m2;
+			}
+			if (overlap(x, m)) {
+				tmp =  interval<T>::hull(tmp, lgamma_point(m));
+			}
+		}
+
+		return interval<T>(tmp.lower(), std::numeric_limits<T>::infinity());
 	}
-	if (floor(x.lower()) == x.lower()) {
-		return interval<T>::whole();
+
+	if (floor(x.lower()) == x.lower()) { // integer
+		return interval<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::infinity());
 	}
 
 	m = digamma_zero(x.lower());
@@ -235,24 +265,25 @@ template <class T> interval<T> digamma_plus(const interval<T>& x) {
  */
 
 template <class T> interval<T> digamma_point(const interval<T>& x) {
-	T tmp;
+	T y;
 	int i;
 	interval<T> r;
 
-	tmp = floor(x.lower());
+	y = floor(x.lower());
 
-	if (tmp == 1.) {
+	if (y == 1.) {
 		return digamma_plus(x);
 	} 
 
-	r = digamma_plus(x - tmp + 1.);
-	if (tmp > 1.) {
-		for (i = tmp-1; i>=1; i--) {
+	r = digamma_plus(x - (y - 1.));
+
+	if (y > 1.) {
+		for (i=y-1; i>=1; i--) {
 			r += 1. / (x - i);
 		}
 	} else {
-		for (i = tmp-1; i<=-1; i++) {
-			r -= 1. / (x - i - 1.);
+		for (i=0; i>=y; i--) {
+			r -= 1. / (x - i);
 		}
 	}
 
@@ -260,7 +291,13 @@ template <class T> interval<T> digamma_point(const interval<T>& x) {
 }
 
 template <class T> interval<T> digamma(const interval<T>& x) {
-	if (x.lower() < 0. && floor(x.lower()) != floor(x.upper())) {
+	if (x.lower() > 0.) {
+		return interval<T>::hull(digamma_point(interval<T>(x.lower())), digamma_point(interval<T>(x.upper())));
+	}
+	if (floor(x.lower()) != floor(x.upper())) {
+		return interval<T>::whole();
+	}
+	if (floor(x.lower()) == x.lower()) { // integer
 		return interval<T>::whole();
 	}
 	return interval<T>::hull(digamma_point(interval<T>(x.lower())), digamma_point(interval<T>(x.upper())));
@@ -306,7 +343,7 @@ template <class T> interval<T> trigamma_plus(const interval<T>& x) {
 	result = defint_singular_autostep(Trigamma< interval<T> >(x), Trigamma_0< interval<T> >(x), interval<T>(0.), th, TRIGAMMA_ORDER);
 
 	tmp = th * x;
-	result += interval<T>::hull(0., exp(-tmp) * (tmp + 1) / (x * x));
+	result += interval<T>::hull(0., exp(-tmp) * (tmp + 1) / (x * x * (1. - exp(-th))));
 
 	return result;
 }
@@ -316,24 +353,25 @@ template <class T> interval<T> trigamma_plus(const interval<T>& x) {
  */
 
 template <class T> interval<T> trigamma_point(const interval<T>& x) {
-	T tmp;
+	T y;
 	int i;
 	interval<T> r;
 
-	tmp = floor(x.lower());
+	y = floor(x.lower());
 
-	if (tmp == 1.) {
+	if (y == 1.) {
 		return trigamma_plus(x);
 	} 
 
-	r = trigamma_plus(x - tmp + 1.);
-	if (tmp > 1.) {
-		for (i = tmp-1; i>=1; i--) {
+	r = trigamma_plus(x - (y - 1.));
+
+	if (y > 1.) {
+		for (i=y-1; i>=1; i--) {
 			r -= 1. / ((x - i) * (x - i));
 		}
 	} else {
-		for (i = tmp-1; i<=-1; i++) {
-			r += 1. / ((x - i - 1.) * (x - i - 1.));
+		for (i=0; i>=y; i--) {
+			r += 1. / ((x - i) * (x - i));
 		}
 	}
 
@@ -347,8 +385,8 @@ template <class T> interval<T> trigamma(const interval<T>& x) {
 	if (floor(x.lower()) != floor(x.upper())) {
 		return interval<T>(0., std::numeric_limits<T>::infinity());
 	}
-	if (floor(x.lower()) == x.lower()) {
-		return interval<T>(0., std::numeric_limits<T>::infinity());
+	if (floor(x.lower()) == x.lower()) { // integer
+		return interval<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::infinity());
 	}
 	return trigamma_point(interval<T>(x));
 }
@@ -412,8 +450,10 @@ template <class T> interval<T> digamma_zero(T x) {
 		K = 0.;
 	}
 
-	is_calculated[n] = true;
-	cache[n] = K;
+	if (n <= DIGAMMA_ZERO_MAX) {
+		is_calculated[n] = true;
+		cache[n] = K;
+	}
 
 	return K;
 }

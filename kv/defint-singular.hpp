@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2014-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_SINGULAR_HPP
@@ -335,14 +335,15 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 
 		try {
 			y = integrate(f2(x));
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
 				psa< interval<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("defint_singular_autostep: evaluation error");
+				throw std::domain_error("defint_singular_autostep: evaluation error");
 			}
 		}
 
@@ -447,14 +448,15 @@ defint_power_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int orde
 
 		try {
 			y = f2(x);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
 				psa< interval<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("defint_singular_autostep: evaluation error");
+				throw std::domain_error("defint_singular_autostep: evaluation error");
 			}
 		}
 
@@ -577,14 +579,15 @@ defint_log_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, i
 
 		try {
 			y = f2(x);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
 				psa< interval<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("defint_singular_autostep: evaluation error");
+				throw std::domain_error("defint_singular_autostep: evaluation error");
 			}
 		}
 
@@ -704,14 +707,15 @@ defint_log_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order,
 
 		try {
 			y = f2(x);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
 				psa< interval<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("defint_singular_autostep: evaluation error");
+				throw std::domain_error("defint_singular_autostep: evaluation error");
 			}
 		}
 

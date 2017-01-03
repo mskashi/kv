@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef KRAW_APPROX_HPP
@@ -48,7 +48,7 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 		try {
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(C)), fc, fdc);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			return false;
 		}
 		r = invert(mid(fdc), R);
@@ -63,7 +63,7 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 	try {
 		autodif< interval<T> >::split(f(autodif< interval<T> >::init(C)), fc, fdc);
 	}
-	catch (std::range_error& e) {
+	catch (std::domain_error& e) {
 		return false;
 	}
 	r = invert(mid(fdc), R);
@@ -93,7 +93,7 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 	try {
 		autodif< interval<T> >::split(f(autodif< interval<T> >::init(I)), fi, fdi);
 	}
-	catch (std::range_error& e) {
+	catch (std::domain_error& e) {
 		return false;
 	}
 

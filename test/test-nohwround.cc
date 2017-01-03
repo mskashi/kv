@@ -11,6 +11,7 @@
 
 #include <fenv.h>
 #include <boost/random.hpp>
+#include <ctime>
 
 #ifndef NT
 #define NT 10000000
@@ -487,14 +488,14 @@ struct nohwround {
 			x2 = x * c1;
 			d2 = d * c2;
 			twoproduct(d2, d2, r, r2);
-			if ( r < x2 || (r == x2) && r2 < 0.) {
+			if ( r < x2 || (r == x2 && r2 < 0.)) {
 				return succ(d);
 			}
 			return d;
 		}
 
 		twoproduct(d, d, r, r2);
-		if ( r < x || (r == x) && r2 < 0.) {
+		if ( r < x || (r == x && r2 < 0.)) {
 			return succ(d);
 		}
 		return d;
@@ -513,14 +514,14 @@ struct nohwround {
 			x2 = x * c1;
 			d2 = d * c2;
 			twoproduct(d2, d2, r, r2);
-			if ( r > x2 || (r == x2) && r2 > 0.) {
+			if ( r > x2 || (r == x2 && r2 > 0.)) {
 				return pred(d);
 			}
 			return d;
 		}
 
 		twoproduct(d, d, r, r2);
-		if ( r > x || (r == x) && r2 > 0.) {
+		if ( r > x || (r == x && r2 > 0.)) {
 			return pred(d);
 		}
 		return d;

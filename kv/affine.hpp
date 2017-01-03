@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -892,7 +892,7 @@ template <class T> class affine {
 		l = I.lower();
 		u = I.upper();
 		if (l < 0. && u > 0.) {
-			throw std::range_error("affine: division by 0");
+			throw std::domain_error("affine: division by 0");
 		}
 
 		a = -1. /(l * u);
@@ -1031,7 +1031,7 @@ template <class T> class affine {
 		l = I.lower();
 		u = I.upper();
 		if (l < 0.) {
-			throw std::range_error("affine: sqrt of negative value");
+			throw std::domain_error("affine: sqrt of negative value");
 
 		}
 
@@ -1226,7 +1226,7 @@ template <class T> class affine {
 		u = I.upper();
 
 		if (l <= 0.) {
-			throw std::range_error("affine: log of nagative value");
+			throw std::domain_error("affine: log of nagative value");
 		}
 
 		using std::log;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AIRY_HPP
@@ -84,7 +84,7 @@ template <class T> interval<T> airy(const interval<T>& x, int mode = 0, bool d =
 		if (end.lower() < 0.) end.lower() = 0.;
 		r = odelong_maffine(Airy_p(), tx, kv::interval<T>(0.), end);
 		if (r != 2) {
-			throw std::range_error("airy(): cannot calculate verified solution.");
+			throw std::domain_error("airy(): cannot calculate verified solution.");
 		}
 		result = tx(suffix);
 		flag = true;
@@ -97,7 +97,7 @@ template <class T> interval<T> airy(const interval<T>& x, int mode = 0, bool d =
 		end = -end;
 		r = odelong_maffine(Airy_m(), tx, kv::interval<T>(0.), end);
 		if (r != 2) {
-			throw std::range_error("airy(): cannot calculate verified solution.");
+			throw std::domain_error("airy(): cannot calculate verified solution.");
 		}
 		if (flag) {
 			result = interval<T>::hull(result, tx(suffix));

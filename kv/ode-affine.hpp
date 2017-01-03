@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_HPP
@@ -156,14 +156,15 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 
 		try { 
 			w = f(z, t);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			 if (restart < p.restart_max) {
 				psa< affine<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("ode_affine: evaluation error");
+				throw std::domain_error("ode_affine: evaluation error");
 			}
 		}
 

@@ -4,6 +4,7 @@
 #include <boost/numeric/ublas/io.hpp>
 
 #include <boost/random.hpp>
+#include <ctime>
 #include <boost/timer.hpp>
 
 #include <kv/matrix-inversion.hpp>

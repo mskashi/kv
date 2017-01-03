@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef LP_HPP
@@ -40,7 +40,7 @@ template <class T> inline T lp_minimize(ub::vector<T>& objfunc, std::list< ub::v
 	p = constraints.begin();
 	for (i=0; i<m; i++) {
 		if ((*p)[0] > 0) {
-			throw std::range_error("lp_minimize: constraints sign error");
+			throw std::domain_error("lp_minimize: constraints sign error");
 		}
 		a(i+1, 0) = -(*p)[0];
 		for (j=1; j<=lp_n; j++) {
@@ -83,7 +83,7 @@ template <class T> inline T lp_minimize(ub::vector<T>& objfunc, std::list< ub::v
 			}
 		}
 		if (pivot_i == -1) {
-			throw std::range_error("lp_minimize: no optimal solution");
+			throw std::domain_error("lp_minimize: no optimal solution");
 		}
 
 		isbasic(basic(pivot_i)) = false;
@@ -139,7 +139,7 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 	p = constraints.begin();
 	for (i=0; i<m; i++) {
 		if ((*p)[0] > 0) {
-			throw std::range_error("lp_minimize: constraints sign error");
+			throw std::domain_error("lp_minimize: constraints sign error");
 		}
 		a(i+1, 0) = -(*p)[0];
 		for (j=1; j<=lp_n; j++) {
@@ -182,7 +182,7 @@ template <class T> inline T lp_minimize_verified(ub::vector<T>& objfunc, std::li
 			}
 		}
 		if (pivot_i == -1) {
-			throw std::range_error("lp_minimize: no optimal solution");
+			throw std::domain_error("lp_minimize: no optimal solution");
 		}
 
 		Imin = (interval<T>)a(pivot_i, 0) / a(pivot_i, pivot_j);

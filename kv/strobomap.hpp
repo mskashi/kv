@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef STROBOMAP_HPP
@@ -81,7 +81,7 @@ template <class F, class T> class StroboMap {
 		#endif
 
 		if (r != 2) {
-			throw std::range_error("StroboMap(): cannot calculate validated solution.");
+			throw std::domain_error("StroboMap(): cannot calculate validated solution.");
 		}
 
 		return result;
@@ -102,7 +102,7 @@ template <class F, class T> class StroboMap {
 		#endif
 
 		if (r != 2) {
-			throw std::range_error("StroboMap(): cannot calculate validated solution.");
+			throw std::domain_error("StroboMap(): cannot calculate validated solution.");
 		}
 
 		return result;
@@ -118,7 +118,7 @@ template <class F, class T> class StroboMap {
 
 		r = odelong_maffine(f, result, start, end2, p);
 		if (r != 2) {
-			throw std::range_error("StroboMap(): cannot calculate validated solution.");
+			throw std::domain_error("StroboMap(): cannot calculate validated solution.");
 		}
 
 		return result;

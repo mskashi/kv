@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_HPP
@@ -143,14 +143,15 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 		try {
 			w = f(z, t);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < p.restart_max) {
 				psa< interval<T> >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
 			} else {
-				throw std::range_error("ode: evaluation error");
+				throw std::domain_error("ode: evaluation error");
 			}
 		}
 

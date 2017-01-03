@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -1156,7 +1156,7 @@ template <> class numeric_limits<kv::dd> {
 	}
 
 	static const int digits = 106;
-	static const int digits10 = (digits-1)*301/1000; // ln(2)/ln(10)
+	static const int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
 	static const int radix = 2;
 	static const int min_exponent = -1021;
 	static const int min_exponent10 = -307;

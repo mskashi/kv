@@ -62,7 +62,9 @@ int main()
 
 	// friend functions
 	std::cout << width(z) << "\n";
+	std::cout << rad(z) << "\n";
 	std::cout << median(z) << "\n";
+	std::cout << mid(z) << "\n";
 	std::cout << norm(z) << "\n";
 	std::cout << mag(z) << "\n";
 	std::cout << std::boolalpha;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -468,11 +468,7 @@ template <class T> class psa {
 			xn2 = 1./range;
 		}
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -499,7 +495,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa sin (const psa& x) {
@@ -523,11 +521,7 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -558,7 +552,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa cos (const psa& x) {
@@ -582,11 +578,7 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -617,7 +609,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa exp (const psa& x) {
@@ -638,11 +632,7 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -667,7 +657,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa sqrt(const psa& x) {
@@ -692,11 +684,7 @@ template <class T> class psa {
 			xn2 = 1./(2. * sqrt(range));
 		}
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -722,7 +710,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa log(const psa& x) {
@@ -745,11 +735,7 @@ template <class T> class psa {
 			xn2 = -1.;
 		}
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -776,7 +762,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa sinh (const psa& x) {
@@ -798,11 +786,7 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -831,7 +815,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	friend psa cosh (const psa& x) {
@@ -853,11 +839,7 @@ template <class T> class psa {
 		hn = 1.;
 		fact_n = 1.;
 		if (use_history() == true) {
-			if (history().size() == 0) {
-				old_size = 0;
-			} else {
-				old_size = history().front().v.size();
-			}
+			old_size = history().front().v.size();
 		}
 		for (i=1; i<x.v.size(); i++) {
 			if (use_history() == true && i >= old_size) {
@@ -886,7 +868,9 @@ template <class T> class psa {
 		if (recover_uh) use_history() = true;
 		if (recover_rh) record_history() = true;
 
-		return r;
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value && ! boost::is_integral<C>::value, psa >::type pow(const psa& a, const C& b) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_NOHWROUND_HPP
@@ -370,14 +370,14 @@ template <> struct rop <double> {
 			x2 = x * c1;
 			d2 = d * c2;
 			twoproduct(d2, d2, r, r2);
-			if ( r < x2 || (r == x2) && r2 < 0.) {
+			if ( r < x2 || (r == x2 && r2 < 0.)) {
 				return succ(d);
 			}
 			return d;
 		}
 
 		twoproduct(d, d, r, r2);
-		if ( r < x || (r == x) && r2 < 0.) {
+		if ( r < x || (r == x && r2 < 0.)) {
 			return succ(d);
 		}
 		return d;
@@ -396,14 +396,14 @@ template <> struct rop <double> {
 			x2 = x * c1;
 			d2 = d * c2;
 			twoproduct(d2, d2, r, r2);
-			if ( r > x2 || (r == x2) && r2 > 0.) {
+			if ( r > x2 || (r == x2 && r2 > 0.)) {
 				return pred(d);
 			}
 			return d;
 		}
 
 		twoproduct(d, d, r, r2);
-		if ( r > x || (r == x) && r2 > 0.) {
+		if ( r > x || (r == x && r2 > 0.)) {
 			return pred(d);
 		}
 		return d;

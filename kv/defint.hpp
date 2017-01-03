@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_HPP
@@ -169,14 +169,15 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 
 			try {
 				y = integrate(f(x));
-			} catch (std::range_error& e) {
+			}
+			catch (std::domain_error& e) {
 				if (restart < RESTART_MAX) {
 					psa< interval<T> >::use_history() = false;
 					radius *= 0.5;
 					restart++;
 					continue;
 				} else {
-					throw std::range_error("defint_autostep: evaluation error");
+					throw std::domain_error("defint_autostep: evaluation error");
 				}
 			}
 

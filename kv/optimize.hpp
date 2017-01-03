@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef OPTIMIZE_HPP
@@ -55,7 +55,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 		try {
 			fi = f(I);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -68,7 +68,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 			fc = f(C);
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(I)), fi, fdi);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -94,7 +94,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 		try {
 			fc2 = f(C2);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 		tmp = fc2.upper();

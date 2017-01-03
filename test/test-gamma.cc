@@ -20,6 +20,8 @@ int main() {
 	std::cout << kv::lgamma(itv(-0.9, -0.1)) << "\n";
 	std::cout << kv::lgamma(itv(-1.5)) << "\n";
 	std::cout << kv::lgamma(itv(10000.)) << "\n";
+	std::cout << kv::lgamma(itv(-4.1, 2.)) << "\n";
+	std::cout << kv::lgamma(itv(-2.1, 2.)) << "\n";
 
 	std::cout << kv::digamma(itv(1.)) << "\n";
 	std::cout << kv::digamma(itv(10.)) << "\n";

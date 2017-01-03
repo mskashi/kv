@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
@@ -90,7 +90,7 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 		tmp = eval_polynomial(b, r) / eval_polynomial(db, r);
 		r -= tmp;
 		using std::abs;
-		if (abs(tmp) < abs(r) * epsilon) break;
+		if (abs(tmp) < n * abs(r) * epsilon) break;
 	}
 
 	// set Aberth's initial values
@@ -122,7 +122,7 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T 
 			norm1 = std::max(norm1, abs(x(i)));
 			norm2 = std::max(norm2, abs(dx(i)));
 		}
-		if (norm2 <= norm1 * epsilon) break;
+		if (norm2 <= n * norm1 * epsilon) break;
 	}
 
 	result = x;

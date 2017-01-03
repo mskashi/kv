@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -424,7 +424,7 @@ template <class T> class interval {
 			}
 		} else {
 			rop<T>::end();
-			throw std::range_error("interval: division by 0");
+			throw std::domain_error("interval: division by 0");
 		}
 		rop<T>::end();
 
@@ -443,7 +443,7 @@ template <class T> class interval {
 			r.sup = rop<T>::div_up(x.inf, T(y));
 		} else {
 			rop<T>::end();
-			throw std::range_error("interval: division by 0");
+			throw std::domain_error("interval: division by 0");
 		}
 		rop<T>::end();
 
@@ -468,7 +468,7 @@ template <class T> class interval {
 			}
 		} else {
 			rop<T>::end();
-			throw std::range_error("interval: division by 0");
+			throw std::domain_error("interval: division by 0");
 		}
 		rop<T>::end();
 
@@ -505,6 +505,10 @@ template <class T> class interval {
 
 	friend interval sqrt(const interval& x) {
 		T tmp1, tmp2;
+
+		if (x.inf < 0.) {
+			throw std::domain_error("interval: sqrt of negative value");
+		}
 
 		rop<T>::begin();
 		tmp1 = rop<T>::sqrt_down(x.inf);
@@ -797,7 +801,7 @@ template <class T> class interval {
 		}
 
 		if (y.inf == 0. && y.sup == 0.) {
-			throw std::range_error("interval: division by 0");
+			throw std::domain_error("interval: division by 0");
 		}
 
 		rop<T>::begin();
@@ -859,7 +863,7 @@ template <class T> class interval {
 		}
 
 		if (y.inf == 0. && y.sup == 0.) {
-			throw std::range_error("interval: division by 0");
+			throw std::domain_error("interval: division by 0");
 		}
 
 		rop<T>::begin();
@@ -1159,6 +1163,9 @@ template <class T> class interval {
 	}
 
 	friend interval log(const interval& I) {
+		if (I.inf < 0.) {
+			throw std::domain_error("interval: log of negative value");
+		}
 		return interval(log_point(I.lower(), -1), log_point(I.upper(), 1));
 	}
 
@@ -1206,6 +1213,9 @@ template <class T> class interval {
 	}
 
 	friend interval log1p(const interval& I) {
+		if (I.inf < -1.) {
+			throw std::domain_error("interval: log of negative value");
+		}
 		return interval(log1p_point(I.lower(), -1), log1p_point(I.upper(), 1));
 	}
 

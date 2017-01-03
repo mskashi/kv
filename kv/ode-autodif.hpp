@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_HPP
@@ -161,14 +161,15 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 
 		try {
 			w = f(z, t);
-		} catch (std::range_error& e) {
+		}
+		catch (std::domain_error& e) {
 			if (restart < p.restart_max) {
 				psa< autodif< interval<T> > >::use_history() = false;
 				radius *= 0.5;
 				restart++;
 				continue;
                         } else {
-				throw std::range_error("ode: evaluation error");
+				throw std::domain_error("ode: evaluation error");
                         }
 
 		}

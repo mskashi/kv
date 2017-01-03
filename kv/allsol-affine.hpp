@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ALLSOL_AFFINE_HPP
@@ -162,7 +162,7 @@ allsol_list_affine(F f, std::list< ub::vector< interval<T> > > targets, int verb
 		try {
 			fi = f(I);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -177,7 +177,7 @@ allsol_list_affine(F f, std::list< ub::vector< interval<T> > > targets, int verb
 		try {
 			ay = f(ax);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ALLSOL_HPP
@@ -358,7 +358,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		try {
 			fi = f(I);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -376,7 +376,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		try {
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(I)), fi, fdi);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -396,7 +396,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		try {
 			fc = f(C);
 		}
-		catch (std::range_error& e) {
+		catch (std::domain_error& e) {
 			goto label;
 		}
 
@@ -532,7 +532,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 			// "division scheduled" index by interval shrinking,
 			// skip the existence test and do interval
 			// shrinking again.
-			mi = allsolsub::search_maxwidth(I);
+			mi = allsol_sub::search_maxwidth(I);
 			if (rad(IR(mi)) <= 0.5 * rad(I(mi))) {
 				#pragma omp critical (targets)
 				{
@@ -549,7 +549,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 			try {
 				fc = f(C);
 			}
-			catch (std::range_error& e) {
+			catch (std::domain_error& e) {
 				goto label;
 			}
 
