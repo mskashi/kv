@@ -290,6 +290,9 @@ template <class T> class psa {
 			if (use_history() == true) {
 				r = history().front();
 				old_size = r.v.size();
+				if (mode() == 2) {
+					old_size = std::min(old_size, (int)s - 1);
+				}
 				r.v.resize(s, true);
 			} else {
 				old_size = 0;

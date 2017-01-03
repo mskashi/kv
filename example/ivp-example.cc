@@ -7,13 +7,13 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
 int main()
 {
-	ub::vector<itvd> x;
-	itvd start, end;
+	ub::vector<itv> x;
+	itv start, end;
 	kv::ode_param<double> p;
 	bool r;
 

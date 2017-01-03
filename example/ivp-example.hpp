@@ -2,9 +2,8 @@
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 
-class SimpleHarmonic {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct SimpleHarmonic {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -31,9 +30,8 @@ class SimpleHarmonic {
 	}
 };
 
-class Lorenz {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Lorenz {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(3);
 
 		y(0) = 10. * ( x(1) - x(0) );
@@ -62,14 +60,12 @@ class Lorenz {
 	}
 };
 
-class VdP {
-	public:
-
+struct VdP {
 	double mu;
 
-	VdP(double _mu = 0.25) : mu(_mu) {}
+	VdP(double mu = 0.25) : mu(mu) {}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -96,9 +92,8 @@ class VdP {
 	}
 };
 
-class Nobi {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Nobi {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1);
@@ -123,13 +118,12 @@ class Nobi {
 
 	template <class T>
 	void stop_time(kv::interval<T>& x) {
-		x = 3.3;
+		x = "3.3";
 	}
 };
 
-class QuadTest1 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct QuadTest1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(1);
 
 		y(0) = t * t;
@@ -154,9 +148,8 @@ class QuadTest1 {
 	}
 };
 
-class QuadTest2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct QuadTest2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(1);
 
 		y(0) = 0.;

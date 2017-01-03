@@ -4,11 +4,11 @@
 #include "burkardt-int.hpp"
 
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 int main()
 {
-	itvd start, end;
+	itv start, end;
 
 	std::cout.precision(17);
 

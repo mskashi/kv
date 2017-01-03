@@ -237,8 +237,8 @@ int main()
 		std::cout << end << "\n";
 	}
 
-	typename std::list< kv::interval<double> >::iterator ps, pe;
-	typename std::list< ub::vector< kv::psa< kv::interval<double> > > >::iterator pp;
+	std::list< kv::interval<double> >::iterator ps, pe;
+	std::list< ub::vector< kv::psa< kv::interval<double> > > >::iterator pp;
 	ps = start_list.begin();
 	pe = end_list.begin();
 	pp = psa_list.begin();
@@ -263,8 +263,8 @@ int main()
 		std::cout << end << "\n";
 	}
 
-	typename std::list< kv::interval<double> >::iterator pt;
-	typename std::list< ub::vector< kv::interval<double> > >::iterator pv;
+	std::list< kv::interval<double> >::iterator pt;
+	std::list< ub::vector< kv::interval<double> > >::iterator pv;
 	pt = time_list.begin();
 	pv = value_list.begin();
 

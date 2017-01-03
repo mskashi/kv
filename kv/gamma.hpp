@@ -5,6 +5,7 @@
 #ifndef GAMMA_HPP
 #define GAMMA_HPP
 
+#include <cmath>
 #include <kv/defint.hpp>
 #include <kv/defint-singular.hpp>
 
@@ -364,7 +365,9 @@ template <class T> interval<T> digamma_zero(T x) {
 		// http://en.wikipedia.org/wiki/Digamma_function
 		// I cannot find the true source of this formula.
 		dn = n;
-		x = (T)(-dn + atan(M_PI / (log(dn) + 1/(8 * dn))) / M_PI);
+		using std::atan;
+		using std::log;
+		x = (T)(-dn + atan(constants<double>::pi() / (log(dn) + 1/(8 * dn))) / constants<double>::pi());
 	}
 
 	for (i=0; i<15; i++) {

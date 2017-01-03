@@ -48,7 +48,7 @@ int main()
 	boost::timer t;
 	ub::vector<itv> I;
 	std::list< ub::vector<itv> > rest;
-	typename std::list< ub::vector<itv> >::iterator p;
+	std::list< ub::vector<itv> >::iterator p;
 
 	std::cout.precision(17);
 

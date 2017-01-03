@@ -367,7 +367,7 @@ class dd {
 		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		}
-		if (std::fabs(y) == std::numeric_limits<double>::infinity()) {
+		if (std::fabs((double)y) == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		}
 

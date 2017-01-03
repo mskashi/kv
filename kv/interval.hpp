@@ -676,7 +676,7 @@ template <class T> class interval {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, bool>::type operator<(const C& x, const interval& y) {
-		return rop<T>::fromstring_up(y) < y.inf;
+		return rop<T>::fromstring_up(x) < y.inf;
 	}
 
 
@@ -1245,7 +1245,7 @@ template <class T> class interval {
 			y *= I;
 			y /= (T)i;
 			if (mag(y) < std::numeric_limits<T>::epsilon()) {
-				r += y * interval<T>(-1., 1.);
+				r += y * interval(-1., 1.);
 				break;
 			} else {
 				if (i % 2 == 0) {
@@ -1524,7 +1524,7 @@ template <class T> class interval {
 		}
 	}
 
-	friend interval asin(const interval<T>& I) {
+	friend interval asin(const interval& I) {
 		return interval(asin_point(I.lower()).lower(), asin_point(I.upper()).upper());
 	}
 

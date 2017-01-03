@@ -9,8 +9,7 @@
 #include <kv/rdouble.hpp>
 
 
-class P01 {
-	public:
+struct P01 {
 	template <class T> T operator() (T x){
 		return exp(x);
 	}
@@ -28,8 +27,7 @@ class P01 {
 	}
 };
 
-class P03 {
-	public:
+struct P03 {
 	template <class T> T operator() (T x){
 		return (2./3.) * x * sqrt(x);
 	}
@@ -47,8 +45,7 @@ class P03 {
 	}
 };
 
-class P04 {
-	public:
+struct P04 {
 	template <class T> T operator() (T x){
 		return 1. / (x*x*x*x + x*x + 0.9);
 	}
@@ -66,8 +63,7 @@ class P04 {
 	}
 };
 
-class P08 {
-	public:
+struct P08 {
 	template <class T> T operator() (T x){
 		return 1. / (1. + x*x*x*x);
 	}
@@ -85,8 +81,7 @@ class P08 {
 	}
 };
 
-class P10 {
-	public:
+struct P10 {
 	template <class T> T operator() (T x){
 		return 1. / (1. + x);
 	}
@@ -104,8 +99,7 @@ class P10 {
 	}
 };
 
-class P11 {
-	public:
+struct P11 {
 	template <class T> T operator() (T x){
 		return 1. / (1. + exp(x));
 	}
@@ -123,8 +117,7 @@ class P11 {
 	}
 };
 
-class P12 {
-	public:
+struct P12 {
 	template <class T> T operator() (T x){
 		return x / (exp(x) - 1.);
 	}
@@ -142,8 +135,7 @@ class P12 {
 	}
 };
 
-class P13 {
-	public:
+struct P13 {
 	template <class T> T operator() (T x){
 		return sin(x) / x;
 	}
@@ -161,8 +153,7 @@ class P13 {
 	}
 };
 
-class P14 {
-	public:
+struct P14 {
 	template <class T> T operator() (T x){
 		return sqrt(50.) * exp(-50. * 3.1415926535897932 * x * x);
 	}
@@ -180,8 +171,7 @@ class P14 {
 	}
 };
 
-class P15 {
-	public:
+struct P15 {
 	template <class T> T operator() (T x){
 		return 25. * exp(-25. * x);
 	}
@@ -199,8 +189,7 @@ class P15 {
 	}
 };
 
-class P16 {
-	public:
+struct P16 {
 	template <class T> T operator() (T x){
 		return 50. / (3.1415926535897932 * (2500. * x * x + 1.));
 	}
@@ -218,8 +207,7 @@ class P16 {
 	}
 };
 
-class P17 {
-	public:
+struct P17 {
 	template <class T> T operator() (T x){
 		T tmp;
 		tmp = sin(50. * 3.1415926535897932 * x);
@@ -239,8 +227,7 @@ class P17 {
 	}
 };
 
-class P18 {
-	public:
+struct P18 {
 	template <class T> T operator() (T x){
 		return x / (exp(x) + 1.);
 	}
@@ -258,8 +245,7 @@ class P18 {
 	}
 };
 
-class P20 {
-	public:
+struct P20 {
 	template <class T> T operator() (T x){
 		return 1. / (x * x + 1.005);
 	}
@@ -277,8 +263,7 @@ class P20 {
 	}
 };
 
-class P22 {
-	public:
+struct P22 {
 	template <class T> T operator() (T x){
 		return 1. / (x*x*x*x + x*x + 1.);
 	}
@@ -296,8 +281,7 @@ class P22 {
 	}
 };
 
-class P39 {
-	public:
+struct P39 {
 	template <class T> T operator() (T x){
 		return exp(cos(x));
 	}
@@ -315,8 +299,7 @@ class P39 {
 	}
 };
 
-class P41 {
-	public:
+struct P41 {
 	template <class T> T operator() (T x){
 		return exp(-x) * sin(50. * x);
 	}
@@ -334,8 +317,7 @@ class P41 {
 	}
 };
 
-class P44 {
-	public:
+struct P44 {
 	template <class T> T operator() (T x){
 		return 1. / (1. + x * x);
 	}
@@ -353,8 +335,7 @@ class P44 {
 	}
 };
 
-class P45 {
-	public:
+struct P45 {
 	template <class T> T operator() (T x){
 		return exp(x) * cos(x);
 	}
@@ -372,8 +353,7 @@ class P45 {
 	}
 };
 
-class P47 {
-	public:
+struct P47 {
 	template <class T> T operator() (T x){
 		return (10. * x - 1) * (10. * x - 1.1) * (10. * x - 1.2) * (10. * x - 1.3);
 	}
@@ -391,8 +371,7 @@ class P47 {
 	}
 };
 
-class P51 {
-	public:
+struct P51 {
 	template <class T> T operator() (T x){
 		return cos(8. * sin(x));
 	}
@@ -410,8 +389,7 @@ class P51 {
 	}
 };
 
-class P57 {
-	public:
+struct P57 {
 	template <class T> T operator() (T x){
 		return exp(20. * (x - 1)) * sin(4. * x);
 	}
@@ -429,8 +407,7 @@ class P57 {
 	}
 };
 
-class P63 {
-	public:
+struct P63 {
 	template <class T> T operator() (T x){
 		T alpha;
 		alpha = sin(3.1415926535897932 / 12.);
@@ -450,8 +427,7 @@ class P63 {
 	}
 };
 
-class P73 {
-	public:
+struct P73 {
 	template <class T> T operator() (T x){
 		return 2. / (2. + sin(10. * 3.1415926535897932 * x));
 	}
@@ -469,8 +445,7 @@ class P73 {
 	}
 };
 
-class P74 {
-	public:
+struct P74 {
 	template <class T> T operator() (T x){
 		const double c = 3.;
 		const double x0 = 0.75;
@@ -490,8 +465,7 @@ class P74 {
 	}
 };
 
-class P75 {
-	public:
+struct P75 {
 	template <class T> T operator() (T x){
 		return 1. / (x*x*x*x*x*x + 0.9);
 	}
@@ -509,8 +483,7 @@ class P75 {
 	}
 };
 
-class P77 {
-	public:
+struct P77 {
 	template <class T> T operator() (T x){
 		return cos(x) + 5. * cos(1.6 * x) - 2. * cos(2. * x) + 5. * cos(4.5 * x) + 7. * cos(9. * x);
 	}
