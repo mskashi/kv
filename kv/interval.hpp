@@ -975,6 +975,8 @@ template <class T> class interval {
 		interval xp = x;
 		interval r(1.);
 
+		if (i != i) return (interval)i; // NaN check
+
 		while (i != 0.) {
 			i *= 0.5;
 			using std::floor;
@@ -1687,7 +1689,13 @@ template <class T> class interval {
 	}
 
 	static interval tanh_point(const T& x) {
-		return sinh_point(x) / cosh_point(x);
+		if (x > 0.5) {
+			return 1. - 2. / (1. + exp_point(2. * x));
+		} else if (x < -0.5) {
+			return 2. / (1. + exp_point(-2. * x)) - 1.;
+		} else {
+			return sinh_origin(x) / cosh_point(x);
+		}
 	}
 
 	friend interval tanh(const interval& I) {

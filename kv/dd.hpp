@@ -670,6 +670,8 @@ class dd {
 		dd xp = x;
 		dd r(1.);
 
+		if (i != i) return (dd)i; // NaN check
+
 		while (i != 0.) {
 			i *= 0.5;
 			using std::floor;
@@ -1078,7 +1080,13 @@ class dd {
 	}
 
 	friend dd tanh(const dd& x) {
-		return sinh(x) / cosh(x);
+		if (x > 0.5) {
+			return 1. - 2. / (1. + exp(2. * x));
+		} else if (x < -0.5) {
+			return 2. / (1. + exp(-2. * x)) - 1.;
+		} else {
+			return sinh_origin(x) / cosh(x);
+		}
 	}
 
 	friend dd asinh(const dd& x) {
