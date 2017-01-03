@@ -544,18 +544,18 @@ template <class T> class interval {
 	}
 
 	friend interval sqrt(const interval& x) {
-		T tmp1, tmp2;
+		interval r;
 
 		if (x.inf < 0.) {
 			throw std::domain_error("interval: sqrt of negative value");
 		}
 
 		rop<T>::begin();
-		tmp1 = rop<T>::sqrt_down(x.inf);
-		tmp2 = rop<T>::sqrt_up(x.sup);
+		r.inf = rop<T>::sqrt_down(x.inf);
+		r.sup = rop<T>::sqrt_up(x.sup);
 		rop<T>::end();
 
-		return interval(tmp1, tmp2);
+		return r;
 	}
 
 	const T& lower() const {

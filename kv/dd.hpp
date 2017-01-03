@@ -288,7 +288,6 @@ class dd {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, dd >::type operator*(const dd& x, const C& y) {
 		double z1, z2, z3, z4;
-		volatile double v;
 
 		twoproduct(x.a1, y, z1, z2);
 		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
