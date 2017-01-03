@@ -56,7 +56,7 @@ int main()
 	Shinohara2().range(I);
 	std::cout << "Shinohara2\n";
 	t.restart();
-	allsol(Shinohara2(), I, 1, 1e-8, &rest);
+	kv::allsol(Shinohara2(), I, 1, 1e-8, &rest);
 	std::cout << t.elapsed() << " sec\n";
 
 	p = rest.begin();

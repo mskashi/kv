@@ -28,11 +28,11 @@ int main()
 
 	for (i=0; i<I.size(); i++) I(i) = itv(-10, 10);
 	t.restart();
-	allsol(Func(), I, 2);
+	kv::allsol(Func(), I, 2);
 	std::cout << t.elapsed() << " sec\n";
 
 	for (i=0; i<I.size(); i++) I(i) = itv::whole();
 	t.restart();
-	allsol(Func(), I, 2);
+	kv::allsol(Func(), I, 2);
 	std::cout << t.elapsed() << " sec\n";
 }

@@ -82,6 +82,18 @@ int main()
 	std::cout << mig(itv(-2., 1.)) << "\n";
 	std::cout << mig(itv(-2., -1.)) << "\n";
 	std::cout << mig(itv(2., 3.)) << "\n";
+	std::cout << max(itv(2., 4.), itv(3., 5.)) << "\n";
+	std::cout << min(itv(2., 4.), itv(3., 5.)) << "\n";
+
+	// test for midrad
+	std::cout << "test for midrad\n";
+	itv::base_type m, r; // double
+	z = itv(1., 1 + std::numeric_limits<itv::base_type>::epsilon() * 3);
+	std::cout << mid(z) << "\n";
+	std::cout << rad(z) << "\n";
+	midrad(z, m, r);
+	std::cout << m << "\n";
+	std::cout << r << "\n";
 
 	// comparison operators
 	std::cout << (x < y) << "\n";

@@ -65,7 +65,7 @@ int main()
 	I(2) = itv(-10., 10.);
 	I(3) = itv(1e-5, 10.);
 
-	allsol(g, I, 1);
+	kv::allsol(g, I, 2);
 
 	x(0) = 0.13;
 	x(1) = 0.37;

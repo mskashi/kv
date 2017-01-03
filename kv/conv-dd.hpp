@@ -689,13 +689,13 @@ struct conv_dd {
 					if (result[offset2 + i] == 0) {
 					} else {
 						r += std::ldexp(1., i+1);
-						flag = 1;
+						flag = true;
 					}
 				} else {
 					if (result[offset2 + i] == 0) {
 					} else {
 						r += std::ldexp(1., i+1);
-						flag = 1;
+						flag = true;
 					}
 				}
 				result_max2 = i;
@@ -710,7 +710,7 @@ struct conv_dd {
 			r2 = 0.;
 		}
 
-		msb = std::numeric_limits<int>::min();
+		msb = result_min - 1; // outside result bits
 
 		for (i=result_max2; i >= result_min; i--) {
 			if (fast) {
@@ -744,7 +744,7 @@ struct conv_dd {
 			}
 			tmp = result[offset2 + i];
 			r2 += std::ldexp((double)tmp, i);
-			if (msb == std::numeric_limits<int>::min() && ((flag == true && tmp == 0) || (flag == false && tmp == 1))) {
+			if (msb == result_min - 1 && ((flag && tmp == 0) || (!flag && tmp == 1))) {
 				msb = i;
 			}
 		}

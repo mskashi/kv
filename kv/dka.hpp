@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
@@ -141,6 +141,8 @@ ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< inte
 	ub::vector< complex< interval<T> > > x2, x3(n);
 	complex< interval<T> > f, df;
 	T err;
+	ub::vector<int> unified(n);
+	bool flag;
 
 	x2 = x;
 
@@ -158,6 +160,31 @@ ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< inte
 		}
 		x3(i).real() = x2(i).real() + err * interval<T>(-1., 1.);
 		x3(i).imag() = x2(i).imag() + err * interval<T>(-1., 1.);
+	}
+
+	/* unify overlapping solutions */
+
+	for (i=0; i<n; i++) unified(i) = -1; /* not unified */
+
+	while (true) {
+		flag = true;
+		for (i=0; i<n-1; i++) {
+			if (unified(i) != -1) continue;
+			for (j=i; j<n; j++) {
+				if (unified(j) != -1) continue;
+				if (overlap(x3(i).real(), x3(j).real()) && overlap(x3(i).imag(), x3(j).imag())) {
+					x3(i).real() = interval<T>::hull(x3(i).real(), x3(j).real());
+					x3(i).imag() = interval<T>::hull(x3(i).imag(), x3(j).imag());
+					unified(j) = i; /* x3(j) is unified to x3(i) */
+					flag = false;
+				}
+			}
+		}
+		if (flag) break;
+	}
+
+	for (i=0; i<n; i++) {
+		if (unified(i) != -1) x3(i) = x3(unified(i));
 	}
 
 	return x3;

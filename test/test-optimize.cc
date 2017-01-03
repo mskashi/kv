@@ -62,11 +62,39 @@ struct Levy {
 };
 
 
+/*
+ * Griewank Function
+    taken from:
+ *  https://www.sfu.ca/~ssurjano/griewank.html
+ *  http://www.autodiff.org/ad16/Invited/Rump_Reliable.pdf
+ */
+
+
+struct Griewank {
+	int n;
+	Griewank(int n): n(n) {
+	}
+	template <class T> T operator() (const ub::vector<T>& x){
+		int i;
+		T s1, s2;
+		s1 = 0;
+		for (i=0; i<n; i++) {
+			s1 += x(i) * x(i);
+		}
+		s2 = 1;
+		for (i=0; i<n; i++) {
+			s2 *= cos(x(i) / sqrt(T(i + 1)));
+		}
+		return 1 + s1 / 4000. - s2;
+	}
+};
+
+
 typedef kv::interval<double> itv;
 
 int main()
 {
-	int i;
+	int i, n;
 	boost::timer t;
 	ub::vector<itv> I;
 	std::list< ub::vector<itv> > result;
@@ -92,4 +120,16 @@ int main()
 	while (p != result.end()) {
 		std::cout << *(p++) << "\n";
 	}
+
+	n = 5;
+	I.resize(n);
+	for (i=0; i<I.size(); i++) I(i) = itv(-600., 600.);
+	t.restart();
+	result = optimize(I, Griewank(n), 1e-5);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
+	std::cout << t.elapsed() << " sec\n";
+
 }

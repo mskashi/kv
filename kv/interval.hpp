@@ -648,6 +648,16 @@ template <class T> class interval {
 		return mid(x);
 	}
 
+	friend void midrad(const interval& x, T& m, T& r) {
+		T tmp;
+		m = mid(x);
+		rop<T>::begin();
+		r = rop<T>::sub_up(x.sup, m);
+		tmp = rop<T>::sub_up(m, x.inf);
+		rop<T>::end();
+		if (tmp > r) r = tmp;
+	}
+
 	friend T norm(const interval& x) {
 		if (x.inf >= 0.) return x.sup;
 		if (x.sup <= 0.) return -x.inf;
@@ -672,6 +682,24 @@ template <class T> class interval {
 		T tmp = -x.inf;
 		if (x.sup > tmp) tmp = x.sup;
 		return interval(0., tmp);
+	}
+
+	friend interval max(const interval& x, const interval& y) {
+		T z1, z2;
+		z1 = x.inf;
+		if (y.inf > z1) z1 = y.inf;
+		z2 = x.sup;
+		if (y.sup > z2) z2 = y.sup;
+		return interval(z1, z2);
+	}
+
+	friend interval min(const interval& x, const interval& y) {
+		T z1, z2;
+		z1 = x.inf;
+		if (y.inf < z1) z1 = y.inf;
+		z2 = x.sup;
+		if (y.sup < z2) z2 = y.sup;
+		return interval(z1, z2);
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool >::type in(const C& a, const interval& x) {
