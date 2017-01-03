@@ -13,7 +13,7 @@
  */
 
 namespace ub = boost::numeric::ublas;
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 struct Func {
 	template <class T> T operator()(const ub::vector<T>& t) {
@@ -30,40 +30,41 @@ struct Func {
 int main()
 {
 	int i;
-	ub::vector<itvd> I;
+	ub::vector<itv> I;
 	Func f;
 
 	std::cout.precision(17);
 
 	I.resize(5);
 
-	I[0] = itvd(8.7, 8.8);
-	I[1] = itvd(-9.4, -9.3);
-	I[2] = itvd(-4.6, -4.5);
-	I[3] = itvd(3.5, 3.6);
-	I[4] = itvd(-2.9, -2.8);
+	I[0] = itv(8.7, 8.8);
+	I[1] = itv(-9.4, -9.3);
+	I[2] = itv(-4.6, -4.5);
+	I[3] = itv(3.5, 3.6);
+	I[4] = itv(-2.9, -2.8);
+
 
 	// interval arithmetic
+
 	std::cout << "interval: " << f(I) << "\n";
 
+	// affine arithmetic
 
-	ub::vector< kv::affine<double> > a;
+	// ub::vector< kv::affine<double> > a;
+	ub::vector< kv::affine<itv::base_type> > a;
 
 	a.resize(5);
-
 	for (i=0; i<5; i++) a(i) = I(i);
-
-	// affine arithmetic
 	std::cout << "affine: " << to_interval(f(a)) << "\n";
 
+	// mean value form
 
-	ub::vector<itvd> c, fdi;
-	itvd fc, fi;
+	ub::vector<itv> c, fdi;
+	itv fc, fi;
 
 	c = mid(I);
 	fc = f(c);
-	kv::autodif<itvd>::split(f(kv::autodif<itvd>::init(I)), fi, fdi);
+	kv::autodif<itv>::split(f(kv::autodif<itv>::init(I)), fi, fdi);
 
-	// mean value form
 	std::cout << "mvf: " << fc + inner_prod(fdi, I - c) << "\n";
 }

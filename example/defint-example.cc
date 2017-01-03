@@ -1,7 +1,7 @@
 #include <iostream>
 #include <kv/defint.hpp>
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
 // simple constant problem
@@ -29,7 +29,7 @@ struct Petras {
 
 struct DTaylor {
 	template <class T> T operator() (T x) {
-		static T pi(kv::constants<itvd>::pi());
+		static T pi(kv::constants<itv>::pi());
 		return sin(pi * x) - sin(x);
 	}
 };
@@ -72,11 +72,11 @@ struct Nanbu {
 int main() {
 	std::cout.precision(17);
 
-	std::cout << kv::defint_autostep(Constant_Example(), (itvd)0., (itvd)1., 12) << "\n";
-	std::cout << kv::defint_autostep(Petras(), (itvd)0., kv::constants<itvd>::pi(), 12) << "\n";
-	std::cout << kv::defint_autostep(DTaylor(), (itvd)0., (itvd)20., 12) << "\n";
-	std::cout << kv::defint_autostep(Sqrt(), (itvd)"0.0001", (itvd)2., 12) << "\n";
-	std::cout << kv::defint_autostep(Func1(), (itvd)(-1.), (itvd)1., 12) << "\n";
-	std::cout << kv::defint_autostep(Rump1(), (itvd)(0.), (itvd)8., 12) << "\n";
-	std::cout << kv::defint_autostep(Nanbu(), (itvd)(0.5), (itvd)4., 10) << "\n";
+	std::cout << kv::defint_autostep(Constant_Example(), (itv)0., (itv)1., 12) << "\n";
+	std::cout << kv::defint_autostep(Petras(), (itv)0., kv::constants<itv>::pi(), 12) << "\n";
+	std::cout << kv::defint_autostep(DTaylor(), (itv)0., (itv)20., 12) << "\n";
+	std::cout << kv::defint_autostep(Sqrt(), (itv)"0.0001", (itv)2., 12) << "\n";
+	std::cout << kv::defint_autostep(Func1(), (itv)(-1.), (itv)1., 12) << "\n";
+	std::cout << kv::defint_autostep(Rump1(), (itv)(0.), (itv)8., 12) << "\n";
+	std::cout << kv::defint_autostep(Nanbu(), (itv)(0.5), (itv)4., 10) << "\n";
 }

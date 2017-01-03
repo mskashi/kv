@@ -150,14 +150,14 @@ struct conv_dd {
 				// NOTICE: tmp may become negative
 				tmp = buf[offset + i] + s * buf2[offset + i] + carry;
 				carry = (int)std::floor(tmp / 2.);
-				buf[offset + i] = tmp % 2;
+				buf[offset + i] = tmp - carry * 2;
 			}
-			for (i=emax2+1; emax; i++) {
+			for (i=emax2+1; i<=emax; i++) {
 				if (carry == 0) break;
 				// NOTICE: tmp may become negative
 				tmp = buf[offset + i] + carry;
 				carry = (int)std::floor(tmp / 2.);
-				buf[offset + i] = tmp % 2;
+				buf[offset + i] = tmp - carry * 2;
 			}
 			while (buf[offset + emax] == 0) {
 				emax--;

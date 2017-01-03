@@ -1,11 +1,8 @@
 #include <iostream>
 #include <limits>
-
 #include <kv/ode.hpp>
 
-
 namespace ub = boost::numeric::ublas;
-
 typedef kv::interval<double> itv;
 
 
@@ -23,7 +20,7 @@ struct Kahaner10 {
 
 template <class F> struct DefintByODE {
 	F f;
-	DefintByODE(F f_v) : f(f_v) {}
+	DefintByODE(F f) : f(f) {}
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t) {
 		ub::vector<T> y(1);
 
@@ -49,10 +46,10 @@ int main()
 	Func f;
 	DefintByODE<Func> g(f);
 
-	// maffineなどの高度な解法は途中経過が初期値に依存しないので意味が無い
-	// r = odelong(g, ix, itv(1.), itv(3), 12);
 	end = 3.;
-	r = kv::odelong(DefintByODE<Func>(Func()), ix, itv(1.), end);
+	// there is no sense using sophisticated algorithm like ode_maffine
+	// because the result of the problem has no dependence on initial value
+	r = kv::odelong(g, ix, itv(1.), end);
 	if (!r) {
 		std::cout << "can't calculate verified solution\n";
 	} else {

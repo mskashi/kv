@@ -5,7 +5,7 @@ namespace ub = boost::numeric::ublas;
 
 
 struct Func {
-	template <class T> T operator() (ub::vector<T> x){
+	template <class T> T operator() (const ub::vector<T>& x){
 		T tmp, tmp2;
 		tmp = x(0) - 1.;
 		tmp2 = x(1) - 2.;
@@ -17,7 +17,7 @@ struct Func {
 // example found in
 // http://www.msi.co.jp/nuopt/products/derivation/global/index.html
 struct Func2 {
-	template <class T> T operator() (ub::vector<T> in){
+	template <class T> T operator() (const ub::vector<T>& in){
 		T x, y, z, w;
 
 		x = in(0);
@@ -33,7 +33,7 @@ struct Func2 {
 };
 
 struct Rosenbrock {
-	template <class T> T operator() (ub::vector<T> x){
+	template <class T> T operator() (const ub::vector<T>& x){
 		T tmp, tmp2;
 		tmp = 1. - x(0);
 		tmp2 = x(1) - x(0) * x(0);

@@ -2,11 +2,10 @@
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x) {
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x) {
 		ub::vector<T> y(2);
 		y(0) = x(0) * x(0) - x(1) - 1.;
 		y(1) = (x(0) - 2.) * (x(0) - 2.) - x(1) - 1.;
@@ -17,7 +16,7 @@ class Func {
 int main()
 {
 	ub::vector<double> x;
-	ub::vector<itvd> ix;
+	ub::vector<itv> ix;
 	bool b;
 
 	std::cout.precision(17);

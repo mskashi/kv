@@ -8,10 +8,10 @@
 #include <kv/affine.hpp>
 
 #ifdef TEST_DD
-typedef kv::interval<kv::dd> itvd;
+typedef kv::interval<kv::dd> itv;
 typedef kv::affine<kv::dd> afd;
 #else
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 typedef kv::affine<double> afd;
 #endif
 
@@ -21,7 +21,7 @@ int main()
 	int i;
 
 	// initialize from interval
-	a = itvd(2., 3.);
+	a = itv(2., 3.);
 	std::cout << a << "\n";
 	// initialize from string
 	b = "0.1";
@@ -74,6 +74,24 @@ int main()
 	d = cos(a); // lazy implementation
 	std::cout << d << "\n";
 	d = tan(a); // lazy implementation
+	std::cout << d << "\n";
+	d = asin(a/10.); // lazy implementation
+	std::cout << d << "\n";
+	d = acos(a/10.); // lazy implementation
+	std::cout << d << "\n";
+	d = atan(a); // lazy implementation
+	std::cout << d << "\n";
+	d = sinh(a); // lazy implementation
+	std::cout << d << "\n";
+	d = cosh(a); // lazy implementation
+	std::cout << d << "\n";
+	d = tanh(a); // lazy implementation
+	std::cout << d << "\n";
+	d = asinh(a); // lazy implementation
+	std::cout << d << "\n";
+	d = acosh(a); // lazy implementation
+	std::cout << d << "\n";
+	d = tanh(a/10); // lazy implementation
 	std::cout << d << "\n";
 
 	// maximin number of dummy variables

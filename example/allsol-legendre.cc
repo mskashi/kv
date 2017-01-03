@@ -1,8 +1,7 @@
 #include <kv/allsol.hpp>
 
 namespace ub = boost::numeric::ublas;
-
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 struct Legendre {
 	int n;
@@ -37,10 +36,10 @@ struct Legendre {
 
 int main()
 {
-	ub::vector<itvd> I(1);
+	ub::vector<itv> I(1);
 	std::cout.precision(17);
 
-	I(0) = itvd(-1, 1);
+	I(0) = itv(-1, 1);
 
 	allsol(Legendre(20), I, 2);
 }

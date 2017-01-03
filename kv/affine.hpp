@@ -1423,7 +1423,7 @@ template <class T> class affine {
 		return r + m * tmp;
 	}
 
-	// lazy implementation of tan 
+	// lazy implementation of tan
 	friend affine tan(const affine& x) {
 		// return tan((interval<T>)(x.a(0))) + pow(cos(to_interval(x)), -2) * (x - x.a(0));
 
@@ -1435,6 +1435,168 @@ template <class T> class affine {
 		tmp.a(0) = 0.;
 		r = tan((interval<T>)(x.a(0)));
 		r2 = pow(cos(to_interval(x)), -2);
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of asin
+	friend affine asin(const affine& x) {
+		// return asin((interval<T>)(x.a(0))) + (1. / sqrt(1. - pow(to_interval(x), 2))) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = asin((interval<T>)(x.a(0)));
+		r2 = 1. / sqrt(1. - pow(to_interval(x), 2));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of acos
+	friend affine acos(const affine& x) {
+		// return acos((interval<T>)(x.a(0))) + (- 1. / sqrt(1. - pow(to_interval(x), 2))) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = acos((interval<T>)(x.a(0)));
+		r2 = - 1. / sqrt(1. - pow(to_interval(x), 2));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of atan
+	friend affine atan(const affine& x) {
+		// return atan((interval<T>)(x.a(0))) + (1. / sqrt(1. + pow(to_interval(x), 2))) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = atan((interval<T>)(x.a(0)));
+		r2 = 1. / sqrt(1. + pow(to_interval(x), 2));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of sinh
+	friend affine sinh(const affine& x) {
+		// return sinh((interval<T>)(x.a(0))) + cosh(to_interval(x)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = sinh((interval<T>)(x.a(0)));
+		r2 = cosh(to_interval(x));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of cosh
+	friend affine cosh(const affine& x) {
+		// return cosh((interval<T>)(x.a(0))) + sinh(to_interval(x)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = cosh((interval<T>)(x.a(0)));
+		r2 = sinh(to_interval(x));
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of tanh
+	friend affine tanh(const affine& x) {
+		// return tanh((interval<T>)(x.a(0))) + pow(cosh(to_interval(x)), -2) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = tanh((interval<T>)(x.a(0)));
+		r2 = pow(cosh(to_interval(x)), -2);
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of asinh
+	friend affine asinh(const affine& x) {
+		// return asinh((interval<T>)(x.a(0))) + (1 / sqrt(pow(to_interval(x), 2) + 1)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = asinh((interval<T>)(x.a(0)));
+		r2 = 1 / sqrt(pow(to_interval(x), 2) + 1);
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of acosh
+	friend affine acosh(const affine& x) {
+		// return acosh((interval<T>)(x.a(0))) + (1 / sqrt(pow(to_interval(x), 2) - 1)) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = acosh((interval<T>)(x.a(0)));
+		r2 = 1 / sqrt(pow(to_interval(x), 2) - 1);
+		m = mid(r2);
+		r += (r2 - m) * to_interval(tmp);
+		
+		return r + m * tmp;
+	}
+
+	// lazy implementation of atanh
+	friend affine atanh(const affine& x) {
+		// return atanh((interval<T>)(x.a(0))) + (1 / (1 - pow(to_interval(x), 2))) * (x - x.a(0));
+
+		affine tmp;
+		interval<T> r, r2;
+		T m;
+
+		tmp = x;
+		tmp.a(0) = 0.;
+		r = atanh((interval<T>)(x.a(0)));
+		r2 = 1 / (1 - pow(to_interval(x), 2));
 		m = mid(r2);
 		r += (r2 - m) * to_interval(tmp);
 		

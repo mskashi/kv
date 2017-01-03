@@ -61,11 +61,8 @@ template <class F1, class F2, class T> class PoincareMap {
 		y = st(x2);
 
 		/*
-		  解の終了時刻tに関する微分が出来ないので、後付けしている。
-		  dx/dt = f(x,t)なので、解をtで微分したものは方程式の
-		  右辺に解と終了時刻を代入すると得られる。
-		  pをそれに関して微分している変数とすると、
-		  dx/dp = (dx/dt) * (dt/dp)
+		  adding "derivative of solution w.r.t. end time" afterwards
+		  using dx/dt = f(x,t) and dx/dp = (dx/dt) * (dt/dp)
 		*/
 		for (i=0; i<s-1; i++) y2(i) = y(i).v;
 		dxdt = f1(y2, mid(t));
@@ -119,11 +116,8 @@ template <class F1, class F2, class T> class PoincareMap {
 		y = st(x2);
 
 		/*
-		  解の終了時刻tに関する微分が出来ないので、後付けしている。
-		  dx/dt = f(x,t)なので、解をtで微分したものは方程式の
-		  右辺に解と終了時刻を代入すると得られる。
-		  pをそれに関して微分している変数とすると、
-		  dx/dp = (dx/dt) * (dt/dp)
+		  adding "derivative of solution w.r.t. end time" afterwards
+		  using dx/dt = f(x,t) and dx/dp = (dx/dt) * (dt/dp)
 		*/
 		for (i=0; i<s-1; i++) y2(i) = y(i).v;
 		dxdt = f1(y2, t);

@@ -2,11 +2,11 @@
 #include <kv/rdouble.hpp>
 #include <kv/psa.hpp>
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 int main()
 {
-	kv::psa<itvd> a, b;
+	kv::psa<itv> a, b;
 
 	// a = 1  (+ 0t + 0t^2 + ...)
 	a = 1.;
@@ -53,7 +53,7 @@ int main()
 	std::cout << integrate(a) << "\n";
 
 	// evaluate on some point
-	std::cout << eval(a, (itvd)0.5) << "\n";
+	std::cout << eval(a, (itv)0.5) << "\n";
 
 	// set order
 	std::cout << setorder(a, 1) << "\n";
@@ -63,8 +63,8 @@ int main()
 	std::cout << "Type-II PSA\n";
 
 	// set Type-II PSA with domain [0,1]
-	kv::psa<itvd>::mode() = 2;
-	kv::psa<itvd>::domain() = itvd(0., 1.);
+	kv::psa<itv>::mode() = 2;
+	kv::psa<itv>::domain() = itv(0., 1.);
 
 	// for basic operations
 	std::cout << a + b << "\n";
@@ -90,7 +90,7 @@ int main()
 	std::cout << integrate(a) << "\n";
 
 	// evaluate on some point
-	std::cout << eval(a, (itvd)0.5) << "\n";
+	std::cout << eval(a, (itv)0.5) << "\n";
 
 	// evaluate on whole range
 	std::cout << evalrange(a) << "\n";

@@ -4,12 +4,12 @@
 #include <kv/psa.hpp>
 #include <kv/psa-plot.hpp>
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
 int main()
 {
-	kv::psa<itvd> c;
+	kv::psa<itv> c;
 	kv::gnuplot g;
 	// g.open("/usr/bin/gnuplot", "x11");
 	g.open();
@@ -20,7 +20,7 @@ int main()
 	c.v(1) = 3.;
 	c.v(2) = 2.;
 
-	kv::psa<itvd>::domain() = itvd(0., 0.2);
+	kv::psa<itv>::domain() = itv(0., 0.2);
 
 	std::cout << c << "\n";
 	kv::psa_plot(c, 0., g);

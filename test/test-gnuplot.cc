@@ -4,19 +4,19 @@ int main()
 {
 	kv::gnuplot g;
 
-	// 初期化
+	// initialize
 	g.open();
 
-	// pathを指定するにはこんな感じ。
+	// initialize with the path of gnuplot exectable
 	// g.open("/usr/bin/gnuplot");
 
-	// ファイルに吐くには例えばこちら
+	// example for generating picture file
 	// g.open("/usr/bin/gnuplot", "postscript eps color", "aaa.eps");
 
-	// teeを使って描画コマンドをファイルに残す方法もある。
+	// example for saving gnuplot command sequence using tee
 	// g.open("tee aaa.dat | /usr/bin/gnuplot");
 
-	// 描画範囲設定
+	// set drawing range
 	g.screen(0, 0, 10, 10);
 
 	g.line(1,1,3,4);
@@ -27,6 +27,6 @@ int main()
 
 	getchar();
 
-	// 描画終了
+	// finish drawing
 	g.close();
 }

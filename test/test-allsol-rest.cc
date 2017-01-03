@@ -9,10 +9,11 @@
 #include <boost/timer.hpp>
 
 namespace ub = boost::numeric::ublas;
+typedef kv::interval<double> itv;
 
-// 篠原能材: 数値解析の基礎 問3.8.3
+// from Yoshitane Shinohara: "suuchi kaiseki no kiso", problem 3.8.3
 struct Shinohara2 {
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		T p, q;
 
@@ -45,13 +46,13 @@ struct Shinohara2 {
 int main()
 {
 	boost::timer t;
-	ub::vector< kv::interval<double> > I;
-	std::list< ub::vector< kv::interval<double> > > rest;
-	typename std::list< ub::vector< kv::interval<double> > >::iterator p;
+	ub::vector<itv> I;
+	std::list< ub::vector<itv> > rest;
+	typename std::list< ub::vector<itv> >::iterator p;
 
 	std::cout.precision(17);
 
-	// (2,0)が重解らしい?
+	// (2,0) seems to be multiple root
 	Shinohara2().range(I);
 	std::cout << "Shinohara2\n";
 	t.restart();

@@ -2,11 +2,11 @@
 #include <kv/rdouble.hpp>
 #include <kv/psa.hpp>
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 int main()
 {
-	kv::psa<itvd> x;
+	kv::psa<itv> x;
 	int i;
 
 	// approximate solution of dx/dt = -x^2 - sin(x), x(0) = 1
@@ -28,19 +28,19 @@ int main()
 	 */
 
 	x = 1.;
-	kv::psa<itvd>::record_history() = true;
+	kv::psa<itv>::record_history() = true;
 	for (i=0; i<5; i++) {
 		if (i == 1) {
-			kv::psa<itvd>::use_history() = true;
+			kv::psa<itv>::use_history() = true;
 		}
 		if (i == 4) {
-			kv::psa<itvd>::record_history() = false;
+			kv::psa<itv>::record_history() = false;
 		}
 		x = 1. + integrate(-x*x - sin(x));
 		std::cout << x << "\n";
 	}
-	kv::psa<itvd>::use_history() = false;
+	kv::psa<itv>::use_history() = false;
 
 	// size of history buffer: should be 0
-	std::cout << kv::psa<itvd>::history().size() << "\n";;
+	std::cout << kv::psa<itv>::history().size() << "\n";;
 }

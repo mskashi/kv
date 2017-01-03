@@ -1,7 +1,6 @@
 #include <kv/affine.hpp>
 #include <kv/jointrange.hpp>
 
-typedef kv::interval<double> itvd;
 typedef kv::affine<double> afd;
 
 int main()

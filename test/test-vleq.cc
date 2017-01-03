@@ -6,14 +6,13 @@
 #include <kv/vleq.hpp>
 
 namespace ub = boost::numeric::ublas;
-
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 int main()
 {
-	ub::matrix<itvd> a(2, 2);
-	ub::matrix<itvd> b(2, 1);
-	ub::matrix<itvd> x(2, 1);
+	ub::matrix<itv> a(2, 2);
+	ub::matrix<itv> b(2, 1);
+	ub::matrix<itv> x(2, 1);
 
 	a(0, 0) = 1.; a(0, 1) = 2.;
 	a(1, 0) = 3.; a(1, 1) = 4.;

@@ -3,9 +3,8 @@
 
 namespace ub = boost::numeric::ublas;
 
-class Matsu1 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Matsu1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = (x(0)-1.) * (x(0)-1.) + x(1) * x(1) - 1.;
@@ -25,9 +24,8 @@ class Matsu1 {
 	}
 };
 
-class Matsu2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Matsu2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * x(0) + x(1) * x(1) - 1.;
@@ -47,15 +45,14 @@ class Matsu2 {
 	}
 };
 
-class NoSol {
-	public:
+struct NoSol {
 
 	double param;
 
-	NoSol(double param_v = 1e-5) : param(param_v) {
+	NoSol(double param = 1e-5) : param(param) {
 	}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * x(0) - x(1);
@@ -75,15 +72,14 @@ class NoSol {
 	}
 };
 
-class BadCond {
-	public:
+struct BadCond {
 
 	double param;
 
-	BadCond (double param_v = 1e-7) : param(param_v) {
+	BadCond (double param = 1e-7) : param(param) {
 	}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * x(0) - x(1);
@@ -103,10 +99,8 @@ class BadCond {
 	}
 };
 
-class Hansen1 {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Hansen1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 
 		y(0) = x(0)*x(0)*x(0)*x(0) - 12.*x(0)*x(0)*x(0) + 47.*x(0)*x(0) - 60.*x(0);
@@ -125,10 +119,8 @@ class Hansen1 {
 	}
 };
 
-class Burden {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Burden {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) * (4. - 0.0003 * x(0) - 0.0004 * x(1));
@@ -148,10 +140,8 @@ class Burden {
 	}
 };
 
-class GE1 {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct GE1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = -1. / (1. + x(0)) + x(1) / (1. + x(1));
@@ -172,10 +162,8 @@ class GE1 {
 };
 
 // 篠原能材: 数値解析の基礎 問3.8.2
-class Shinohara1 {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Shinohara1 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		T p, q;
 
@@ -204,10 +192,8 @@ class Shinohara1 {
 };
 
 // 篠原能材: 数値解析の基礎 問3.8.3
-class Shinohara2 {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Shinohara2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 		T p, q;
 
@@ -239,10 +225,8 @@ class Shinohara2 {
 
 
 // 篠原能材: 数値解析の基礎 演習問題3.8
-class Shinohara3 {
-	public:
-
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Shinohara3 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(5);
 		T p, q, r, s, t;
 
@@ -286,9 +270,8 @@ class Shinohara3 {
   7つ解があるが、ホモトピー法でうまく解が見つからないことがあるらしい。
  */
 
-class ModifiedHimmelblau {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct ModifiedHimmelblau {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = 2.*x(0)*x(0)*x(0) + 2.*x(0)*x(1) - 22.*x(0) + x(1)*x(1) + 13.;
@@ -312,9 +295,8 @@ class ModifiedHimmelblau {
 // 2013/07/25のゼミで平八郎君が適当に作った例題
 //
 
-class Heihachiro {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Heihachiro {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = 2. * x(0) * x(0) * x(1) - 1.;
@@ -339,9 +321,8 @@ class Heihachiro {
 // 山村先生の論文によく出てくる区分線形な方程式
 //
 
-class Yamamura2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Yamamura2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int n = x.size();
 		ub::vector<T> y(n);
 		T s;

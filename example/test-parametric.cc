@@ -3,26 +3,22 @@
 
 #include <kv/ode-maffine.hpp>
 
-
 namespace ub = boost::numeric::ublas;
+typedef kv::interval<double> itv;
 
-typedef kv::interval<double> itvd;
 
-
-class Func {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Func {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(1);
 
-		y(0) = -itvd(4.9,5.1) * x(0);
+		y(0) = -itv(4.9,5.1) * x(0);
 
 		return y;
 	}
 };
 
-class Func2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct Func2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
 		y(0) = x(1) * x(0);
@@ -33,21 +29,19 @@ class Func2 {
 };
 
 
-class LotkaVolterra {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct LotkaVolterra {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);
 
-		y(0) = itvd(2.99, 3.01) * x(0) * (1. - x(1));
-		y(1) = itvd(0.99, 1.01) * x(1) * (x(0) - 1.);
+		y(0) = itv(2.99, 3.01) * x(0) * (1. - x(1));
+		y(1) = itv(0.99, 1.01) * x(1) * (x(0) - 1.);
 
 		return y;
 	}
 };
 
-class LotkaVolterra2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+struct LotkaVolterra2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(4);
 
 		y(0) = x(2) * x(0) * (1. - x(1));
@@ -62,17 +56,17 @@ class LotkaVolterra2 {
 int main()
 {
 	int i;
-	ub::vector<itvd> ix;
+	ub::vector<itv> ix;
 	bool r;
 
-	itvd end;
+	itv end;
 	std::cout.precision(17);
 
 	ix.resize(1);
 	ix(0) = 1.;
 
 	end = 1.;
-	r = kv::odelong_maffine(Func(), ix, itvd(0.), end);
+	r = kv::odelong_maffine(Func(), ix, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -82,10 +76,10 @@ int main()
 
 	ix.resize(2);
 	ix(0) = 1.;
-	ix(1) = -itvd(4.9,5.1);
+	ix(1) = -itv(4.9,5.1);
 
 	end = 1.;
-	r = kv::odelong_maffine(Func2(), ix, itvd(0.), end);
+	r = kv::odelong_maffine(Func2(), ix, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -98,7 +92,7 @@ int main()
 	ix(1) = 1.1;
 
 	end = 10.;
-	r = kv::odelong_maffine(LotkaVolterra(), ix, itvd(0.), end);
+	r = kv::odelong_maffine(LotkaVolterra(), ix, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
@@ -109,11 +103,11 @@ int main()
 	ix.resize(4);
 	ix(0) = 1.2;
 	ix(1) = 1.1;
-	ix(2) = itvd(2.99, 3.01);
-	ix(3) = itvd(0.99, 1.01);
+	ix(2) = itv(2.99, 3.01);
+	ix(3) = itv(0.99, 1.01);
 
 	end = 10.;
-	r = kv::odelong_maffine(LotkaVolterra2(), ix, itvd(0.), end);
+	r = kv::odelong_maffine(LotkaVolterra2(), ix, itv(0.), end);
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {
