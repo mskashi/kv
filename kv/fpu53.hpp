@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef FPU53_HPP
@@ -13,10 +13,11 @@
 namespace kv {
 
 // set FPU's precision to 53bit.
-// You *must* run init() if you use dd.hpp on FPU of Intel CPU.
+// You *must* run fpu53() if you use dd.hpp on FPU of Intel CPU.
 inline void fpu53() {
 	#if defined(_WIN32) || defined(_WIN64)
-	_controlfp(_PC_53, _MCW_PC);
+	unsigned int cw = 0;
+	_controlfp_s(&cw, _PC_53, _MCW_PC);
 	#endif
 	#if defined(__i386__) || defined(__x86_64__)
 	unsigned short int reg;

@@ -5,14 +5,16 @@
 #ifndef CONV_DD_HPP
 #define CONV_DD_HPP
 
-#include <iostream>
-#include <limits>
-#include <cmath>
 #include <cstdio>
+#include <iostream>
+#include <iomanip>
 #include <string>
+#include <sstream>
 #include <cctype>
 #include <vector>
 #include <list>
+#include <limits>
+#include <cmath>
 #include <cstdlib>
 #include <algorithm>
 
@@ -259,13 +261,12 @@ struct conv_dd {
 		}
 		#endif
 
-		std::string result_str;
-		char stmp[100];
+		std::ostringstream result_str;
 
 		if (sign == 1) {
-			result_str = "";
+			result_str << "";
 		} else {
-			result_str = "-";
+			result_str << "-";
 		}
 
 		if (format == 'f') {
@@ -294,9 +295,8 @@ struct conv_dd {
 
 			// make result string
 			for (i=result_max; i>=result_min; i--) {
-				if (i == -1) result_str += ".";
-				sprintf(stmp, "%d", result[offset2 + i]);
-				result_str += stmp;
+				if (i == -1) result_str << ".";
+				result_str << result[offset2 + i];
 			}
 
 		} else if (format == 'e') {
@@ -332,12 +332,11 @@ struct conv_dd {
 
 			// make result string
 			for (i=result_max; i>=result_min; i--) {
-				if (i == result_max -1) result_str += ".";
-				sprintf(stmp, "%d", result[offset2 + i]);
-				result_str += stmp;
+				if (i == result_max -1) result_str << ".";
+				result_str << result[offset2 + i];
 			}
-			sprintf(stmp, "e%+03d", result_max);
-			result_str += stmp;
+			// sprintf(stmp, "e%+03d", result_max);
+			result_str << "e" << std::showpos << std::setfill('0') << std::setw(3) << result_max << std::noshowpos;
 
 		} else if (format == 'g') {
 			// delete zeros of head
@@ -379,9 +378,8 @@ struct conv_dd {
 
 				// make result string
 				for (i=result_max; i>=result_min; i--) {
-					if (i == -1) result_str += ".";
-					sprintf(stmp, "%d", result[offset2 + i]);
-					result_str += stmp;
+					if (i == -1) result_str << ".";
+					result_str << result[offset2 + i];
 				}
 
 			} else {
@@ -394,24 +392,22 @@ struct conv_dd {
 
 				// make result string
 				for (i=result_max; i>=result_min; i--) {
-					if (i == result_max -1) result_str += ".";
-					sprintf(stmp, "%d", result[offset2 + i]);
-					result_str += stmp;
+					if (i == result_max -1) result_str << ".";
+					result_str << result[offset2 + i];
 				}
-				sprintf(stmp, "e%+03d", result_max);
-				result_str += stmp;
+				// sprintf(stmp, "e%+03d", result_max);
+				result_str << "e" << std::showpos << std::setfill('0') << std::setw(3) << result_max << std::noshowpos;
 			}
 
 		} else if (format == 'a') {
 			// make result string
 			for (i=result_max; i>=result_min; i--) {
-				if (i == -1) result_str += ".";
-				sprintf(stmp, "%d", result[offset2 + i]);
-				result_str += stmp;
+				if (i == -1) result_str << ".";
+				result_str << result[offset2 + i];
 			}
 		}
 
-		return result_str;
+		return result_str.str();
 	}
 
 

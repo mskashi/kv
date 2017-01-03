@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <stdexcept>
 #include <string>
 
 #include <kv/convert.hpp>
@@ -449,6 +450,10 @@ class dd {
 	friend dd sqrt(const dd& x) {
 		dd r;
 
+		if (x < 0.) {
+			throw std::domain_error("dd: sqrt of negative value");
+                }
+
 		if (x == 0.) return dd(0.);
 		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
@@ -803,6 +808,10 @@ class dd {
 		int p_i;
 		dd p;
 		int i;
+
+		if (x < 0.) {
+			throw std::domain_error("dd: log of negative value");
+                }
 
 		if (x == dd(std::numeric_limits<double>::infinity(), 0.)) {
 			return dd(std::numeric_limits<double>::infinity(), 0.);
