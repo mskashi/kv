@@ -1797,33 +1797,24 @@ template <class T> inline void epsilon_reduce(ub::vector< affine<T> >& x, int n,
 
 template <class T> struct constants< affine<T> > {
 	static affine<T> pi() {
-		static const affine<T> tmp(
-			"3.1415926535897932384626433832795028841971693993751",
-			"3.1415926535897932384626433832795028841971693993752"
-		);
+		static const affine<T> tmp(constants< interval<T> >::pi());
 		return tmp;
 	}
 
 	static affine<T> e() {
-		static const affine<T> tmp(
-			"2.7182818284590452353602874713526624977572470936999",
-			"2.7182818284590452353602874713526624977572470937000"
-		);
+		static const affine<T> tmp(constants< interval<T> >::e());
 		return tmp;
 	}
 
 	static affine<T> ln2() {
-		static const affine<T> tmp(
-			"0.69314718055994530941723212145817656807550013436025",
-			"0.69314718055994530941723212145817656807550013436026"
-		);
+		static const affine<T> tmp(constants< interval<T> >::ln2());
 		return tmp;
 	}
 	static affine<T> str(const std::string& s) {
-		return affine<T>(s, s);
+		return affine<T>(constants< interval<T> >::str(s));
 	}
 	static affine<T> str(const std::string& s1, const std::string& s2) {
-		return affine<T>(s1, s2);
+		return affine<T>(constants< interval<T> >::str(s1, s2));
 	}
 };
 

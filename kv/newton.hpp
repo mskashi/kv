@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef NEWTON_HPP
@@ -12,6 +12,7 @@
 #include <limits>
 #include <boost/random.hpp>
 #include <ctime>
+#include <cmath>
 
 
 namespace kv {
@@ -27,7 +28,7 @@ newton(F f, ub::vector<T>& x, T epsilon = std::numeric_limits<T>::epsilon(), int
 	int i, j, r;
 	ub::vector<T> fx;
 	ub::matrix<T> fdx;
-	T norm1, norm2, tmp;
+	T norm1, norm2;
 
 	for (i=0; i<maxloop; i++) {
 		try {
@@ -44,10 +45,9 @@ newton(F f, ub::vector<T>& x, T epsilon = std::numeric_limits<T>::epsilon(), int
 		norm1 = 1.;
 		norm2 = 0.;
 		for (j=0; j<s; j++) {
-			tmp = (x(j) >= 0.) ? x(j) : -x(j);
-			norm1 = std::max(norm1, tmp);
-			tmp = (fx(j) >= 0.) ? fx(j) : -fx(j);
-			norm2 = std::max(norm2, tmp);
+			using std::abs;
+			norm1 = std::max(norm1, abs(x(j)));
+			norm2 = std::max(norm2, abs(fx(j)));
 		}
 
 		x = x - fx;
@@ -64,7 +64,8 @@ newton_random(F f, ub::vector<T>& x, T epsilon = std::numeric_limits<T>::epsilon
 	int i;
 
 	using namespace boost;
-	variate_generator< mt19937, normal_distribution<> > rand (mt19937(time(0)), normal_distribution<>(0., 10.));
+	// use "static" to be "randomized" only once
+	static variate_generator< mt19937, normal_distribution<> > rand (mt19937(time(0)), normal_distribution<>(0., 10.));
 
 	for (i=0; i<s; i++) x(i) = rand();
 	return newton(f, x, epsilon, maxloop);

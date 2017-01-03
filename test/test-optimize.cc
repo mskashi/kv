@@ -41,19 +41,55 @@ struct Rosenbrock {
 	}
 };
 
+// taken from: http://ci.nii.ac.jp/naid/110002373498
+
+struct Levy {
+	template <class T> T operator() (const ub::vector<T>& x){
+		T tmp, tmp2;
+		int i;
+
+		tmp = 0;
+		for (i=1; i<=5; i++) {
+			tmp += i * cos((i-1)*x(0) + i);
+		}
+		tmp2 = 0;
+		for (i=1; i<=5; i++) {
+			tmp2 += i * cos((i+1)*x(1) + i);
+		}
+		
+		return tmp * tmp2;
+	}
+};
+
+
+typedef kv::interval<double> itv;
 
 int main()
 {
 	int i;
 	boost::timer t;
-	ub::vector< kv::interval<double> > I;
+	ub::vector<itv> I;
+	std::list< ub::vector<itv> > result;
+	typename std::list< ub::vector<itv> >::iterator p;
 
 	std::cout.precision(17);
 
 	I.resize(4);
-	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-10., 10.);
+	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
 	t.restart();
-	optimize(I, Func2(), 1e-12);
+	result = optimize(I, Func2(), 1e-5);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
 	std::cout << t.elapsed() << " sec\n";
+
+	I.resize(2);
+	for (i=0; i<I.size(); i++) I(i) = itv(0., 10.);
+	result = optimize(I, Levy(), 1e-5);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
 }

@@ -11,6 +11,7 @@
 
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
+#include <kv/geoseries.hpp>
 #include <algorithm>
 #include <limits>
 
@@ -90,7 +91,7 @@ interval<T> hypergeom(const interval<T>& a, const interval<T>& b, const interval
 
 template <class T>
 interval<T> hypergeom(const interval<T>& a, const interval<T>& b, const interval<T>& c, const interval<T>& z) {
-	interval<T> result, ta, tb, tc, td, tr, ratio, residual, tmp, tmp2;
+	interval<T> result, ta, tb, tc, td, tr, ratio, residual, tmp;
 	T offset;
 
 	result = 1.;
@@ -112,16 +113,7 @@ interval<T> hypergeom(const interval<T>& a, const interval<T>& b, const interval
 			ratio = z * (1 + (ta - offset) * tmp) * (1 + (tb - offset) * tmp)
 				/ (1 + (tc - offset) * tmp) / (1 + (td - offset) * tmp);
 			if (mag(ratio) < 1) {
-				if (ratio > 0) {
-					residual = tr / (1 - ratio);
-				} else if (ratio < 0) {
-					tmp = 1 - ratio * ratio;
-					residual = tr * (1 / tmp + ratio / tmp);
-				} else {
-					tmp2 = ratio * ratio;
-					tmp = 1 - tmp2;
-					residual = tr * (1 + 1 / tmp + tmp2 / tmp);
-				}
+				residual = tr * geoseries(ratio);
 				if (width(residual) < mag(result) * std::numeric_limits<T>::epsilon()) {
 					result += residual;
 					break;

@@ -20,6 +20,7 @@
 #include <kv/eig.hpp>
 #include <kv/fpu53.hpp>
 #include <kv/gamma.hpp>
+#include <kv/geoseries.hpp>
 #include <kv/gnuplot.hpp>
 #include <kv/hypergeom.hpp>
 #include <kv/hwround.hpp>

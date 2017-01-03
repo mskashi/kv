@@ -42,6 +42,21 @@ int main()
 	kv::vdka(va, vr);
 	std::cout << vr << "\n";
 
+	// 2 -7t +9t^2 -5t^3 +t^4  (t-1)^3*(t-2)
+	a.resize(5);
+	a(0) = 2.;
+	a(1) = -7.;
+	a(2) = 9.;
+	a(3) = -5.;
+	a(4) = 1.;
+
+	kv::dka(a, r);
+	std::cout << r << "\n";
+
+	va = a;
+	kv::vdka(va, vr);
+	std::cout << vr << "\n";
+
 	// -1 +3t -3t^2 + t^3  (t-1)^3
 	a.resize(4);
 	a(0) = -1.;

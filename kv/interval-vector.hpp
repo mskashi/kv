@@ -227,6 +227,34 @@ template <class T> inline ub::matrix< interval<T> > intersect (const ub::matrix<
 	return r;
 }
 
+template <class T> inline ub::vector< interval<T> > hull (const ub::vector< interval<T> >& I, const ub::vector< interval<T> > & J) {
+	int i;
+	int s = I.size();
+	ub::vector< interval<T> > r(s);
+
+	for (i=0; i<s; i++) {
+		r(i) = interval<T>::hull(I(i), J(i));
+	}
+
+	return r;
+}
+
+template <class T> inline ub::matrix< interval<T> > hull (const ub::matrix< interval<T> >& I, const ub::matrix< interval<T> > & J) {
+	int i, j;
+	int s1 = I.size1();
+	int s2 = I.size2();
+	ub::matrix< interval<T> > r(s1, s2);
+
+	for (i=0; i<s1; i++) {
+		for (j=0; j<s2; j++) {
+			r(i, j) = interval<T>::hull(I(i, j), J(i, j));
+		}
+	}
+
+	return r;
+}
+
+
 template <class T> inline T max_norm (const ub::vector<T>& x) {
 	int i;
 	int s = x.size();

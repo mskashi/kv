@@ -17,6 +17,16 @@
 #include <kv/autodif.hpp>
 
 
+// 0: Do not use TRIM
+// 1: use TRIM and use slow trim algorithm
+// 2: use TRIM and use fast bat slightly inefficient trim algorithm
+// 3: use TRIM and use new trim algorithm
+
+#ifndef USE_TRIM
+#define USE_TRIM 0
+#endif
+
+
 namespace kv {
 
 namespace ub = boost::numeric::ublas;
@@ -24,25 +34,29 @@ namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 std::list< ub::vector< interval<T> > >
-optimize(const ub::vector< interval<T> >& init, F f, T limit, int verbose=1)
+optimize(const ub::vector< interval<T> >& init, F f, T limit, bool unify = true, int verbose = 0)
 {
 	std::list< ub::vector< interval<T> > > targets;
 	targets.push_back(init);
-	return optimize_list(targets, f, limit, verbose);
+	return optimize_list(targets, f, limit, unify, verbose);
 }
 
 template <class T, class F>
 std::list< ub::vector< interval<T> > >
-optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int verbose=1)
+optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool unify = true, int verbose = 0)
 {
 	int s = (targets.front()).size();
-	ub::vector< interval<T> > I, C, I1, I2, IR, fdi, C2; 
+	ub::vector< interval<T> > I, C, I1, I2, IR, fdi, C2;
 	interval<T> fc, fi, mvf, fc2; 
 	T tmp, tmp2;
 	std::list< ub::vector< interval<T> > > solutions;
-	int i, j, mi;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	int i, j, k, mi;
 	bool flag;
 	interval<T> A, B, J, J2, Itmp; 
+#if USE_TRIM == 3
+	ub::vector< interval<T> > A0, A1, A2; // for new trim algorithm
+#endif // USE_TRIM == 3
 
 	C2.resize(s);
 
@@ -100,13 +114,46 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 		tmp = fc2.upper();
 		if (tmp < delta) delta = tmp;
 
-#if USE_TRIM == 1
+#if USE_TRIM >= 1
 		// interval shrinking
+
+#if USE_TRIM == 3
+		// prepare for new trim algorithm
+		A0.resize(s);
+		A1.resize(s);
+		A2.resize(s);
+		for (j=0; j<s; j++) {
+			A0(j) = fdi(j) * (I(j)-C(j));
+		}
+		Itmp = 0.;
+		for (j=0; j<s; j++) {
+			A1(j) = Itmp;
+			Itmp += A0(j);
+		}
+		Itmp = 0.;
+		for (j=s-1; j>=0; j--) {
+			A2(j) = Itmp;
+			Itmp += A0(j);
+		}
+#endif // USE_TRIM == 3
+
 		IR = I;
 		flag = false; // non-existence in I turns out or not
 		for (j=0; j<s; j++) {
 			B = fdi(j);
 
+#if USE_TRIM == 1
+			// calculate A simply
+			// simple but slow
+			A = 0.;
+			for (k=0; k<s; k++) {
+				if (k == j) continue;
+				A += fdi(k) * (I(k)-C(k));
+			}
+			A += fc;
+#endif // USE_TRIM == 1
+#if USE_TRIM == 2
+			// old trim algorithm
 			// calculate back A from mvf
 			A = mvf;
 			Itmp = B * (I(j)-C(j));
@@ -115,16 +162,11 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 			tmp2 = rop<T>::sub_up(A.upper(), Itmp.upper());
 			rop<T>::end();
 			A.assign(tmp, tmp2);
-#if 0
-			// calculate A simply
-			// below is simple but slow
-			A = 0.;
-			for (k=0; k<s; k++) {
-				if (k == j) continue;
-				A += fdi(k) * (I(k)-C(k));
-			}
-			A += fc(i);
-#endif
+#endif // USE_TRIM == 2
+#if USE_TRIM == 3
+			// new trim algorithm
+			A = fc + A1(j) + A2(j);
+#endif // USE_TRIM == 3
 
 			A -= delta;
 
@@ -188,7 +230,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 
 		I = IR;
 
-#endif // USE_TRIM == 1
+#endif // USE_TRIM >= 1
 
 		label:;
 
@@ -201,10 +243,26 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, int 
 		}
 
 		if (tmp2 < limit) {
-			solutions.push_back(I);
 			if (verbose >= 1) {
 				std::cout << I << "\n";
 			}
+			if (unify) {
+				while (true) {
+					flag = false;
+                                        p = solutions.begin();
+					while (p != solutions.end()) {
+						if (overlap(*p, I)) {
+							I = hull(I, *p);
+							p = solutions.erase(p);
+							flag = true;
+							continue;
+						}
+						p++;
+					}
+					if (flag == false) break;
+				}
+			}
+			solutions.push_back(I);
 			continue;
 		}
 
