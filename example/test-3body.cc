@@ -1,22 +1,21 @@
 #include <iostream>
 #include <kv/ode-maffine.hpp>
-
+#include <kv/ode-maffine2.hpp>
+#include <kv/ode-maffine3.hpp>
 
 namespace ub = boost::numeric::ublas;
 
-typedef kv::interval<double> itvd;
+typedef kv::interval<double> itv;
 
 
-class ThreeBody {
-	public:
-
+struct ThreeBody {
 	template <class T> T pow23(T x, T y) {
-			T tmp;
-			tmp = x*x + y*y;
-			return tmp * sqrt(tmp);
+		T tmp;
+		tmp = x*x + y*y;
+		return tmp * sqrt(tmp);
 	}
 
-	template <class T> ub::vector<T> operator() (ub::vector<T> x, T t){
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(12);
 
 		T x1 = x(0);
@@ -52,12 +51,12 @@ int main()
 {
 	int i;
 	ub::vector<double> x;
-	ub::vector<itvd> ix;
+	ub::vector<itv> ix;
 	bool r;
 
 	std::cout.precision(17);
 
-	itvd end;
+	itv end;
 
 	x.resize(12);
 	x(0) = 1.; x(1) = 3.;
@@ -70,7 +69,7 @@ int main()
 
 	ix = x;
 	end = 70.;
-	r = kv::odelong_maffine(f, ix, itvd(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10));
+	r = kv::odelong_maffine2(f, ix, itv(0.), end, kv::ode_param<double>().set_verbose(1).set_restart_max(10));
 	if (!r) {
 		std::cout << "can't calculate verified solution\n";
 	} else {

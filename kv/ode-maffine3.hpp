@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
-#ifndef ODE_MAFFINE_HPP
-#define ODE_MAFFINE_HPP
+#ifndef ODE_MAFFINE3_HPP
+#define ODE_MAFFINE3_HPP
 
-// ODE using Affine and Mean Value Form
+// ODE using Affine and Mean Value Form 3
 
 #include <iostream>
 #include <list>
@@ -28,25 +28,78 @@ namespace kv {
 namespace ub = boost::numeric::ublas;
 
 
+template <class F, class T> struct MakeVariationalEq {
+	F f;
+	ub::vector< psa<T> > solution;
+	int s, s2;
+
+	MakeVariationalEq(F f, ub::vector< psa<T> > solution) : f(f), solution(solution) {
+		s = solution.size();
+		s2 = s * s;
+	}
+
+	ub::vector< psa<T> > operator() (const ub::vector< psa<T> >& x, const psa<T>& t){
+		ub::matrix< psa<T> > x2(s, s);
+		ub::vector< psa<T> > y(s2);
+
+		ub::vector< psa<T> > solution2(s);
+		psa<T> t2;
+
+		ub::vector< psa<T> > rv;
+		ub::matrix< psa<T> > rm;
+
+		int i, j, k;
+		int order, tmp;
+
+		order = 0;
+		k = 0;
+		for (i=0; i<s; i++) {
+			for (j=0; j<s; j++) {
+				tmp = x(k).v.size() - 1;
+				if (tmp > order) order = tmp;
+				x2(i, j) = x(k);
+				k++;
+			}
+		}
+
+		for (i=0; i<s; i++) {
+			solution2(i) = setorder(solution(i), order);
+		}
+		t2 = setorder(t, order);
+
+		autodif< psa<T> >::split(f(autodif< psa<T> >::init(solution2), autodif< psa<T> >(t2)), rv, rm);
+
+		rm = prod(rm, x2);
+
+		k = 0;
+		for (i=0; i<s; i++) {
+			for (j=0; j<s; j++) {
+				y(k++) = rm(i, j);
+			}
+		}
+
+		return y;
+	}
+};
+
+
 template <class T, class F>
 int
-ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>() , ub::matrix< interval<T> >* mat = NULL, ub::vector< psa< interval<T> > >* result_psa = NULL)
+ode_maffine3(F f, ub::vector< affine<T> >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>() , ub::matrix< interval<T> >* mat = NULL, ub::vector< psa< interval<T> > >* result_psa = NULL)
 {
 	int n = init.size();
-	int i, j;
+	int i, j, k;
 
 	ub::vector< interval<T> > c;
 	ub::vector< interval<T> > fc;
 	ub::vector< interval<T> > I;
-	ub::vector< autodif< interval<T> > > Iad;
-
-	ub::vector< interval<T> > result_i;
-	ub::matrix< interval<T> > result_d;
+	ub::vector< interval<T> > fI;
+	ub::matrix< interval<T> > fdI;
+	ub::vector< interval<T> > fdI_tmp;
 
 	ub::vector< affine<T> > result;
 
-	ub::vector< psa< autodif< interval<T> > > > *result_tmp_p;
-	ub::vector< psa< autodif< interval<T> > > > result_tmp;
+	ub::vector< psa< interval<T> > > result_tmp;
 
 
 	int maxnum_save;
@@ -61,6 +114,9 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	int ret_val;
 	interval<T> end2 = end;
 
+	ode_param<T> p2 = p;
+	p2.set_autostep(false);
+
 	I.resize(n);
 	c.resize(n);
 	for (i=0; i<n; i++) {
@@ -68,53 +124,76 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		c(i) = mid(I(i));
 	}
 
-	// prepare for result_psa if needed
-	if (result_psa != NULL) {
-		result_tmp_p = &result_tmp;
-	} else {
-		result_tmp_p = NULL;
-	}
-
-	Iad = autodif< interval<T> >::init(I);
-	// NOTICE: below must be autodif version of ode
-	r = ode(f, Iad, start, end2, p, result_tmp_p);
+	fI = I;
+	r = ode(f, fI, start, end2, p, &result_tmp);
 	if (r == 0) return 0;
 	ret_val = r;
 
-	// store result_tmp to *result_psa without autodif information
 	if (result_psa != NULL) {
-		(*result_psa).resize(n);
-		for (i=0; i<n; i++) {
-			(*result_psa)(i).v.resize(result_tmp(i).v.size());
-			for (j=0; j<result_tmp(i).v.size(); j++) {
-				(*result_psa)(i).v(j) = result_tmp(i).v(j).v;
+		*result_psa = result_tmp;
+	}
+
+	MakeVariationalEq< F, interval<T> > g(f, result_tmp);
+
+	fdI_tmp.resize(n * n);
+	k = 0;
+	for (i=0; i<n; i++) {
+		for (j=0; j<n; j++) {
+			if (i == j) fdI_tmp(k) = 1.;
+			else fdI_tmp(k) = 0.;
+			k++;
+		}
+	}
+
+	#if 0
+	// fixed stepsize
+	r = ode(g, fdI_tmp, start, end2, p2);
+	if (r == 0) {
+		if (p.autostep == false) return 0;
+		// autostep
+		r = ode(g, fdI_tmp, start, end2, p);
+		if (r == 0) return 0;
+		ret_val = 1;
+	}
+	#endif
+	r = ode(g, fdI_tmp, start, end2, p2);
+	if (r == 0) {
+		if (p.autostep == false) return 0;
+		for (i=0; i<p.restart_max; i++) {
+			end2 = start + (end2 - start) * 0.5;
+			r = ode(g, fdI_tmp, start, end2, p2);
+			if (r != 0) {
+				ret_val = 1;
+				break;
 			}
+		}
+		if (r == 0) return 0;
+	}
+
+	fdI.resize(n, n);
+	k = 0;
+	for (i=0; i<n; i++) {
+		for (j=0; j<n; j++) {
+			fdI(i, j) = fdI_tmp(k++);
 		}
 	}
 
 	fc = c;
-	// Step size should be same as above ode call.
-	// Because above ode call is with autodif and interval input and
-	// below ode call is without autodif and point input,
-	// below ode call is supposed to be easier to succeed than above.
-	// If below ode call fails, force success by increasing order.
-	p.set_autostep(false);
 	while (true) {
-		r = ode(f, fc, start, end2, p);
+		// fixed stepsize
+		r = ode(f, fc, start, end2, p2);
 		if (r != 0) break;
-		p.order++;
+		p2.order++;
 		if (p.verbose == 1) {
-			std::cout << "ode_maffine: increase order: " << p.order << "\n";
+			std::cout << "ode_maffine3: increase order: " << p2.order << "\n";
 		}
 	}
-
-	autodif< interval<T> >::split(Iad, result_i, result_d);
 
 	if (p.ep_reduce == 0) {
 		maxnum_save = affine<T>::maxnum();
 	}
 
-	result = fc + prod(result_d, init - c);
+	result = fc + prod(fdI, init - c);
 
 	if (p.ep_reduce == 0) {
 		s1_save.resize(n);
@@ -137,14 +216,14 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 
 	init = result;
 	if (ret_val == 1) end = end2;
-	if (mat != NULL) *mat = result_d;
+	if (mat != NULL) *mat = fdI;
 
 	return ret_val;
 }
 
 template <class T, class F>
 int
-odelong_maffine(
+odelong_maffine3(
 	F f,
 	ub::vector< affine<T> >& init,
 	const interval<T>& start,
@@ -180,7 +259,7 @@ odelong_maffine(
 		x1 = x;
 		t1 = end;
 
-		r = ode_maffine(f, x1, t, t1, p, M_p, &result_tmp);
+		r = ode_maffine3(f, x1, t, t1, p, M_p, &result_tmp);
 		if (r == 0) {
 			if (ret_val == 1) {
 				init = x1;
@@ -215,7 +294,7 @@ odelong_maffine(
 
 template <class T, class F>
 int
-odelong_maffine(
+odelong_maffine3(
 	F f,
 	ub::vector< interval<T> >& init,
 	const interval<T>& start,
@@ -235,7 +314,7 @@ odelong_maffine(
 
 	x = init;
 
-	r = odelong_maffine(f, x, start, end2, p, callback);
+	r = odelong_maffine3(f, x, start, end2, p, callback);
 
 	affine<T>::maxnum() = maxnum_save;
 
@@ -249,7 +328,7 @@ odelong_maffine(
 
 template <class T, class F>
 int
-odelong_maffine(
+odelong_maffine3(
 	F f,
 	ub::vector< autodif< interval<T> > >& init,
 	const interval<T>& start,
@@ -274,7 +353,7 @@ odelong_maffine(
 
 	x = xi;
 
-	r = odelong_maffine(f, x, start, end2, p, callback, &M_tmp);
+	r = odelong_maffine3(f, x, start, end2, p, callback, &M_tmp);
 
 	affine<T>::maxnum() = maxnum_save;
 
@@ -297,4 +376,4 @@ odelong_maffine(
 
 } // namespace kv
 
-#endif // ODE_MAFFINE_HPP
+#endif // ODE_MAFFINE3_HPP
