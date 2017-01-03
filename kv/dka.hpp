@@ -43,7 +43,7 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 	ub::vector< complex<T> > a(s);
 	complex<T> c;
 	ub::vector<T> b;
-	T r, tmp, norm1, norm2;
+	T r, tmp, norm1, norm2, norm3;
 	ub::vector<T> db;
 	ub::vector< complex<T> > dx(n);
 	T pi = boost::math::constants::pi<T>();
@@ -99,6 +99,12 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 		x(i) = c + r * exp((2. * i * pi / n + pi / (2. * n)) * complex<T>::i());
 	}
 
+	// max(|pi|)
+	norm3 = 0.;
+	for (i=0; i<s; i++) {
+		norm3 = std::max(norm3, abs(p(i)));
+	}
+
 	// Durand Kerner algorithm
 
 	while (true) {
@@ -125,6 +131,7 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 			norm2 = std::max(norm2, abs(dx(i)));
 		}
 		if (norm2 <= n * norm1 * epsilon) break;
+		if (abs(f) <= n * norm3 * epsilon) break;
 	}
 
 	return true;

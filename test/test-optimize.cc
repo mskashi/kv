@@ -1,22 +1,23 @@
-#include <boost/timer.hpp>
 #include <kv/optimize.hpp>
 
 namespace ub = boost::numeric::ublas;
 
-
 struct Func {
 	template <class T> T operator() (const ub::vector<T>& x){
-		T tmp, tmp2;
-		tmp = x(0) - 1.;
-		tmp2 = x(1) - 2.;
-		return tmp * tmp + tmp2 * tmp2;
+		return 1/(pow(x(0)-2,2) + pow(x(1)-3,2)+1) - 1/(pow(x(0)-5,2)+pow(x(1)-6,2)+1);
 	}
 };
 
+struct Func2 {
+	template <class T> T operator() (const T& x){
+		return sin(x) + log(x);
+	}
+};
 
 // example found in
+// Numerical Optimizer/Global by NTT Data
 // http://www.msi.co.jp/nuopt/products/derivation/global/index.html
-struct Func2 {
+struct NTTData {
 	template <class T> T operator() (const ub::vector<T>& in){
 		T x, y, z, w;
 
@@ -61,15 +62,12 @@ struct Levy {
 	}
 };
 
-
 /*
  * Griewank Function
     taken from:
  *  https://www.sfu.ca/~ssurjano/griewank.html
  *  http://www.autodiff.org/ad16/Invited/Rump_Reliable.pdf
  */
-
-
 struct Griewank {
 	int n;
 	Griewank(int n): n(n) {
@@ -95,41 +93,95 @@ typedef kv::interval<double> itv;
 int main()
 {
 	int i, n;
-	boost::timer t;
 	ub::vector<itv> I;
 	std::list< ub::vector<itv> > result;
 	std::list< ub::vector<itv> >::iterator p;
+	std::list<itv> result2;
+	std::list<itv>::iterator p2;
+	itv v;
 
 	std::cout.precision(17);
 
-	I.resize(4);
-	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
-
-	t.restart();
-	result = optimize(I, Func2(), 1e-5);
-	p = result.begin();
-	while (p != result.end()) {
-		std::cout << *(p++) << "\n";
-	}
-	std::cout << t.elapsed() << " sec\n";
-
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = itv(0., 10.);
-	result = optimize(I, Levy(), 1e-5);
+
+	std::cout << "calculate intervals minimizing Func with partitioned intervals smaller than 1e-5\n";
+	result = minimize(I, Func(), 1e-5);
 	p = result.begin();
 	while (p != result.end()) {
 		std::cout << *(p++) << "\n";
 	}
 
+	std::cout << "calculate intervals minimizing Func with 10000 partitioned intervals\n";
+	result = minimize(I, Func(), 10000);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
+
+	std::cout << "calculate minimum value of Func\n";
+	v = minimize_value(I, Func(), 10000);
+	std::cout << v << "\n";
+
+	std::cout << "calculate intervals maximizing Func\n";
+	result = maximize(I, Func(), 10000);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
+
+	std::cout << "calculate maximum value of Func\n";
+	v = maximize_value(I, Func(), 10000);
+	std::cout << v << "\n";
+
+	std::cout << "calculate intervals minimizing Func2\n";
+	result2 = minimize(itv(1,10), Func2(), 10000);
+	p2 = result2.begin();
+	while (p2 != result2.end()) {
+		std::cout << *(p2++) << "\n";
+	}
+
+	std::cout << "calculate minimum value of Func2\n";
+	v = minimize_value(itv(1,10), Func2(), 10000);
+	std::cout << v << "\n";
+
+	std::cout << "calculate intervals maximizing Func2\n";
+	result2 = maximize(itv(1,10), Func2(), 10000);
+	p2 = result2.begin();
+	while (p2 != result2.end()) {
+		std::cout << *(p2++) << "\n";
+	}
+
+	std::cout << "calculate maximum value of Func2\n";
+	v = maximize_value(itv(1,10), Func2(), 10000);
+	std::cout << v << "\n";
+
+
+	std::cout << "NTTData\n";
+	I.resize(4);
+	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
+	result = minimize(I, NTTData(), 1e-3);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
+
+	std::cout << "Levy\n";
+	I.resize(2);
+	for (i=0; i<I.size(); i++) I(i) = itv(0., 10.);
+	result = minimize(I, Levy(), 1e-5);
+	p = result.begin();
+	while (p != result.end()) {
+		std::cout << *(p++) << "\n";
+	}
+
+	std::cout << "Griewank\n";
 	n = 5;
 	I.resize(n);
 	for (i=0; i<I.size(); i++) I(i) = itv(-600., 600.);
-	t.restart();
-	result = optimize(I, Griewank(n), 1e-5);
+	result = minimize(I, Griewank(n), 1e-5);
 	p = result.begin();
 	while (p != result.end()) {
 		std::cout << *(p++) << "\n";
 	}
-	std::cout << t.elapsed() << " sec\n";
-
 }

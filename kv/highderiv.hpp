@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2015-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef HIGHDERIV_HPP
@@ -52,6 +52,53 @@ ub::vector<T> highderiv(F f, const T& x, int n, bool divfact = false) {
 
 	return p.v;
 }
+
+// make function object f^{n} from f
+template <class F> struct HighDeriv {
+	F f;
+	int n;
+	HighDeriv(F f, int n) : f(f), n(n) {}
+	template <class T> T operator()(const T& x) {
+		return kv::highderiv(f, x, n)[n];
+	}
+};
+
+/*
+ * fix except the n-th argument (partial application)
+ */
+template <class F, class TT>
+struct Fix_Except_One_Arg {
+	F f;
+	int n;
+	ub::vector<TT> x;
+	int s;
+	Fix_Except_One_Arg(F f, int n, const ub::vector<TT>& x): f(f), n(n), x(x) {
+		s = x.size();
+	}
+	template <class T> T operator()(const T& in) {
+		ub::vector<T> tmp(s);
+		for (int i=0; i<s; i++) {
+			if (i == n) {
+				tmp(i) = in; // x(n) is discarded
+			} else {
+				tmp(i) = T(x(i));
+			}
+		}
+		
+		return f(tmp);
+	}
+};
+
+// make [\partial^m f/\partial x_n^m] from f
+template <class F> struct PartialDeriv {
+	F f;
+	int n, m;
+	PartialDeriv(F f, int n, int m) : f(f), n(n), m(m) {}
+	template <class T> T operator()(const ub::vector<T>& x) {
+		Fix_Except_One_Arg<F,T> g(f, n, x);
+		return kv::highderiv(g, x(n), m)[m];
+	}
+};
 
 } // namespace kv;
 

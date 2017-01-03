@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ALLSOL_HPP
@@ -393,18 +393,34 @@ template <class T> int search_maxwidth_finite (const ub::vector< interval<T> >& 
 
 #endif // ENABLE_INFINITY
 
+
+// generate 1-d vector function from scalar function
+
+template <class F>
+struct MakeVec {
+	F f;
+	MakeVec(F f): f(f) {}
+
+	template <class T> ub::vector<T> operator()(const ub::vector<T>& x) {
+		ub::vector<T> r(1);
+		r(0) = f(x(0));
+		return r;
+	}
+};
+
 } // namespace allsol_sub
 
 
 // find all solution of f in I
 
-template <class T, class F> std::list< ub::vector< interval<T> > >
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
 allsol (
 F f,
 const ub::vector< interval<T> >& I,
-int verbose=1,
+int verbose = 1,
 T giveup = T(0.),
-std::list< ub::vector < interval<T> > >* rest=NULL
+std::list< ub::vector < interval<T> > >* rest = NULL
 )
 {
 	std::list< ub::vector < interval<T> > > targets;
@@ -415,13 +431,14 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 
 // find all solution of f in targets (list of intervals)
 
-template <class T, class F> std::list< ub::vector< interval<T> > >
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
 allsol_list (
 F f,
 std::list< ub::vector< interval<T> > > targets,
-int verbose=1,
+int verbose = 1,
 T giveup = T(0.),
-std::list< ub::vector < interval<T> > >* rest=NULL
+std::list< ub::vector < interval<T> > >* rest = NULL
 )
 {
 	int s = (targets.front()).size();
@@ -1087,6 +1104,52 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 	}
 
 	return solutions;
+}
+
+
+// allsol for 1-dimentional function
+
+template <class T, class F>
+std::list< interval<T> >
+allsol (
+F f,
+const interval<T>& I,
+int verbose = 1,
+T giveup = T(0.),
+std::list< interval<T> >* rest = NULL
+)
+{
+	allsol_sub::MakeVec<F> g(f);
+	ub::vector< interval<T> > I2(1);
+	std::list< ub::vector< interval<T> > > rest2;
+	typename std::list< ub::vector< interval<T> > >::iterator p1;
+	std::list< ub::vector< interval<T> > >* rest_p;
+	std::list< ub::vector< interval<T> > > r1;
+	typename std::list< ub::vector< interval<T> > >::iterator p2;
+	std::list< interval<T> > r2;
+
+	I2(0) = I;
+	if (rest == NULL) {
+		rest_p = NULL;
+	} else {
+		rest_p = &rest2;
+	}
+
+	r1 = allsol(g, I2, verbose, giveup, rest_p);
+
+	p2 = r1.begin();
+	while (p2 != r1.end()) {
+		r2.push_back((*(p2++))(0));
+	}
+
+	if (rest != NULL) {
+		p1 = rest2.begin();
+		while (p1 != rest2.end()) {
+			(*rest).push_back((*(p1++))(0));
+		}
+	}
+
+	return r2;
 }
 
 } // namespace kv

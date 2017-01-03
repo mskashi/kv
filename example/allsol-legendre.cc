@@ -1,5 +1,6 @@
 #include <kv/allsol.hpp>
 #include <kv/psa.hpp>
+#include <kv/dka.hpp>
 // #include <kv/dd.hpp>
 // #include <kv/rdd.hpp>
 // #include <kv/mpfr.hpp>
@@ -17,30 +18,22 @@ typedef kv::interval<double> itv;
 struct Legendre {
 	int n;
 
-	Legendre(int n) : n(n){
-	}
+	Legendre(int n) : n(n) {}
 
-	template <class T> ub::vector<T> operator()(const ub::vector<T>& x) {
+	template <class T> T operator()(const T& x) {
 		int i;
-		T tmp1, tmp2, tmp3;
-		ub::vector<T> y(1);
+		T tmp1, tmp2, y;
 
-		if (n == 0) {
-			y(0) = 1.;
-			return y;
-		}
-		if (n == 1) {
-			y(0) = x(0);
-			return y;
-		}
-		tmp1 = 1.;
-		tmp2 = x(0);
+		if (n == 0) return T(1);
+		if (n == 1) return x;
+
+		tmp1 = 1;
+		tmp2 = x;
 		for (i=2; i<=n; i++) {
-			tmp3 = ((2*i-1) * x(0) * tmp2 - (i-1) * tmp1) / i;
+			y = ((2*i-1) * x * tmp2 - (i-1) * tmp1) / i;
 			tmp1 = tmp2;
-			tmp2 = tmp3;
+			tmp2 = y;
 		}
-		y(0) = tmp3;
 		return y;
 	}
 };
@@ -85,22 +78,38 @@ template <class TT> struct Legendre_psa {
 		p = tmp3;
 	}
 
-	template <class T> ub::vector<T> operator()(const ub::vector<T>& x) {
-		ub::vector<T> y(1);
-
-		y(0) = eval(p, x(0));
-
-		return y;
+	template <class T> T operator()(const T& x) {
+		return eval(p, x);
 	}
 };
 
 int main()
 {
-	ub::vector<itv> I(1);
 	std::cout.precision(17);
 
-	I(0) = itv(-1, 1);
+	// calculate zeros of Legendre polynomial
+	// using recursive evaluation
 
-	// allsol(Legendre(20), I, 2);
-	allsol(Legendre_psa<itv>(20), I, 2);
+	Legendre f(20);
+	allsol(f, itv(-1, 1), 2);
+
+	// calculate zeros of Legendre polynomial
+	// using pre-calculation
+
+	Legendre_psa<itv> g(20);
+	allsol(g, itv(-1, 1), 2);
+
+	// calculate zeros of Legendre polynomial
+	// using pre-calculation and DKA method
+
+	ub::vector< kv::complex<itv> > va, vr;
+	int s = g.p.v.size();
+	va.resize(s);
+	for (int i=0; i<s; i++) {
+		va(i) = g.p.v(i);
+	}
+	kv::vdka(va, vr);
+	for (int i=0; i<vr.size(); i++) {
+        	std::cout << vr(i).real() << "\n";
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef OPTIMIZE_HPP
@@ -22,14 +22,38 @@
 // 2: use TRIM and use fast bat slightly inefficient trim algorithm
 // 3: use TRIM and use new trim algorithm
 
-#ifndef USE_TRIM
-#define USE_TRIM 0
+#ifndef OPTIMIZE_TRIM
+#define OPTIMIZE_TRIM 0
+#endif
+
+#ifndef OPTIMIZE_ZERODIVIDE
+#define OPTIMIZE_ZERODIVIDE 2
 #endif
 
 
 namespace kv {
 
 namespace ub = boost::numeric::ublas;
+
+
+// change scalar function f to -f
+template <class F> struct Opt_MakeMinus {
+	F f;
+	Opt_MakeMinus(F f) : f(f) {}
+	template <class T> T operator()(const ub::vector<T>& x) {
+		return -f(x);
+	}
+};
+
+// change scalar function T -> T
+// to 1-dimentional vector function T^1 -> T
+template <class F> struct Opt_MakeVec {
+	F f;
+	Opt_MakeVec(F f) : f(f) {}
+	template <class T> T operator()(const ub::vector<T>& x) {
+		return f(x(0));
+	}
+};
 
 
 template <class T, class F>
@@ -54,9 +78,9 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 	int i, j, k, mi;
 	bool flag;
 	interval<T> A, B, J, J2, Itmp; 
-#if USE_TRIM == 3
+#if OPTIMIZE_TRIM == 3
 	ub::vector< interval<T> > A0, A1, A2; // for new trim algorithm
-#endif // USE_TRIM == 3
+#endif // OPTIMIZE_TRIM == 3
 
 	C2.resize(s);
 
@@ -114,10 +138,10 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 		tmp = fc2.upper();
 		if (tmp < delta) delta = tmp;
 
-#if USE_TRIM >= 1
+#if OPTIMIZE_TRIM >= 1
 		// interval shrinking
 
-#if USE_TRIM == 3
+#if OPTIMIZE_TRIM == 3
 		// prepare for new trim algorithm
 		A0.resize(s);
 		A1.resize(s);
@@ -135,14 +159,14 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 			A2(j) = Itmp;
 			Itmp += A0(j);
 		}
-#endif // USE_TRIM == 3
+#endif // OPTIMIZE_TRIM == 3
 
 		IR = I;
 		flag = false; // non-existence in I turns out or not
 		for (j=0; j<s; j++) {
 			B = fdi(j);
 
-#if USE_TRIM == 1
+#if OPTIMIZE_TRIM == 1
 			// calculate A simply
 			// simple but slow
 			A = 0.;
@@ -151,8 +175,8 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 				A += fdi(k) * (I(k)-C(k));
 			}
 			A += fc;
-#endif // USE_TRIM == 1
-#if USE_TRIM == 2
+#endif // OPTIMIZE_TRIM == 1
+#if OPTIMIZE_TRIM == 2
 			// old trim algorithm
 			// calculate back A from mvf
 			A = mvf;
@@ -162,23 +186,24 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 			tmp2 = rop<T>::sub_up(A.upper(), Itmp.upper());
 			rop<T>::end();
 			A.assign(tmp, tmp2);
-#endif // USE_TRIM == 2
-#if USE_TRIM == 3
+#endif // OPTIMIZE_TRIM == 2
+#if OPTIMIZE_TRIM == 3
 			// new trim algorithm
 			A = fc + A1(j) + A2(j);
-#endif // USE_TRIM == 3
+#endif // OPTIMIZE_TRIM == 3
 
-			A -= delta;
+			// A -= delta;
+			A -= interval<T>(-std::numeric_limits<T>::infinity(), delta);
 
 			if (zero_in(B)) {
-#if USE_ZERODIVIDE >= 1
+#if OPTIMIZE_ZERODIVIDE >= 1
 				bool bdummy;
 				if (rad(B) <= 0) continue;
 				J = C(j) - division_part1(A, B, bdummy);
 				J2 = C(j) - division_part2(A, B);
 				if (overlap(IR(j), J)) {
 					if (overlap(IR(j), J2)) {
-#if USE_ZERODIVIDE == 2
+#if OPTIMIZE_ZERODIVIDE == 2
 						if (overlap(J, J2)) continue;
 						// interval division
 						I1 = IR;
@@ -193,15 +218,11 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 						continue;
 #endif
 					} else {
-						if (!subset(IR(j), J)) {
-							IR(j) = intersect(IR(j), J);
-						}
+						IR(j) = intersect(IR(j), J);
 					}
 				} else {
 					if (overlap(IR(j), J2)) {
-						if (!subset(IR(j), J2)) {
-							IR(j) = intersect(IR(j), J2);
-						}
+						IR(j) = intersect(IR(j), J2);
 					} else {
 						flag = true;
 						break;
@@ -213,9 +234,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 			} else {
 				J = C(j) - A/B;
 				if (overlap(IR(j), J)) {
-					if (!subset(IR(j), J)) {
-						IR(j) = intersect(IR(j), J);
-					}
+					IR(j) = intersect(IR(j), J);
 				} else {
 					flag = true;
 					break;
@@ -230,7 +249,7 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 
 		I = IR;
 
-#endif // USE_TRIM >= 1
+#endif // OPTIMIZE_TRIM >= 1
 
 		label:;
 
@@ -279,6 +298,218 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 	}
 
 	return solutions;
+}
+
+// rename of optimize
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+minimize(const ub::vector< interval<T> >& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+        return optimize(x, f, limit, unify, verbose);
+}
+
+// specify maximum number of subdivision instead of width limit
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+minimize(const ub::vector< interval<T> >& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	int i;
+	T tmp;
+	tmp = 1.;
+	for (i=0; i<x.size(); i++) {
+		tmp *= width(x(i));
+	}
+	T limit = (T)std::pow(tmp / n, 1.0/x.size());
+        return minimize(x, f, limit, unify, verbose);
+}
+
+// return only mininum value
+template <class T, class F>
+interval<T>
+minimize_value(const ub::vector< interval<T> >& x, F f, T limit) {
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	T ret_l, ret_u;
+	interval<T> tmp;
+
+	ret_l = std::numeric_limits<T>::infinity();
+	ret_u = std::numeric_limits<T>::infinity();
+
+	result = minimize(x, f, limit, false); // disable unify
+	p = result.begin();
+	while (p != result.end()) {
+		tmp = f(*p);
+		ret_u = std::min(ret_u, tmp.upper());
+		ret_l = std::min(ret_l, tmp.lower());
+		p++;
+	}
+
+	return kv::interval<T>(ret_l, ret_u);
+}
+
+// return only mininum value
+// specify maximum number of subdivision instead of width limit
+template <class T, class F>
+interval<T>
+minimize_value(const ub::vector< interval<T> >& x, F f, int n = 1000) {
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	T ret_l, ret_u;
+	interval<T> tmp;
+
+	ret_l = std::numeric_limits<T>::infinity();
+	ret_u = std::numeric_limits<T>::infinity();
+
+	result = minimize(x, f, n, false); // disable unify
+	p = result.begin();
+	while (p != result.end()) {
+		tmp = f(*p);
+		ret_u = std::min(ret_u, tmp.upper());
+		ret_l = std::min(ret_l, tmp.lower());
+		p++;
+	}
+
+	return kv::interval<T>(ret_l, ret_u);
+}
+
+// maximize/maximize_value
+
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+maximize(const ub::vector< interval<T> >& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+        return minimize(x, Opt_MakeMinus<F>(f), limit, unify, verbose);
+}
+
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+maximize(const ub::vector< interval<T> >& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+        return minimize(x, Opt_MakeMinus<F>(f), n, unify, verbose);
+}
+
+template <class T, class F>
+interval<T>
+maximize_value(const ub::vector< interval<T> >& x, F f, T limit) {
+	return -minimize_value(x, Opt_MakeMinus<F>(f), limit);
+}
+
+template <class T, class F>
+interval<T>
+maximize_value(const ub::vector< interval<T> >& x, F f, int n = 1000) {
+	return -minimize_value(x, Opt_MakeMinus<F>(f), n);
+}
+
+// one dimensional version of minimize/minimize_value
+
+template <class T, class F>
+std::list< interval<T> >
+minimize(const interval<T>& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = minimize(v, g, limit, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+std::list< interval<T> >
+minimize(const interval<T>& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = minimize(v, g, n, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+interval<T>
+minimize_value(const interval<T>& x, F f, T limit) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return minimize_value(v, g, limit);
+}
+
+template <class T, class F>
+interval<T>
+minimize_value(const interval<T>& x, F f, int n = 1000) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return minimize_value(v, g, n);
+}
+
+// one dimensional version of maximize/maximize_value
+
+template <class T, class F>
+std::list< interval<T> >
+maximize(const interval<T>& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = maximize(v, g, limit, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+std::list< interval<T> >
+maximize(const interval<T>& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = maximize(v, g, n, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+interval<T>
+maximize_value(const interval<T>& x, F f, T limit) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return maximize_value(v, g, limit);
+}
+
+template <class T, class F>
+interval<T>
+maximize_value(const interval<T>& x, F f, int n = 1000) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return maximize_value(v, g, n);
 }
 
 } // namespace kv
