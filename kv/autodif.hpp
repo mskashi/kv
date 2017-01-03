@@ -481,25 +481,25 @@ template <class T> class autodif {
 
 	// for functions R^n -> R^m
 	static void split (const ub::vector<autodif>& in, ub::vector<T>& v, ub::matrix<T>& d) {
-		int i, j, m, tmp;
-		int n = in.size();
+		int i, j, n, tmp;
+		int m = in.size();
 
 		if (in.size() == 0) return;
-		m = in(0).d.size();
-		for (i=1; i<n; i++) {
+		n = in(0).d.size();
+		for (i=1; i<m; i++) {
 			tmp = in(i).d.size();
-			if (tmp > m) m = tmp;
+			if (tmp > n) n = tmp;
 		}
 
-		v.resize(n);
-		d.resize(n, m);
-		for (i=0; i<n; i++) {
+		v.resize(m);
+		d.resize(m, n);
+		for (i=0; i<m; i++) {
 			v(i) = in(i).v;
 			tmp = in(i).d.size();
 			for (j=0; j<tmp; j++) {
 				d(i, j) = in(i).d(j);
 			}
-			for (j=tmp; j<m; j++) {
+			for (j=tmp; j<n; j++) {
 				d(i, j) = 0.;
 			}
 		}
@@ -507,15 +507,36 @@ template <class T> class autodif {
 
 	// for functions R^n -> R
 	static void split (const autodif& in, T& v, ub::vector<T>& d) {
-		int j, m;
+		int j, n;
 
-		m = in.d.size();
-		d.resize(m);
+		n = in.d.size();
+		d.resize(n);
 
 		v = in.v;
-		for (j=0; j<m; j++) {
+		for (j=0; j<n; j++) {
 			d(j) = in.d(j);
 		}
+	}
+
+	// for functions R -> R^m
+	static void split (const ub::vector<autodif>& in, ub::vector<T>& v, ub::vector<T>& d) {
+		int i;
+		int m = in.size();
+
+		if (in.size() == 0) return;
+
+		v.resize(m);
+		d.resize(m);
+		for (i=0; i<m; i++) {
+			v(i) = in(i).v;
+			d(i) = in(i).d(0);
+		}
+	}
+
+	// for functions R -> R
+	static void split (const autodif& in, T& v, T& d) {
+		v = in.v;
+		d = in.d(0);
 	}
 
 	static ub::vector<autodif>

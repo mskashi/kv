@@ -18,7 +18,7 @@ template <class T> T testfunc2(const T& x) {
 	T tmp;
 
 	tmp = x * x - 1.;
-	return sin(tmp + sin(tmp));
+	return cos(tmp + sin(tmp));
 }
 
 // f: R^n->R
@@ -26,8 +26,18 @@ template <class T> T testfunc3(const ub::vector<T>& x) {
 	return atan(x(0) * x(0) + 2. * x(1) * x(1) - 1.);
 }
 
+// f: R->R^n
+template <class T> ub::vector<T> testfunc4(const T& x) {
+	ub::vector<T> y(2);
+
+	y(0) = sin(x);
+	y(1) = cos(x);
+
+	return y;
+}
+
 // f: R^n->R^n
-template <class T> ub::vector<T> testfunc4(const ub::vector<T>& x) {
+template <class T> ub::vector<T> testfunc5(const ub::vector<T>& x) {
 	ub::vector<T> y(2);
 
 	y(0) = 2. * x(0) * x(0) * x(1) - 1.;
@@ -56,8 +66,13 @@ int main()
 
 	a2 = testfunc1(a1);
 
-	std::cout << a2.v << "\n"; // f(1.5)
-	std::cout << a2.d(0) << "\n"; // f'(1.5)
+	// helper function to separate autodif variable into value and gradient
+	// same as " d1 = a2.v; d2 = a2.d(0); "
+	kv::autodif<double>::split(a2, d1, d2);
+
+	std::cout << "testfunc1\n";
+	std::cout << d1 << "\n"; // f(1.5)
+	std::cout << d2 << "\n"; // f'(1.5)
 
 	//
 	// f: R->R (testfunc2: use template)
@@ -65,8 +80,12 @@ int main()
 
 	a1 = kv::autodif<double>::init(1.5);
 	a2 = testfunc2(a1);
-	std::cout << a2.v << "\n"; // f(1.5)
-	std::cout << a2.d(0) << "\n"; // f'(1.5)
+
+	kv::autodif<double>::split(a2, d1, d2);
+
+	std::cout << "testfunc2\n";
+	std::cout << d1 << "\n"; // f(1.5)
+	std::cout << d2 << "\n"; // f'(1.5)
 
 	d1 = 1.5;
 	d2 = testfunc2(d1); // double can be also passed
@@ -90,8 +109,26 @@ int main()
 	// same as " y = a1.v; v2(0) = a1.d(0); v2(1) = a1.d(1) "
 	kv::autodif<double>::split(a1, d1, v2);
 
+	std::cout << "testfunc3\n";
 	std::cout << d1 << "\n"; // f(5, 6)
 	std::cout << v2 << "\n"; // gradient
+
+	//
+	// f: R->R^n
+	//
+
+	a1 = kv::autodif<double>::init(1.5);
+
+	va1 = testfunc4(a1);
+
+	// helper function to separate autodif variable into value and gradient
+	// same as " v1(0) = va1(0).v; v1(1) = va1(1).v; "
+	//         " v2(0) = va1(0).d(0); v2(1) = va1(1).d(0); "
+	kv::autodif<double>::split(va1, v1, v2);
+
+	std::cout << "testfunc4\n";
+	std::cout << v1 << "\n"; // f(1.5)
+	std::cout << v2 << "\n"; // f'(1.5)
 
 	//
 	// f: R^n->R^m
@@ -101,13 +138,14 @@ int main()
 
 	va1 = kv::autodif<double>::init(v1);
 
-	va2 = testfunc4(va1);
+	va2 = testfunc5(va1);
 
 	// helper function to separate autodif vector into vector value and jacobian
 	// same as " v2(0) = va2(0).v; m(0)(0) = va2(0).d(0); m(0)(1) = va2(0).d(1); "
 	//         " v2(1) = va2(1).v; m(1)(0) = va2(1).d(0); m(1)(1) = va2(1).d(1); "
 	kv::autodif<double>::split(va2, v2, m);
 
+	std::cout << "testfunc5\n";
 	std::cout << v2 << "\n"; // f(5, 6)
 	std::cout << m << "\n"; // Jacobian matrix
 
@@ -119,6 +157,9 @@ int main()
 	va1 = kv::autodif<double>::init(v1);
 	a1 = va1(0);
 	a2 = va1(1);
+
+	std::cout << "autodif operations\n";
+
 	std::cout << a1 << "\n";
 	std::cout << a2 << "\n";
 
@@ -159,16 +200,21 @@ int main()
 	va2(1) = va1(11);
 
 	// usual way
-	std::cout << va2 << ": usual input\n";
-	va3 = testfunc4(va2);
-	std::cout << va3 << ": usual output\n";
+	std::cout << "usual input\n";
+	std::cout << va2 << "\n";
+	va3 = testfunc5(va2);
+	std::cout << "usual output\n";
+	std::cout << va3 << "\n";
 
 	// using compress/expand to save calculation time
 	ub::matrix<double> save;
 	va3 = kv::autodif<double>::compress(va2, save);
-	std::cout << va3 << ": compressed input\n";
-	va4 = testfunc4(va3);
-	std::cout << va4 << ": compressed output\n";
+	std::cout << "compressed input\n";
+	std::cout << va3 << "\n";
+	va4 = testfunc5(va3);
+	std::cout << "compressed output\n";
+	std::cout << va4 << "\n";
 	va5 = kv::autodif<double>::expand(va4, save);
-	std::cout << va5 << ": expanded output\n";
+	std::cout << "expanded output\n";
+	std::cout << va5 << "\n";
 }

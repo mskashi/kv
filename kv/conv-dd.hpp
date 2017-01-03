@@ -502,7 +502,7 @@ struct conv_dd {
 		std::vector<int> table;
 
 		table_max = num1_s.size() - 1 + e10;
-		table_min = - num2_s.size() + e10;
+		table_min = e10 - num2_s.size();
 		table.resize(table_max - table_min + 1);
 		offset = - table_min;
 
@@ -657,7 +657,7 @@ struct conv_dd {
 		double dtmp;
 
 		if (result_max > 1023) {
-			if ((sign == 1 && mode == -1) || (sign == -1 and mode == 1)) {
+			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {
 				x1 = sign * (std::numeric_limits<double>::max)();
 				x2 = std::ldexp(x1, -54);
 				return;
@@ -669,7 +669,7 @@ struct conv_dd {
 		}
 
 		if (result_max < -1075) {
-			if ((sign == 1 && mode == 1) || (sign == -1 and mode == -1)) {
+			if ((sign == 1 && mode == 1) || (sign == -1 && mode == -1)) {
 				x1 = sign * std::numeric_limits<double>::denorm_min();
 				x2 = sign * 0.;
 				return;
