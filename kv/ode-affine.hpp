@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_HPP
@@ -25,6 +25,10 @@
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
+#endif
+
+#ifndef ODE_RESTART_RATIO
+#define ODE_RESTART_RATIO 1
 #endif
 
 
@@ -64,6 +68,9 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 	T radius, radius_tmp;
 	T tolerance;
 	int n_rad;
+	#if ODE_RESTART_RATIO == 1
+	T max_ratio;
+	#endif
 
 	int ret_val;
 	interval<T> end2;
@@ -160,7 +167,13 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		catch (std::domain_error& e) {
 			 if (restart < p.restart_max) {
 				psa< affine<T> >::use_history() = false;
+				if (p.verbose == 1) {
+					std::cout << "ode: radius changed: " << radius;
+				}
 				radius *= 0.5;
+				if (p.verbose == 1) {
+					std::cout << " -> " << radius << "\n";
+				}
 				restart++;
 				continue;
 			} else {
@@ -221,15 +234,24 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 		w = init + w;
 
 		flag = true;
+		#if ODE_RESTART_RATIO == 1
+		max_ratio = 0.;
+		#endif
 		for (i=0; i<n; i++) {
 			#ifdef ODE_AFFINE_SIMPLE
 			s2i = to_interval(w(i).v(p.order));
+			#if ODE_RESTART_RATIO == 1
+			max_ratio = std::max(max_ratio, width(s2i) / width(s2i_save(i)));
+			#endif
 			flag = flag && subset(s2i, s2i_save(i));
 			s2i_save(i) = s2i;
 			w(i).v(p.order) = (affine<T>)s2i;
 			#else
 			split(w(i).v(p.order), maxnum_save, s1, s2);
 			s2i = to_interval(s2);
+			#if ODE_RESTART_RATIO == 1
+			max_ratio = std::max(max_ratio, width(to_interval(s1 - s1_save(i)) + s2i) / width(s2i_save(i)));
+			#endif
 			flag = flag && subset(to_interval(s1 - s1_save(i)) + s2i, s2i_save(i));
 			s1_save(i) = s1;
 			s2i_save(i) = s2i;
@@ -242,7 +264,17 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			ret_val = 0;
 			break;
 		}
+		if (p.verbose == 1) {
+			std::cout << "ode: radius changed: " << radius;
+		}
+		#if ODE_RESTART_RATIO == 1
+		radius *= std::max(std::min(0.5, 0.5 / max_ratio), 0.125);
+		#else
 		radius *= 0.5;
+		#endif
+		if (p.verbose == 1) {
+			std::cout << " -> " << radius << "\n";
+		}
 		restart++;
 	}
 

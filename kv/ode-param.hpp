@@ -24,7 +24,7 @@ template <class T> struct ode_param {
 		verbose(0),
 		ep_reduce(0),
 		ep_reduce_limit(0),
-		restart_max(1)
+		restart_max(2)
 	{}
 
 	ode_param& set_order(int x) {

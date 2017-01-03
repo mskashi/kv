@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_HPP
@@ -24,6 +24,10 @@
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
+#endif
+
+#ifndef ODE_RESTART_RATIO
+#define ODE_RESTART_RATIO 1
 #endif
 
 
@@ -58,6 +62,9 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 	T radius, radius_tmp;
 	T tolerance;
 	int n_rad;
+	#if ODE_RESTART_RATIO == 1
+	T max_ratio;
+	#endif
 
 	int ret_val;
 	interval<T> end2;
@@ -165,7 +172,13 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		catch (std::domain_error& e) {
 			if (restart < p.restart_max) {
 				psa< autodif< interval<T> > >::use_history() = false;
+				if (p.verbose == 1) {
+					std::cout << "ode: radius changed: " << radius;
+				}
 				radius *= 0.5;
+				if (p.verbose == 1) {
+					std::cout << " -> " << radius << "\n";
+				}
 				restart++;
 				continue;
                         } else {
@@ -229,10 +242,19 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		w = new_init + w;
 
 		flag = true;
+		#if ODE_RESTART_RATIO == 1
+		max_ratio = 0.;
+		#endif
 		for (i=0; i<n; i++) {
+			#if ODE_RESTART_RATIO == 1
+			max_ratio = std::max(max_ratio, width(w(i).v(p.order).v) / width(z(i).v(p.order).v));
+			#endif
 			flag = flag && subset(w(i).v(p.order).v, z(i).v(p.order).v);
 			w(i).v(p.order).d.resize(n);
 			for (j=0; j<n; j++) {
+				#if ODE_RESTART_RATIO == 1
+				max_ratio = std::max(max_ratio, width(w(i).v(p.order).d(j)) / width(z(i).v(p.order).d(j)));
+				#endif
 				flag = flag && subset(w(i).v(p.order).d(j), z(i).v(p.order).d(j));
 			}
 		}
@@ -242,7 +264,17 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			ret_val = 0;
 			break;
 		}
+		if (p.verbose == 1) {
+			std::cout << "ode: radius changed: " << radius;
+		}
+		#if ODE_RESTART_RATIO == 1
+		radius *= std::max(std::min(0.5, 0.5 / max_ratio), 0.125);
+		#else
 		radius *= 0.5;
+		#endif
+		if (p.verbose == 1) {
+			std::cout << " -> " << radius << "\n";
+		}
 		restart++;
 	}
 
