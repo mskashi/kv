@@ -634,12 +634,18 @@ template <class T> class interval {
 		return tmp;
 	}
 
-	friend T median(const interval& x) {
-		return (x.inf + x.sup) * 0.5;
-	}
 
 	friend T mid(const interval& x) {
-		return median(x);
+		using std::abs;
+		if (abs(x.inf) > 1. && abs(x.sup) > 1.) {
+			return x.inf * 0.5 + x.sup * 0.5;
+		} else {
+			return (x.inf + x.sup) * 0.5;
+		}
+	}
+
+	friend T median(const interval& x) {
+		return mid(x);
 	}
 
 	friend T norm(const interval& x) {

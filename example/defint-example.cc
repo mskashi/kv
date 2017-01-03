@@ -69,6 +69,21 @@ struct Nanbu {
 };
 
 
+// from
+//  https://twitter.com/Twilight1730/status/619035699392569344/photo/1
+
+struct Twilight {
+	int m;
+	Twilight(int m): m(m) {};
+		
+	template <class T> T operator() (const T& x) {
+		T tmp;
+		tmp = pow(sin(x), m);
+		return tmp / (tmp + pow(cos(x), m));
+	}
+};
+
+
 int main() {
 	std::cout.precision(17);
 
@@ -79,4 +94,9 @@ int main() {
 	std::cout << kv::defint_autostep(Func1(), (itv)(-1.), (itv)1., 12) << "\n";
 	std::cout << kv::defint_autostep(Rump1(), (itv)(0.), (itv)8., 12) << "\n";
 	std::cout << kv::defint_autostep(Nanbu(), (itv)(0.5), (itv)4., 10) << "\n";
+	std::cout << kv::defint_autostep(Twilight(1), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
+	std::cout << kv::defint_autostep(Twilight(2), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
+	std::cout << kv::defint_autostep(Twilight(3), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
+	std::cout << kv::defint_autostep(Twilight(4), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
+
 }

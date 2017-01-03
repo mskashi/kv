@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef VLEQ_HPP
 #define VLEQ_HPP
 
+#include <cstddef>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <kv/interval.hpp>
@@ -17,13 +18,16 @@ namespace kv {
 
 namespace ub = boost::numeric::ublas;
 
+// verified linear equation solver
+// for matrix-rhs
+// set r if you already have approximate inverse of a
 
 template <class T>
 bool vleq(
 	const ub::matrix< interval<T> >& a,
 	const ub::matrix< interval<T> >& b,
 	ub::matrix<interval<T> >& x,
-	const ub::matrix<T>& r = *(ub::matrix<T> *)0 )
+	const ub::matrix<T>* r = NULL )
 {
 	int i, j;
 	int s1 = b.size1();
@@ -34,11 +38,11 @@ bool vleq(
 	bool bo;
 	T norm1, norm2, norm3, err;
 
-	if (&r == 0) {
+	if (r == NULL) {
 		bo = invert(mid(a), R);
 		if (bo == false) return false;
 	} else {
-		R = r;
+		R = *r;
 	}
 
 	E = ub::identity_matrix<T>(s1);
@@ -73,12 +77,16 @@ bool vleq(
 	return true;
 }
 
+// verified linear equation solver
+// for vector-rhs
+// set r if you already have approximate inverse of a
+
 template <class T>
 bool vleq(
 	const ub::matrix< interval<T> >& a,
 	const ub::vector< interval<T> >& b,
 	ub::vector<interval<T> >& x,
-	const ub::matrix<T>& r = *(ub::matrix<T> *)0 )
+	const ub::matrix<T>* r = NULL )
 {
 	int s = b.size();
 	int i;

@@ -74,6 +74,15 @@
 #define ITER_STOP_RATIO 0.9
 #endif
 
+#ifndef ENABLE_INFINITY
+#define ENABLE_INFINITY 1
+#endif
+
+#ifndef WEIGHTED_MAX
+#define WEIGHTED_MAX 1
+#endif
+
+
 
 namespace kv {
 
@@ -91,7 +100,11 @@ template <class T> int search_maxwidth (const ub::vector< interval<T> >& I) {
 
 	m = 0.;
 	for (i=0; i<s; i++) {
+#if WEIGHTED_MAX == 1
+		tmp = width(I(i)) / (1. + mag(I(i)) / (std::numeric_limits<T>::max)() * mag(I(i)));
+#else
 		tmp = width(I(i));
+#endif
 		if (tmp > m) {
 			m = tmp; mi = i;
 		}
@@ -264,6 +277,133 @@ template <class T> int search_optimal_divide2 (const ub::vector< interval<T> >& 
 	return r;
 }
 
+#if ENABLE_INFINITY == 1
+
+template <class T> T mid_infinity (const interval<T>& I) {
+	if (I.upper() == std::numeric_limits<T>::infinity()) {
+		if (I.lower() == -std::numeric_limits<T>::infinity()) {
+			return T(0.);
+		} else {
+			return mid(interval<T>((std::numeric_limits<T>::max)(), I.lower()));
+			#if 0
+			if (I.lower() < 0.) {
+				return T(0.);
+			} else if (I.lower() == 0.) {
+				return T(1.);
+			} else {
+				using std::sqrt;
+				return sqrt((std::numeric_limits<T>::max)()) * sqrt(I.lower());
+			}
+			#endif
+		}
+	} else {
+		if (I.lower() == -std::numeric_limits<T>::infinity()) {
+			return mid(interval<T>(-(std::numeric_limits<T>::max)(), I.upper()));
+			#if 0
+			if (I.upper() > 0.) {
+				return T(0.);
+			} else if (I.upper() == 0.) {
+				return T(-1.);
+			} else {
+				using std::sqrt;
+				return -sqrt((std::numeric_limits<T>::max)()) * sqrt(-I.upper());
+			}
+			#endif
+		} else {
+			return mid(I);
+		}
+	}
+}
+
+template <class T> ub::vector<T> mid_infinity (const ub::vector< interval<T> >& I) {
+	int n = I.size();
+	int i;
+	ub::vector<T> r(n);
+
+	for (i=0; i<n; i++) {
+		r(i) = mid_infinity(I(i));
+	}
+
+	return r;
+}
+
+template <class T> bool include_infinity (const interval<T>& I) {
+	if (I.lower() == -std::numeric_limits<T>::infinity() || I.upper() == std::numeric_limits<T>::infinity()) return true;
+	return false;
+}
+
+template <class T> bool include_infinity (const ub::vector< interval<T> >& I) {
+	int n = I.size();
+	int i;
+	ub::vector<T> r(n);
+
+	for (i=0; i<n; i++) {
+		if (include_infinity(I(i))) return true;
+	}
+
+	return false;
+}
+
+template <class T> int search_maxwidth_infinity (const ub::vector< interval<T> >& I) {
+	int s = I.size();
+	int i, mi, r, tr;
+	T m, tmp, tmp2;
+
+	m = 0.;
+	r = 0.;
+	for (i=0; i<s; i++) {
+		if (I(i).lower() == -std::numeric_limits<T>::infinity()) {
+			if (I(i).upper() == std::numeric_limits<T>::infinity()) {
+				return i;
+			} else {
+				tr = 1;
+				tmp = I(i).upper();
+			}
+		} else {
+			if (I(i).upper() == std::numeric_limits<T>::infinity()) {
+				tr = 1;
+				tmp = -I(i).lower();
+			} else {
+				tr = 0;
+#if WEIGHTED_MAX == 1
+				tmp = width(I(i)) / (1. + mag(I(i)) / (std::numeric_limits<T>::max)() * mag(I(i)));
+#else
+				tmp = width(I(i));
+#endif
+			}
+		}
+		if (tr > r || (tr == r &&  tmp > m)) {
+			r = tr; m = tmp; mi = i;
+		}
+	}
+
+	return mi;
+}
+
+template <class T> int search_maxwidth_finite (const ub::vector< interval<T> >& I) {
+	int s = I.size();
+	int i, mi;
+	T m, tmp, tmp2;
+
+	mi = -1;
+	m = 0.;
+	for (i=0; i<s; i++) {
+		if (include_infinity(I(i))) continue;
+#if WEIGHTED_MAX == 1
+		tmp = width(I(i)) / (1. + mag(I(i)) / (std::numeric_limits<T>::max)() * mag(I(i)));
+#else
+		tmp = width(I(i));
+#endif
+		if (tmp > m) {
+			m = tmp; mi = i;
+		}
+	}
+
+	return mi;
+}
+
+#endif // ENABLE_INFINITY
+
 } // namespace allsol_sub
 
 
@@ -400,7 +540,11 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		}
 #endif
 
+#if ENABLE_INFINITY == 1
+		C = allsol_sub::mid_infinity(I);
+#else
 		C = mid(I);
+#endif
 		try {
 			fc = f(C);
 		}
@@ -418,6 +562,10 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 			}
 			continue;
 		}
+
+#if ENABLE_INFINITY == 1
+		if (allsol_sub::include_infinity(I)) goto label;
+#endif
 
 #if USE_TRIM == 1
 		// interval shrinking
@@ -744,7 +892,12 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 
 		// check the case that solution may exist near boundary.
 		// If so, use K as next interval
-		if (allsol_sub::widthratio_max(K, I) < EDGE_RATIO) {
+#if ENABLE_INFINITY == 1
+		if (!allsol_sub::include_infinity(I) && allsol_sub::widthratio_max(K, I) < EDGE_RATIO)
+#else
+		if (allsol_sub::widthratio_max(K, I) < EDGE_RATIO)
+#endif
+		{
 			allsol_sub::recovery_inflation2(K, Iorg, (T)RECOVER_RATIO);
 			#pragma omp critical (targets)
 			{
@@ -767,7 +920,12 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		// mi = rand();
 
 #if USE_SLOWDIVIDE == 1
-		if (allsol_sub::widthratio_max(I, Iorg) <= 0.5) {
+#if ENABLE_INFINITY == 1
+		if (!allsol_sub::include_infinity(I) && allsol_sub::widthratio_max(I, Iorg) <= 0.5)
+#else
+		if (allsol_sub::widthratio_max(I, Iorg) <= 0.5)
+#endif
+		{
 			#pragma omp critical (targets)
 			{
 			targets.push_back(I);
@@ -791,10 +949,18 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 			continue;
 		}
 #else
+#if ENABLE_INFINITY == 1
+		mi = allsol_sub::search_maxwidth_infinity(I);
+#else
 		mi = allsol_sub::search_maxwidth(I);
 #endif
+#endif
 
+#if ENABLE_INFINITY == 1
+		tmp = allsol_sub::mid_infinity(I(mi));
+#else
 		tmp = mid(I(mi));
+#endif
 		if (width(I(mi)) < giveup || tmp == I(mi).lower() || tmp == I(mi).upper()) {
 			if (verbose >= 2) {
 				std::cout << "too small interval (may be multiple root?):\n" << I << "\n";
@@ -838,6 +1004,38 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		I1 = I; I2 = I;
 		I1(mi).assign(I1(mi).lower(), tmp);
 		I2(mi).assign(tmp, I2(mi).upper());
+#if ENABLE_INFINITY == 1
+		ub::vector< interval<T> > I3;
+		int mi2;
+		if (allsol_sub::include_infinity(I1(mi))) {
+			mi2 = allsol_sub::search_maxwidth_finite(I1);
+			if (mi2 != -1) {
+				I3 = I1;
+				tmp = mid(I1(mi2));
+				I1(mi2).assign(I1(mi2).lower(), tmp);
+				I3(mi2).assign(tmp, I3(mi2).upper());
+				#pragma omp critical (targets)
+				{
+				targets.push_back(I3);
+				count_unknown += 1;
+				}
+			}
+		}
+		if (allsol_sub::include_infinity(I2(mi))) {
+			mi2 = allsol_sub::search_maxwidth_finite(I2);
+			if (mi2 != -1) {
+				I3 = I2;
+				tmp = mid(I2(mi2));
+				I2(mi2).assign(I2(mi2).lower(), tmp);
+				I3(mi2).assign(tmp, I3(mi2).upper());
+				#pragma omp critical (targets)
+				{
+				targets.push_back(I3);
+				count_unknown += 1;
+				}
+			}
+		}
+#endif
 		#pragma omp critical (targets)
 		{
 		targets.push_back(I1);

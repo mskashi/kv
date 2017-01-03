@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_QR_LOHNER_HPP
@@ -115,14 +115,14 @@ odelong_qr_lohner(
 		Q2i = Q2;
 		Q2t = trans(Q2);
 		// bo = vleq(Q2i, AQ, QAQ);
-		bo = vleq(Q2i, AQ, QAQ, Q2t);
+		bo = vleq(Q2i, AQ, QAQ, &Q2t);
 		if (bo == false) break;
 		Q2i = Q2;
 		y1 = prod(QAQ, y);
 		c = mid(fc);
 		tmp = fc - c;
 		// bo = vleq(Q2i, tmp, y2);
-		bo = vleq(Q2i, tmp, y2, Q2t);
+		bo = vleq(Q2i, tmp, y2, &Q2t);
 		if (bo == false) break;
 		y = y1 + y2;
 		x1 = prod(Q2, y) + c;

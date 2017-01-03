@@ -26,7 +26,7 @@ struct Func {
 
 template <class F> struct ComplexReal {
 	F f;
-	ComplexReal(F f_v) : f(f_v) {}
+	ComplexReal(F f) : f(f) {}
 
 	template <class T> ub::vector<T> operator() (ub::vector<T> x){
 		int n = x.size();

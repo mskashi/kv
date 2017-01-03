@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AUTODIF_HPP
@@ -484,6 +484,7 @@ template <class T> class autodif {
 		int i, j, m, tmp;
 		int n = in.size();
 
+		if (in.size() == 0) return;
 		m = in(0).d.size();
 		for (i=1; i<n; i++) {
 			tmp = in(i).d.size();
