@@ -208,7 +208,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 		k = 0;
 		for (i=0; i<n; i++) {
 			z(i).v(p.order).v += newton_step(k++) * interval<T>(-1., 1.);
-			z(i).v(p.order).d.resize(n);
+			z(i).v(p.order).d.resize(n, true);
 			for (j=0; j<n; j++) {
 				z(i).v(p.order).d(j) += newton_step(k++) * interval<T>(-1., 1.);
 			}

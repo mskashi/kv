@@ -584,10 +584,17 @@ struct conv_double {
 		double dtmp;
 
 		if (result_max > 1023) {
+			if ((sign == 1 && mode == -1) || (sign == -1 and mode == 1)) {
+                        	return sign * (std::numeric_limits<double>::max)();
+			}
+
 			return sign * std::numeric_limits<double>::infinity();
 		}
 
 		if (result_max < -1075) {
+			if ((sign == 1 && mode == 1) || (sign == -1 and mode == -1)) {
+				return sign * std::numeric_limits<double>::denorm_min();
+			}
 			return sign * 0.;
 		}
 

@@ -657,6 +657,11 @@ struct conv_dd {
 		double dtmp;
 
 		if (result_max > 1023) {
+			if ((sign == 1 && mode == -1) || (sign == -1 and mode == 1)) {
+				x1 = sign * (std::numeric_limits<double>::max)();
+				x2 = std::ldexp(x1, -54);
+				return;
+			}
 			dtmp = sign * std::numeric_limits<double>::infinity();
 			x1 = dtmp;
 			x2 = dtmp;
@@ -664,6 +669,11 @@ struct conv_dd {
 		}
 
 		if (result_max < -1075) {
+			if ((sign == 1 && mode == 1) || (sign == -1 and mode == -1)) {
+				x1 = sign * std::numeric_limits<double>::denorm_min();
+				x2 = sign * 0.;
+				return;
+			}
 			dtmp = sign * 0.;
 			x1 = dtmp;
 			x2 = dtmp;
