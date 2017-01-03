@@ -1,11 +1,16 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_NOHWROUND_HPP
 #define RDD_NOHWROUND_HPP
 
 #include <kv/rdouble-nohwround.hpp>
+
+
+#ifndef DD_NEW_SQRT
+#define DD_NEW_SQRT 1
+#endif
 
 namespace kv {
 
@@ -87,7 +92,6 @@ template <> struct rop <dd> {
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
-
 	}
 
 	static dd add_down(const dd& x, const dd& y) {
@@ -182,6 +186,7 @@ template <> struct rop <dd> {
 
 	static dd div_up(const dd& x, const dd& y) {
 		double z1, z2, z3, z4;
+		double tmp;
 
 		z1 = x.a1 / y.a1;
 
@@ -194,25 +199,49 @@ template <> struct rop <dd> {
 			return dd(z1, 0.);
 		}
 
-		if (y >= 0.) {
+		if (y.a1 >= 0.) {
 			twoproduct_up(-z1, y.a1, z3, z4);
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
-				// z2 = ((((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4) / (y.a1 * 0.5 + y.a2 * 0.5);
-				z2 = rop<double>::div_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1 * 0.5), rop<double>::mul_up(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4), rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5));
+				// z2 = (((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4;
+				z2 = rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1 * 0.5), rop<double>::mul_up(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5);
+				} else {
+					tmp = rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5);
+				}
+				z2 = rop<double>::div_up(z2, tmp);
 			} else {
-				// z2 = ((((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
-				z2 = rop<double>::div_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1), rop<double>::mul_up(-z1, y.a2)), x.a2), z4), rop<double>::add_down(y.a1, y.a2));
+				// z2 = (((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4;
+				z2 = rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1), rop<double>::mul_up(-z1, y.a2)), x.a2), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_down(y.a1, y.a2);
+				} else {
+					tmp = rop<double>::add_up(y.a1, y.a2);
+				}
+				z2 = rop<double>::div_up(z2, tmp);
 			}
 		} else {
 			twoproduct_down(-z1, y.a1, z3, z4);
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
-				// z2 = ((((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4) / (y.a1 * 0.5 + y.a2 * 0.5);
-				z2 = rop<double>::div_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1 * 0.5), rop<double>::mul_down(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4), rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5));
+				// z2 = (((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4;
+				z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1 * 0.5), rop<double>::mul_down(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5);
+				} else {
+					tmp = rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5);
+				}
+				z2 = rop<double>::div_up(z2, tmp);
 			} else {
-				// z2 = ((((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
-				z2 = rop<double>::div_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), rop<double>::mul_down(-z1, y.a2)), x.a2), z4), rop<double>::add_up(y.a1, y.a2));
+				// z2 = (((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4;
+				z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), rop<double>::mul_down(-z1, y.a2)), x.a2), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_down(y.a1, y.a2);
+				} else {
+					tmp = rop<double>::add_up(y.a1, y.a2);
+				}
+				z2 = rop<double>::div_up(z2, tmp);
 			}
 		}
 		dd::twosum(z1, z2, z3, z4);
@@ -222,8 +251,7 @@ template <> struct rop <dd> {
 
 	static dd div_down(const dd& x, const dd& y) {
 		double z1, z2, z3, z4;
-		volatile double v1, v2, v3, v4, v5, v6, v7, v8;
-		volatile double tmp;
+		double tmp;
 
 		z1 = x.a1 / y.a1;
 
@@ -236,25 +264,49 @@ template <> struct rop <dd> {
 			return dd(z1, 0.);
 		}
 
-		if (y >= 0.) {
+		if (y.a1 >= 0.) {
 			twoproduct_down(-z1, y.a1, z3, z4);
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
-				// z2 = ((((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4) / (y.a1 * 0.5 + y.a2 * 0.5);
-				z2 = rop<double>::div_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1 * 0.5), rop<double>::mul_down(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4), rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5));
+				// z2 = (((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4;
+				z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1 * 0.5), rop<double>::mul_down(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5);
+				} else {
+					tmp = rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5);
+				}
+				z2 = rop<double>::div_down(z2, tmp);
 			} else {
-				// z2 = ((((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
-				z2 = rop<double>::div_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), rop<double>::mul_down(-z1, y.a2)), x.a2), z4), rop<double>::add_up(y.a1, y.a2));
+				// z2 = (((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4;
+				z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), rop<double>::mul_down(-z1, y.a2)), x.a2), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_up(y.a1, y.a2);
+				} else {
+					tmp = rop<double>::add_down(y.a1, y.a2);
+				}
+				z2 = rop<double>::div_down(z2, tmp);
 			}
 		} else {
 			twoproduct_up(-z1, y.a1, z3, z4);
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
-				// z2 = ((((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4) / (y.a1 * 0.5 + y.a2 * 0.5);
-				z2 = rop<double>::div_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1 * 0.5), rop<double>::mul_up(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4), rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5));
+				// z2 = (((z3 + x.a1 * 0.5) + (-z1) * (y.a2 * 0.5)) + x.a2 * 0.5) + z4;
+				z2 = rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1 * 0.5), rop<double>::mul_up(-z1, y.a2 * 0.5)), x.a2 * 0.5), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_up(y.a1 * 0.5, y.a2 * 0.5);
+				} else {
+					tmp = rop<double>::add_down(y.a1 * 0.5, y.a2 * 0.5);
+				}
+				z2 = rop<double>::div_down(z2, tmp);
 			} else {
-				// z2 = ((((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4) / (y.a1 + y.a2);
-				z2 = rop<double>::div_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1), rop<double>::mul_up(-z1, y.a2)), x.a2), z4), rop<double>::add_down(y.a1, y.a2));
+				// z2 = (((z3 + x.a1) + (-z1) * y.a2) + x.a2) + z4;
+				z2 = rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1), rop<double>::mul_up(-z1, y.a2)), x.a2), z4);
+				if (z2 > 0.) {
+					tmp = rop<double>::add_up(y.a1, y.a2);
+				} else {
+					tmp = rop<double>::add_down(y.a1, y.a2);
+				}
+				z2 = rop<double>::div_down(z2, tmp);
 			}
 		}
 		dd::twosum(z1, z2, z3, z4);
@@ -262,10 +314,75 @@ template <> struct rop <dd> {
 		return dd(z3, z4);
 	}
 
+#if DD_NEW_SQRT == 1
+	static dd sqrt_up(const dd& x) {
+		double z1, z2, z3, z4;
+		double tmp;
+
+		#if 0
+		if (x < 0.) {
+			throw std::domain_error("dd: sqrt of negative value");
+		}
+		#endif
+
+		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
+		z1 = std::sqrt(x.a1);
+		twoproduct_up(-z1, z1, z3, z4);
+		// z2 = ((z3 + x.a1) + x.a2 + z4) / (sqrt(x.a1 + x.a2) + z1);
+		z2 = rop<double>::add_up(rop<double>::add_up(rop<double>::add_up(z3, x.a1), x.a2), z4);
+		if (z2 > 0.) {
+			tmp = rop<double>::add_down(rop<double>::sqrt_down(rop<double>::add_down(x.a1, x.a2)), z1);
+		} else {
+			tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+		}
+		z2 = rop<double>::div_up(z2, tmp);
+		dd::twosum(z1, z2, z3, z4);
+
+		return dd(z3, z4);
+	}
+
+	static dd sqrt_down(const dd& x) {
+		double z1, z2, z3, z4;
+		double tmp;
+
+		#if 0
+		if (x < 0.) {
+			throw std::domain_error("dd: sqrt of negative value");
+		}
+		#endif
+
+		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
+		z1 = std::sqrt(x.a1);
+		twoproduct_down(-z1, z1, z3, z4);
+		// z2 = ((z3 + x.a1) + x.a2 + z4) / (sqrt(x.a1 + x.a2) + z1);
+		z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), x.a2), z4);
+		if (z2 > 0.) {
+			tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+		} else {
+			tmp = rop<double>::add_down(rop<double>::sqrt_down(rop<double>::add_down(x.a1, x.a2)), z1);
+		}
+		z2 = rop<double>::div_down(z2, tmp);
+		dd::twosum(z1, z2, z3, z4);
+
+		return dd(z3, z4);
+	}
+#else
 	static dd sqrt_up(const dd& x) {
 		dd r, r2;
 
 		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
 		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_up(x, r);
@@ -278,6 +395,10 @@ template <> struct rop <dd> {
 		dd r, r2;
 
 		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
 		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		r2 = div_down(x, r);
@@ -285,6 +406,7 @@ template <> struct rop <dd> {
 		if (r > r2) return r2;
 		else return r;
 	}
+#endif
 
 	static void begin() {
 	}

@@ -76,6 +76,22 @@ void mpfrtodd(const mpfr<N>& x, dd& y, int rnd = 0)
 	kv::dd::twosum(dtmp1, dtmp2, y.a1, y.a2);
 }
 
+template <int N, int M>
+void mpfrtompfr(const mpfr<N>& x, mpfr<M>& y, int rnd = 0)
+{
+	mp_rnd_t mode;
+
+	if (rnd == 1) {
+		mode = MPFR_RNDU;
+	} else if (rnd == -1) {
+		mode = MPFR_RNDD;
+	} else {
+		mode = MPFR_RNDN;
+	}
+
+	mpfr_set(y.a, x.a, mode);
+}
+
 void ddtodouble(const dd& x, double& y, int rnd = 0)
 {
 	if (rnd == 1) {
@@ -129,6 +145,13 @@ void iddtoimpfr(const interval<dd>& x, interval< mpfr<N> >& y)
 {
 	ddtompfr(x.lower(), y.lower(), -1);
 	ddtompfr(x.upper(), y.upper(), 1);
+}
+
+template <int N, int M>
+void impfrtoimpfr(const interval< mpfr<N> >& x, interval< mpfr<M> >& y)
+{
+	mpfrtompfr(x.lower(), y.lower(), -1);
+	mpfrtompfr(x.upper(), y.upper(), 1);
 }
 
 };

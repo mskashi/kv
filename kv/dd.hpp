@@ -17,6 +17,15 @@
 #include <kv/fpu53.hpp>
 
 
+#ifndef DD_FASTMULT
+#define DD_FASTMULT 0
+#endif
+
+#ifndef DD_NEW_SQRT
+#define DD_NEW_SQRT 1
+#endif
+
+
 namespace kv {
 
 
@@ -97,9 +106,9 @@ class dd {
 		split(na, a1, a2);
 		split(nb, b1, b2);
 		if (std::fabs(x) > th2) {
-			y = a2 * b2 - ((((x * 0.5) - (a1 * 0.5)  * b1) * 2. - a2 * b1) - a1 * b2);
+			y = ((((a1 * 0.5) * b1 - (x * 0.5)) * 2 + a2 * b1) + a1 * b2) + a2 * b2;
 		} else {
-			y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+			y = (((a1 * b1 - x) + a2 * b1) + a1 * b2) + a2 * b2;
 		}
 	}
 
@@ -273,15 +282,14 @@ class dd {
 		if (std::fabs(z1) == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		}
+
+		// x.a2 * y.a2 is very small but sometimes important
+		#if DD_FASTMULT == 1
+		z2 += x.a1 * y.a2 + x.a2 * y.a1;
+		#else
 		z2 += x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
-		#if 0
-		// boost LU successfully run on Linux -m32
-		volatile double v, v2;
-		v = z2;
-		v2 = x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
-		v += v2;
-		z2 = v; 
 		#endif
+
 		twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -447,6 +455,27 @@ class dd {
 		return s;
 	}
 
+#if DD_NEW_SQRT == 1
+	friend dd sqrt(const dd& x) {
+		double z1, z2, z3, z4;
+
+		if (x < 0.) {
+			throw std::domain_error("dd: sqrt of negative value");
+                }
+
+		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
+		z1 = std::sqrt(x.a1);
+		twoproduct(-z1, z1, z3, z4);
+		z2 = ((z3 + x.a1) + x.a2 + z4) / (2 * z1);
+		twosum(z1, z2, z3, z4);
+
+		return dd(z3, z4);
+	}
+#else
 	friend dd sqrt(const dd& x) {
 		dd r;
 
@@ -455,10 +484,15 @@ class dd {
                 }
 
 		if (x == 0.) return dd(0.);
+		if (x.a1 == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1, 0.);
+		}
+
 		r = std::sqrt(x.a1);
 		r = (r + x / r) * 0.5;
 		return r;
 	}
+#endif
 
 	friend dd abs(const dd& x) {
 		if (x.a1 >= 0.) {
