@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_NV_HPP
@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -38,7 +39,7 @@ ode_nv(F f, ub::vector<T>& init, const T& start, T& end, ode_param<T> p = ode_pa
 	T deltat;
 	ub::vector<T> result;
 
-	T m, m_tmp;
+	T m;
 
 	T radius, radius_tmp;
 	T tolerance;
@@ -46,13 +47,12 @@ ode_nv(F f, ub::vector<T>& init, const T& start, T& end, ode_param<T> p = ode_pa
 
 	bool save_mode, save_uh, save_rh;
 
-	m = p.epsilon;
+	m = 1.;
 	for (i=0; i<n; i++) {
 		using std::abs;
-		m_tmp = abs(init(i)) * p.epsilon;
-		if (m_tmp > m) m = m_tmp;
+		m = std::max(m, abs(init(i)));
 	}
-	tolerance = m;
+	tolerance = m * p.epsilon;
 
 	x = init;
 	torg.v.resize(2);
@@ -88,8 +88,8 @@ ode_nv(F f, ub::vector<T>& init, const T& start, T& end, ode_param<T> p = ode_pa
 		for (j = p.order; j>=1; j--) {
 			m = 0.;
 			for (i=0; i<n; i++) {
-				m_tmp = (x(i).v(j) >= 0.) ? x(i).v(j) : -x(i).v(j);
-				if (m_tmp > m) m = m_tmp;
+				using std::abs;
+				m = std::max(m, abs(x(i).v(j)));
 			}
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./j);

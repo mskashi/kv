@@ -4,6 +4,7 @@
  *
  * written	Jun. 4, 2015	A. Takayasu
  * modified	by Masahide Kashiwagi
+ * modified Oct. 11, 2015 A. Takayasu
  */
 
 #ifndef EIG_HPP
@@ -180,6 +181,107 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 	return true;
 }
 
+template <class T> bool lu_factorize_comp(ub::matrix<kv::complex<T> >& A, ub::vector<int>& p)// Numerical recipe in C (ludcmp)
+{
+  int i,j,k,imax;
+  int n = A.size1();
+
+  ub::vector<T> vv;
+  vv.resize(n);
+
+  T big, temp;
+  kv::complex<T> sum, dum;
+
+  using std::abs;
+
+  for (i = 0; i < n; i++) {
+    big = 0.0;
+    for (j = 0; j < n; j++) {
+      if ((temp = abs(A(i,j))) > big) {
+        big = temp;
+      }
+    }
+    if (big == 0.0) {
+      std::cout << "Singular matrix in lu_factorize_comp" << std::endl;
+      return false;
+    }
+    vv(i) = 1.0/big;
+  }
+
+  for (j = 0; j < n; j++) {
+    for (i = 0; i < j; i++) {
+      sum = A(i,j);
+      for (k = 0; k < i; k++) {
+        sum -= A(i,k)*A(k,j);
+      }
+      A(i,j) = sum;
+    }
+    big = 0.0;
+    for (i = j; i < n; i++) {
+      sum = A(i,j);
+      for (k = 0; k < j; k++) {
+        sum -= A(i,k)*A(k,j);
+      }
+      A(i,j) = sum;
+      if ((temp=vv(i)*abs(sum)) >= big) {
+        big = temp;
+        imax = i;
+      }
+    }
+    if (j != imax) {
+      for (k = 0; k < n; k++) {
+        dum = A(imax,k);
+        A(imax,k) = A(j,k);
+        A(j,k) = dum;
+      }
+      vv(imax) = vv(j);
+    }
+    p(j) = imax;
+    if (abs(A(j,j)) == 0) {
+      std::cout << "Singular matrix in lu_factorize_comp" << std::endl;
+      return false;
+    }
+    if (j != n) {
+      dum = 1./(A(j,j));
+      for (i = j+1; i < n; i++) {
+        A(i,j) *= dum;
+      }
+    }
+  }
+  return true;
+}
+
+template <class T> bool lu_substitute_comp(const ub::matrix<kv::complex<T> >& A, const ub::vector<int>& p, ub::vector<kv::complex<T> >& b)// Numerical recipe in C (lubksb)
+{
+  int i, ii=0, ip, j;
+  int n = A.size1();
+  kv::complex<T> sum;
+
+  using std::abs;
+
+  for (i = 0; i < n; i++) {
+    ip = p(i);
+    sum = b(ip);
+    b(ip) = b(i);
+    if (ii==0) {
+      for (j = ii; j <= i-1; j++) {
+        sum -= A(i,j)*b(j);
+      }
+    } else if (abs(sum) != 0) {
+      ii = i;
+    }
+    b(i) = sum;
+  }
+  for (i = n-1; i >= 0; i--) {
+      sum = b(i);
+      for (j = i+1; j < n; j++) {
+        sum -= A(i,j)*b(j);
+      }
+      b(i) = sum/A(i,i);
+  }
+  return true;
+}
+
 template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, ub::matrix< kv::complex<T> >& V, ub::matrix< kv::complex<T> >& D)
 {
 	int i, j, k, l;
@@ -285,16 +387,30 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 						a12 = A(j-2,j-1);
 						a21 = A(j-1,j-2);
 						a22 = A(j-1,j-1)-D(i-1,i-1);
-						ck  = -1/(a11*a22-a12*a21);
-						X(j-2,i-1) = ck*(a22*b1-a12*b2);
-						X(j-1,i-1) = ck*(-a21*b1+a11*b2);
+						ub::matrix<kv::complex<T> > LU(2,2);
+						LU(0,0) = a11; LU(0,1) = a12; LU(1,0) = a21; LU(1,1) = a22;
+						ub::vector<kv::complex<T> > b(2);
+						b(0) = b1; b(1) = b2;
+						ub::vector<int> pm(n);
+						lu_factorize_comp(LU,pm);
+						lu_substitute_comp(LU,pm,b);
+						// ck  = -1/(a11*a22-a12*a21);
+	          // X(j-2,i-1) = ck*(a22*b1-a12*b2);
+	          // X(j-1,i-1) = ck*(-a21*b1+a11*b2);
+						X(j-2,i-1) = b(0);
+						X(j-1,i-1) = b(1);
 						j -= 2;
 					} else {
 						// A(i,i) is eigen value
 						for (k = j+1; k <= fmin(i+1,n); k++) {
 							X(j-1,i-1) = X(j-1,i-1) + A(j-1,k-1)*X(k-1,i-1);
 						}
-						X(j-1,i-1) = -X(j-1,i-1)/(D(j-1,j-1)-D(i-1,i-1));
+						// X(j-1,i-1) = -X(j-1,i-1)/(D(j-1,j-1)-D(i-1,i-1));
+						if ((D(j-1,j-1)-D(i-1,i-1)).real()==0 && (D(j-1,j-1)-D(i-1,i-1)).imag()==0 && X(j-1,i-1).real()==0 && X(j-1,i-1).imag()==0) {
+							X(j-1,i-1) = 0; // d(j) = d(i)
+						} else {
+							X(j-1,i-1) = -X(j-1,i-1)/(D(j-1,j-1)-D(i-1,i-1));
+						}
 						j--;
 					}
 				}
@@ -489,107 +605,6 @@ template <class T> bool veig(const ub::matrix< kv::interval<T> >& A, ub::vector<
 		v(i) = kv::complex< kv::interval<T> >(d(i),d(i+n));
 	}
 	return true;
-}
-
-template <class T> bool lu_factorize_comp(ub::matrix<kv::complex<T> >& A, ub::vector<int>& p)// Numerical recipe in C (ludcmp)
-{
-  int i,j,k,imax;
-  int n = A.size1();
-
-  ub::vector<T> vv;
-  vv.resize(n);
-
-  T big, temp;
-  kv::complex<T> sum, dum;
-
-  using std::abs;
-
-  for (i = 0; i < n; i++) {
-    big = 0.0;
-    for (j = 0; j < n; j++) {
-      if ((temp = abs(A(i,j))) > big) {
-        big = temp;
-      }
-    }
-    if (big == 0.0) {
-      std::cout << "Singular matrix in lu_factorize_comp" << std::endl;
-      return false;
-    }
-    vv(i) = 1.0/big;
-  }
-
-  for (j = 0; j < n; j++) {
-    for (i = 0; i < j; i++) {
-      sum = A(i,j);
-      for (k = 0; k < i; k++) {
-        sum -= A(i,k)*A(k,j);
-      }
-      A(i,j) = sum;
-    }
-    big = 0.0;
-    for (i = j; i < n; i++) {
-      sum = A(i,j);
-      for (k = 0; k < j; k++) {
-        sum -= A(i,k)*A(k,j);
-      }
-      A(i,j) = sum;
-      if ((temp=vv(i)*abs(sum)) >= big) {
-        big = temp;
-        imax = i;
-      }
-    }
-    if (j != imax) {
-      for (k = 0; k < n; k++) {
-        dum = A(imax,k);
-        A(imax,k) = A(j,k);
-        A(j,k) = dum;
-      }
-      vv(imax) = vv(j);
-    }
-    p(j) = imax;
-    if (abs(A(j,j)) == 0) {
-      std::cout << "Singular matrix in lu_factorize_comp" << std::endl;
-      return false;
-    }
-    if (j != n) {
-      dum = 1./(A(j,j));
-      for (i = j+1; i < n; i++) {
-        A(i,j) *= dum;
-      }
-    }
-  }
-  return true;
-}
-
-template <class T> bool lu_substitute_comp(const ub::matrix<kv::complex<T> >& A, const ub::vector<int>& p, ub::vector<kv::complex<T> >& b)// Numerical recipe in C (lubksb)
-{
-  int i, ii=0, ip, j;
-  int n = A.size1();
-  kv::complex<T> sum;
-
-  using std::abs;
-
-  for (i = 0; i < n; i++) {
-    ip = p(i);
-    sum = b(ip);
-    b(ip) = b(i);
-    if (ii==0) {
-      for (j = ii; j <= i-1; j++) {
-        sum -= A(i,j)*b(j);
-      }
-    } else if (abs(sum) != 0) {
-      ii = i;
-    }
-    b(i) = sum;
-  }
-  for (i = n-1; i >= 0; i--) {
-      sum = b(i);
-      for (j = i+1; j < n; j++) {
-        sum -= A(i,j)*b(j);
-      }
-      b(i) = sum/A(i,i);
-  }
-  return true;
 }
 
 template <class T> bool invert_comp(const ub::matrix<kv::complex<T> >& A, ub::matrix<kv::complex<T> >& R)

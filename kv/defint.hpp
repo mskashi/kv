@@ -130,7 +130,11 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 		radius = 0.;
 		n_rad = 0;
 		for (i=order; i>=1; i--) {
-			m = norm(y.v(i));
+			#ifdef DEFINT_STEPSIZE_MAG
+			m = mag(y.v(i));
+			#else
+			m = mig(y.v(i));
+			#endif
 			if (m == 0.) continue;
 			radius_tmp = std::pow((double)m, 1./i);
 			if (radius_tmp > radius) radius = radius_tmp;
@@ -195,6 +199,10 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 				radius /= std::pow((double)m, 1. / order);
 			}
 		}
+		#ifdef DEFINT_SHOW_STEPSIZE
+		std::cout << "stepsize: " << step << "\n";
+		#endif
+
 		result += z;
 		if (flag) break;
 		t = t1;

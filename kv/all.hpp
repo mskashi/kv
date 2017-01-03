@@ -5,6 +5,7 @@
 #include <kv/allsol.hpp>
 #include <kv/autodif.hpp>
 #include <kv/bessel.hpp>
+#include <kv/beta.hpp>
 #include <kv/cardano-ferrari.hpp>
 #include <kv/complex.hpp>
 #include <kv/constants.hpp>
@@ -16,12 +17,15 @@
 #include <kv/defint-singular.hpp>
 #include <kv/dka.hpp>
 #include <kv/doubleintegral.hpp>
+#include <kv/eig.hpp>
 #include <kv/fpu53.hpp>
 #include <kv/gamma.hpp>
 #include <kv/gnuplot.hpp>
+#include <kv/hypergeom.hpp>
 #include <kv/hwround.hpp>
-#include <kv/interval-vector.hpp>
 #include <kv/interval.hpp>
+#include <kv/interval-vector.hpp>
+#include <kv/interval-conv.hpp>
 #include <kv/jointrange.hpp>
 #include <kv/kraw-approx.hpp>
 #include <kv/lobachevsky.hpp>

@@ -975,7 +975,7 @@ template <class T> class psa {
 		return polyrange(x.v, 0, s-1, psa::domain());
 	}
 
-	friend T eval(const psa& x, const T& a) {
+	template <class T1> friend T1 eval(const psa& x, const T1& a) {
 		int s = x.v.size();
 
 		return polyrange(x.v, 0, s-1, a);
@@ -984,10 +984,10 @@ template <class T> class psa {
 	/*
 	 *  evaluate { p[x] + p[x+1]t + ... p[y]t^(y-x) | a \in d }
 	 */
-	static T inline polyrange (const ub::vector<T>& p, int x, int y, const T& d)
+	template <class T1> static T1 inline polyrange (const ub::vector<T>& p, int x, int y, const T1& d)
 	{
 		int i;
-		T r;
+		T1 r;
 
 		r = p(y);
 
@@ -1001,4 +1001,4 @@ template <class T> class psa {
 
 } // namespace kv
 
-#endif //PSA_HPP
+#endif // PSA_HPP

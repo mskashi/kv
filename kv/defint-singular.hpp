@@ -366,7 +366,11 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 	radius = 0.;
 	n_rad = 0;
 	for (i=order; i>=1; i--) {
-		m = norm(y.v(i)) / ((double)mid(power)+i+1);
+		#ifdef DEFINT_STEPSIZE_MAG
+		m = mag(y.v(i) / ((double)mid(power)+i+1));
+		#else
+		m = mig(y.v(i) / ((double)mid(power)+i+1));
+		#endif
 		if (m == 0.) continue;
 		radius_tmp = std::pow((double)m, 1./((double)mid(power)+i+1));
 		if (radius_tmp > radius) radius = radius_tmp;
@@ -435,6 +439,10 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 			radius /= std::pow((double)m, 1. / ((double)mid(power)+order+1));
 		}
 	}
+
+	#ifdef DEFINT_SHOW_STEPSIZE
+	std::cout << "stepsize: " << step << "\n";
+	#endif
 
 	psa< interval<T> >::mode() = save_mode;
 	psa< interval<T> >::use_history() = save_uh;
@@ -505,8 +513,13 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 	radius = 0.;
 	n_rad = 0;
 	for (i=order; i>=1; i--) {
-		m = norm(y2.v(i)) * std::fabs((i+1)*std::log(0.1)-1.)/(i+1.)/(i+1.);
-		m = std::max(m, norm(y.v(i+1)));
+		#ifdef DEFINT_STEPSIZE_MAG
+		m = mag(y2.v(i) * ((i+1)*std::log(0.1)-1.)/(i+1.)/(i+1.));
+		m = std::max(m, mag(y.v(i+1)));
+		#else
+		m = mig(y2.v(i) * ((i+1)*std::log(0.1)-1.)/(i+1.)/(i+1.));
+		m = std::max(m, mig(y.v(i+1)));
+		#endif
 		if (m == 0.) continue;
 		radius_tmp = std::pow((double)m, 1./(i+1));
 		if (radius_tmp > radius) radius = radius_tmp;
@@ -578,6 +591,10 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 		}
 	}
 
+	#ifdef DEFINT_SHOW_STEPSIZE
+	std::cout << "stepsize: " << step << "\n";
+	#endif
+
 	psa< interval<T> >::mode() = save_mode;
 	psa< interval<T> >::use_history() = save_uh;
 	psa< interval<T> >::record_history() = save_rh;
@@ -639,7 +656,11 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 	radius = 0.;
 	n_rad = 0;
 	for (i=order; i>=1; i--) {
-		m = norm(y.v(i));
+		#ifdef DEFINT_STEPSIZE_MAG
+		m = mag(y.v(i));
+		#else
+		m = mig(y.v(i));
+		#endif
 		if (m == 0.) continue;
 		radius_tmp = std::pow((double)m, 1./i);
 		if (radius_tmp > radius) radius = radius_tmp;
@@ -703,6 +724,10 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 			radius /= std::pow((double)m, 1. / order);
 		}
 	}
+
+	#ifdef DEFINT_SHOW_STEPSIZE
+	std::cout << "stepsize: " << step << "\n";
+	#endif
 
 	psa< interval<T> >::mode() = save_mode;
 	psa< interval<T> >::use_history() = save_uh;
