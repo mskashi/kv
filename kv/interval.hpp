@@ -953,6 +953,22 @@ template <class T> class interval {
 		return exp(y * log(x));
 	}
 
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value && ! boost::is_integral<C>::value, interval>::type pow(const interval& x, const C& y) {
+		return pow(x, interval(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, interval>::type pow(const interval& x, const C& y) {
+		return pow(x, interval(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, interval>::type pow(const C& x, const interval& y) {
+		return pow(interval(x), y);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, interval>::value, interval>::type pow(const C& x, const interval& y) {
+		return pow(interval(x), y);
+	}
+
 	// power by integer (i is passed by double)
 	static interval ipower(const interval& x, double i) {
 		double tmp;

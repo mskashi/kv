@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AUTODIF_HPP
@@ -21,13 +21,13 @@ namespace ub = boost::numeric::ublas;
 
 namespace kv {
 
-	template <class T> class autodif;
-	template <class C, class T> struct convertible<C, autodif<T> > {
-		static const bool value = convertible<C, T>::value || boost::is_same<C, autodif<T> >::value;
-	};
-	template <class C, class T> struct acceptable_n<C, autodif<T> > {
-		static const bool value = convertible<C, T>::value;
-	};
+template <class T> class autodif;
+template <class C, class T> struct convertible<C, autodif<T> > {
+	static const bool value = convertible<C, T>::value || boost::is_same<C, autodif<T> >::value;
+};
+template <class C, class T> struct acceptable_n<C, autodif<T> > {
+	static const bool value = convertible<C, T>::value;
+};
 
 
 template <class T> class autodif {
@@ -260,7 +260,6 @@ template <class T> class autodif {
 		return s;
 	}
 
-
 	friend autodif pow(const autodif& x, int y) {
 		autodif r;
 
@@ -274,6 +273,13 @@ template <class T> class autodif {
 		return exp(y * log(x));
 	}
 
+	template <class C> friend typename boost::enable_if_c< kv::acceptable_n<C, autodif>::value && ! boost::is_integral<C>::value, autodif >::type pow(const autodif& a, const C& b) {
+		return pow(a, autodif(b));
+	}
+
+	template <class C> friend typename boost::enable_if_c< kv::acceptable_n<C, autodif>::value, autodif >::type pow(const C& a, const autodif& b) {
+		return pow(autodif(a), b);
+	}
 
 	friend autodif exp (const autodif& x) {
 		autodif r;

@@ -287,21 +287,15 @@ template <class T> class complex {
 	}
 
 	friend complex pow(const complex& x, const complex& y) {
-		using std::exp;
-		using std::log;
 		return exp(y * log(x));
 	}
 
-	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type pow(const complex& x, const C& y) {
-		using std::exp;
-		using std::log;
-		return exp(y * log(x));
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value && ! boost::is_integral<C>::value, complex >::type pow(const complex& x, const C& y) {
+		return pow(x, complex(y));
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, complex>::value, complex >::type pow(const C& x, const complex& y) {
-		using std::exp;
-		using std::log;
-		return exp(y * log(x));
+		return pow(complex(x), y);
 	}
 
 	friend complex exp(const complex& x) {

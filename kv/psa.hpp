@@ -886,6 +886,14 @@ template <class T> class psa {
 		return r;
 	}
 
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value && ! boost::is_integral<C>::value, psa >::type pow(const psa& a, const C& b) {
+		return pow(a, psa(b));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value, psa >::type pow(const C& a, const psa& b) {
+		return pow(psa(a), b);
+	}
+
 	friend psa pow(const psa& x, int y) {
 		psa r, xp;
 		int a, tmp;

@@ -141,7 +141,7 @@ template <class T> class affine {
 
 	template <class C> explicit affine(const C& x, typename boost::enable_if_c< acceptable_s<C, affine>::value >::type* =0) {
 		int i;
-		interval<T> I = x;
+		interval<T> I(x);
 		maxnum()++;
 		a.resize(maxnum()+1);
 
@@ -170,7 +170,7 @@ template <class T> class affine {
 
 	template <class C> typename boost::enable_if_c< acceptable_s<C, affine>::value, affine& >::type operator=(const C& x) {
 		int i;
-		interval<T> I = interval<T>(x);
+		interval<T> I(x);
 		maxnum()++;
 		a.resize(maxnum()+1);
 
@@ -320,8 +320,8 @@ template <class T> class affine {
 		#endif
 
 		rop<T>::begin();
-		r.a(0) = rop<T>::add_down(x.a(0), y);
-		err = rop<T>::sub_up(rop<T>::add_up(x.a(0), y), r.a(0));
+		r.a(0) = rop<T>::add_down(x.a(0), (T)y);
+		err = rop<T>::sub_up(rop<T>::add_up(x.a(0), (T)y), r.a(0));
 		rop<T>::end();
 
 		for (i=1; i<xs; i++) {
@@ -357,8 +357,8 @@ template <class T> class affine {
 		#endif
 
 		rop<T>::begin();
-		r.a(0) = rop<T>::add_down(x, y.a(0));
-		err = rop<T>::sub_up(rop<T>::add_up(x, y.a(0)), r.a(0));
+		r.a(0) = rop<T>::add_down((T)x, y.a(0));
+		err = rop<T>::sub_up(rop<T>::add_up((T)x, y.a(0)), r.a(0));
 		rop<T>::end();
 
 		for (i=1; i<ys; i++) {
@@ -482,8 +482,8 @@ template <class T> class affine {
 		#endif
 
 		rop<T>::begin();
-		r.a(0) = rop<T>::sub_down(x.a(0), y);
-		err = rop<T>::sub_up(rop<T>::sub_up(x.a(0), y), r.a(0));
+		r.a(0) = rop<T>::sub_down(x.a(0), (T)y);
+		err = rop<T>::sub_up(rop<T>::sub_up(x.a(0), (T)y), r.a(0));
 		rop<T>::end();
 
 		for (i=1; i<xs; i++) {
@@ -519,8 +519,8 @@ template <class T> class affine {
 		#endif
 
 		rop<T>::begin();
-		r.a(0) = rop<T>::sub_down(x, y.a(0));
-		err = rop<T>::sub_up(rop<T>::sub_up(x, y.a(0)), r.a(0));
+		r.a(0) = rop<T>::sub_down((T)x, y.a(0));
+		err = rop<T>::sub_up(rop<T>::sub_up((T)x, y.a(0)), r.a(0));
 		rop<T>::end();
 
 		for (i=1; i<ys; i++) {
@@ -577,7 +577,7 @@ template <class T> class affine {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, affine>::value, affine >::type operator*(const affine& x, const C& y) {
 		affine r;
 		int xs, i;
-		T err = 0.;
+		T err(0.);
 
 		xs = x.a.size();
 
@@ -590,10 +590,10 @@ template <class T> class affine {
 
 		rop<T>::begin();
 		for (i=0; i<xs; i++) {
-			r.a(i) = rop<T>::mul_down(x.a(i), y);
+			r.a(i) = rop<T>::mul_down(x.a(i), (T)y);
 		}
 		for (i=0; i<xs; i++) {
-			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(i), y), r.a(i)));
+			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x.a(i), (T)y), r.a(i)));
 		}
 		rop<T>::end();
 
@@ -602,7 +602,7 @@ template <class T> class affine {
 		#endif
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
-		r.er = rop<T>::add_up(rop<T>::mul_up(x.er, ((y >= 0.) ? y : -y)), err);
+		r.er = rop<T>::add_up(rop<T>::mul_up(x.er, (T)((y >= 0.) ? y : -y)), err);
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -614,7 +614,7 @@ template <class T> class affine {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, affine>::value, affine >::type operator*(const C& x, const affine& y) {
 		affine r;
 		int ys, i;
-		T err = 0.;
+		T err(0.);
 
 		ys = y.a.size();
 
@@ -627,10 +627,10 @@ template <class T> class affine {
 
 		rop<T>::begin();
 		for (i=0; i<ys; i++) {
-			r.a(i) = rop<T>::mul_down(x, y.a(i));
+			r.a(i) = rop<T>::mul_down((T)x, y.a(i));
 		}
 		for (i=0; i<ys; i++) {
-			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up(x, y.a(i)), r.a(i)));
+			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::mul_up((T)x, y.a(i)), r.a(i)));
 		}
 		rop<T>::end();
 
@@ -639,7 +639,7 @@ template <class T> class affine {
 		#endif
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
-		r.er = rop<T>::add_up(rop<T>::mul_up(y.er, ((x >= 0.) ? x : -x)), err);
+		r.er = rop<T>::add_up(rop<T>::mul_up(y.er, (T)((x >= 0.) ? x : -x)), err);
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -952,7 +952,7 @@ template <class T> class affine {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, affine>::value, affine >::type operator/(const affine& x, const C& y) {
 		affine r;
 		int xs, i;
-		T err = 0.;
+		T err(0.);
 
 		xs = x.a.size();
 
@@ -965,10 +965,10 @@ template <class T> class affine {
 
 		rop<T>::begin();
 		for (i=0; i<xs; i++) {
-			r.a(i) = rop<T>::div_down(x.a(i), y);
+			r.a(i) = rop<T>::div_down(x.a(i), (T)y);
 		}
 		for (i=0; i<xs; i++) {
-			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::div_up(x.a(i), y), r.a(i)));
+			err = rop<T>::add_up(err, rop<T>::sub_up(rop<T>::div_up(x.a(i), (T)y), r.a(i)));
 		}
 		rop<T>::end();
 
@@ -978,7 +978,7 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		// r.er = x.er / abs(y) + err;
 		rop<T>::begin();
-		r.er = rop<T>::add_up(err, rop<T>::div_up(x.er, ((y >= 0.) ? y : -y)));
+		r.er = rop<T>::add_up(err, rop<T>::div_up(x.er, (T)((y >= 0.) ? y : -y)));
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -1338,6 +1338,53 @@ template <class T> class affine {
 		#endif
 
 		return r;
+	}
+
+	// lazy implementation of integer pow
+	friend affine pow(const affine& x, int y) {
+		affine r, xp;
+		int a, tmp;
+
+		if (y == 0) return affine(1.);
+
+		a = (y >= 0) ? y : -y;
+
+		tmp = a;
+		r = 1.;
+		xp = x;
+		while (tmp != 0) {
+			if (tmp % 2 != 0) {
+				r *= xp;
+			}
+			tmp /= 2;
+			xp = xp * xp;
+		}
+
+		if (y < 0) {
+			r = 1. / r;
+		}
+
+		return r;
+	}
+
+	friend affine pow(const affine& x, const affine& y) {
+		return exp(y * log(x));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, affine>::value && ! boost::is_integral<C>::value, affine >::type pow(const affine& x, const C& y) {
+		return pow(x, affine(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, affine>::value, affine >::type pow(const affine& x, const C& y) {
+		return pow(x, affine(y));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, affine>::value, affine >::type pow(const C& x, const affine& y) {
+		return pow(affine(x), y);
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, affine>::value, affine >::type pow(const C& x, const affine& y) {
+		return pow(affine(x), y);
 	}
 
 	// lazy implementation of sin

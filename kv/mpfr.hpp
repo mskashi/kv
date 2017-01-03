@@ -442,7 +442,7 @@ template <int N = 53> class mpfr {
 		return r;
 	}
 
-	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, mpfr >::type pow(const mpfr& x, const C& y) {
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value && ! boost::is_integral<C>::value, mpfr >::type pow(const mpfr& x, const C& y) {
 		return pow(x, mpfr(y));
 	}
 

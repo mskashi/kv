@@ -617,6 +617,500 @@ class dd {
 	operator double() const {
 		return (double)a1;
 	}
+
+	friend dd pow(const dd& x, int y) {
+		dd r, xp;
+		int a, tmp;
+
+		if (y == 0) return dd(1.);
+
+		a = (y >= 0) ? y : -y;
+
+		tmp = a;
+		r = 1.;
+		xp = x;
+		while (tmp != 0) {
+			if (tmp % 2 != 0) {
+				r *= xp;
+			}
+			tmp /= 2;
+			xp = xp * xp;
+		}
+
+		if (y < 0) {
+			r = 1. / r;
+		}
+
+		return r;
+	}
+
+	friend dd pow(const dd& x, const dd& y) {
+		return exp(y * log(x));
+	}
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value && ! boost::is_integral<C>::value, dd >::type pow(const dd& x, const C& y) {
+                return pow(x, dd(y));
+        }
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, dd >::type pow(const dd& x, const C& y) {
+                return pow(x, dd(y));
+        }
+
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, dd >::type pow(const C& x, const dd& y) {
+                return pow(dd(x), y);
+        }
+
+	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, dd >::type pow(const C& x, const dd& y) {
+                return pow(dd(x), y);
+        }
+
+	// power by integer (i is passed by double)
+	static dd ipower(const dd& x, double i) {
+		double tmp;
+		dd xp = x;
+		dd r(1.);
+
+		while (i != 0.) {
+			i *= 0.5;
+			using std::floor;
+			tmp = floor(i);
+			if (tmp != i) {
+				i = tmp;
+				r *= xp;
+			}
+			xp = xp * xp;
+		}
+
+		return r;
+	}
+
+	friend dd exp(const dd& x) {
+		dd x_i, x_f, tmp;
+		dd r, y;
+		int i;
+
+		if (x == dd(std::numeric_limits<double>::infinity(), 0.)) {
+			return dd(std::numeric_limits<double>::infinity(), 0.);
+		}
+		if (x == -dd(std::numeric_limits<double>::infinity(), 0.)) {
+			return (dd)0.;
+		}
+
+		if (x >= 0.) {
+			x_i = floor(x);
+			x_f = x - x_i;
+			if (x_f >= 0.5) {
+				x_f -= 1.;
+				x_i += 1.;
+			}
+		} else {
+			x_i = -floor(-x);
+			x_f = x - x_i;
+			if (x_f <= -0.5) {
+				x_f += 1.;
+				x_i -= 1.;
+			}
+		}
+
+		r = 1.;
+		y = 1.;
+		for (i=1;  i<=25 ; i++) {
+			y *= x_f;
+			y /= i;
+			r += y;
+		}
+
+		if (x_i >= 0.) {
+			// r *= pow(constants<dd>::e(), (int)x_i);
+			r *= ipower(constants<dd>::e(), (double)x_i);
+		} else {
+			// r /= pow(constants<dd>::e(), -(int)x_i);
+			r /= ipower(constants<dd>::e(), -(double)x_i);
+		}
+
+		return r;
+	}
+
+	static dd expm1_origin(const dd& x) {
+		dd r, y;
+		int i;
+
+		r = 0.;
+		y = 1.;
+		for (i=1; i<=25 ; i++) {
+			y *= x;
+			y /= i;
+			r += y;
+		}
+
+		return r;
+	}
+
+	friend dd expm1(const dd& x) {
+		if (x >= -0.5 && x <= 0.5) {
+			return expm1_origin(x);
+		} else {
+			return exp(x) - 1.;
+		}
+	}
+
+	friend dd log(const dd& x) {
+		dd x2, x2m1;
+		dd r;
+		dd xn;
+		dd sqrt2 = sqrt(dd(2.));
+		int p_i;
+		dd p;
+		int i;
+
+		if (x == dd(std::numeric_limits<double>::infinity(), 0.)) {
+			return dd(std::numeric_limits<double>::infinity(), 0.);
+		}
+		if (x == 0.) {
+			return -dd(std::numeric_limits<double>::infinity(), 0.);
+		}
+
+		x2 = frexp(x, &p_i);
+		p = p_i;
+
+		while (x2 > 4. * std::sqrt(2.) - 4.) {
+			x2 *= 0.5;
+			p += 1.;
+		}
+		while (x2 > 4. - 2. * std::sqrt(2.)) {
+			x2 /= sqrt2;
+			p += 0.5;
+		}
+		while (x2 < 2. - std::sqrt(2.)) {
+			x2 *= 2.;
+			p -= 1.;
+		}
+		while (x2 < 2. * std::sqrt(2.) - 2.) {
+			x2 *= sqrt2;
+			p -= 0.5;
+		}
+
+		x2m1 = x2 - 1.;
+		r = 0.;
+		xn = -1.;
+		for (i=1; i<=45; i++) {
+			xn = -xn * x2m1; 
+			r += xn / i;
+		}
+
+		r += constants<dd>::ln2() * p;
+
+		return r;
+	}
+
+	static dd log1p_origin(const dd& x) {
+		dd r;
+		dd xn;
+		int i;
+
+		r = 0.;
+		xn = -1.;
+		for (i=1; i<=45 ; i++) {
+			xn = -xn * x; 
+			r += xn / i;
+		}
+
+		return r;
+	}
+
+	friend dd log1p(const dd& x) {
+
+		if (x >= -(3. - 2. * std::sqrt(2.)) && x <= 3. - 2. * std::sqrt(2.)) {
+			return log1p_origin(x);
+		} else {
+			return log(x + 1.);
+		}
+	}
+
+	static dd sin_origin(const dd& I) {
+		dd r, y;
+		int i;
+
+		r = 0.;
+		y = 1.;
+		for (i=1; i<=28 ; i++) {
+			y *= I;
+			y /= i;
+			if (i % 2 != 0) {
+				if (i % 4 == 1) {
+					r += y;
+				} else {
+					r -= y;
+				}
+			}
+		}
+
+		return r;
+	}
+
+	static dd cos_origin(const dd& I) {
+		dd r, y;
+		int i;
+
+		r = 1.;
+		y = 1.;
+		for (i=1; i<=28 ; i++) {
+			y *= I;
+			y /= i;
+			if (i % 2 == 0) {
+				if (i % 4 == 0) {
+					r += y;
+				} else {
+					r -= y;
+				}
+			}
+		}
+
+		return r;
+	}
+
+	friend dd sin(const dd& I) {
+		const dd pi = constants<dd>::pi();
+
+		if (I >= pi) {
+			return sin(I - pi * 2.);
+		}
+
+		if (I <= -pi * 3. / 4.) {
+			return -sin_origin(I + pi);
+		}
+		if (I <= -pi * 0.5) {
+			return -cos_origin(-pi * 0.5 - I);
+		}
+		if (I <= -pi * 0.25) {
+			return -cos_origin(I + pi * 0.5);
+		}
+		if (I <= 0.) {
+			return -sin_origin(-I);
+		}
+		if (I <= pi * 0.25) {
+			return sin_origin(I);
+		}
+		if (I <= pi * 0.5) {
+			return cos_origin(pi * 0.5 - I);
+		}
+		if (I <= pi * 3. / 4.) {
+			return cos_origin(I - pi * 0.5);
+		}
+		return sin_origin(pi - I);
+	}
+
+	friend dd cos(const dd& I) {
+		const dd pi = constants<dd>::pi();
+
+		if (I >= pi) {
+			return cos(I - pi * 2.);
+		}
+
+		if (I <= -pi * 3. / 4.) {
+			return -cos_origin(I + pi);
+		}
+		if (I <= -pi * 0.5) {
+			return -sin_origin(-pi * 0.5 - I);
+		}
+		if (I <= -pi * 0.25) {
+			return sin_origin(I + pi * 0.5);
+		}
+		if (I <= 0.) {
+			return cos_origin(-I);
+		}
+		if (I <= pi * 0.25) {
+			return cos_origin(I);
+		}
+		if (I <= pi * 0.5) {
+			return sin_origin(pi * 0.5 - I);
+		}
+		if (I <= pi * 3. / 4.) {
+			return -sin_origin(I - pi * 0.5);
+		}
+		return -cos_origin(pi - I);
+	}
+
+	friend dd tan(const dd& x) {
+		return sin(x) / cos(x);
+	}
+
+	static dd atan_origin(const dd& I) {
+		dd r, y;
+		int i;
+
+		r = 0.;
+		y = 1.;
+		for (i=1; i<=79 ; i++) {
+			y *= I;
+			if (i % 2 != 0) {
+				if (i % 4 == 1) {
+					r += y / i;
+				} else {
+					r -= y / i;
+				}
+			}
+		}
+
+		return r;
+	}
+
+	friend dd atan(const dd& x) {
+		const dd pi = constants<dd>::pi();
+
+		if (x < -(std::sqrt(2.) + 1.)) {
+			return -pi * 0.5 - atan_origin(1. / x);
+		}
+		if (x < -(std::sqrt(2.) - 1.)) {
+			return -pi * 0.25 + atan_origin((1. + x)/(1 - x));
+		}
+		if (x < (std::sqrt(2.) - 1.)) {
+			return atan_origin(x);
+		}
+		if (x < (std::sqrt(2.) + 1.)) {
+			return pi * 0.25 + atan_origin((x - 1.)/(x + 1.));
+		}
+		return pi * 0.5 - atan_origin(1. / x);
+	}
+
+	friend dd asin(const dd& x) {
+		const dd pih = constants<dd>::pi() * 0.5;
+
+		if (x == 1) return pih;
+		if (x == -1) return -pih;
+		using std::abs;
+		if (abs(x) < std::sqrt(6.) / 3.) {
+			return atan(x / sqrt(1. - dd(x) * x));
+		} else {
+			if (x > 0.) {
+				return atan(x / sqrt((1. + dd(x)) * (1. - x)));
+			} else {
+				return atan(x / sqrt((1. + x) * (1. - dd(x))));
+			}
+		}
+	}
+
+	static dd pih_m_atan(const dd& I) {
+		const dd pi = constants<dd>::pi();
+
+		if (I < -(std::sqrt(2.) + 1.)) {
+			return pi + atan_origin(1. / I);
+		}
+		if (I < -(std::sqrt(2.) - 1.)) {
+			return pi * 0.75 - atan_origin((1. + I)/(1 - I));
+		}
+		if (I < (std::sqrt(2.) - 1.)) {
+			return pi * 0.5 - atan_origin(I);
+		}
+		if (I < (std::sqrt(2.) + 1.)) {
+			return pi * 0.25 - atan_origin((I - 1.)/(I + 1.));
+		}
+		return atan_origin(1. / I);
+	}
+
+	friend dd acos(const dd& x) {
+		const dd pi = constants<dd>::pi();
+
+		if (x == 1.) return dd(0.);
+		if (x == -1.) return pi;
+		using std::abs;
+		if (abs(x) < std::sqrt(6.) / 3.) {
+			return pih_m_atan(x / sqrt(1. - dd(x) * x));
+		} else {
+			if (x > 0.) {
+				return pih_m_atan(x / sqrt((1. + dd(x)) * (1. - x)));
+			} else {
+				return pih_m_atan(x / sqrt((1. + x) * (1. - dd(x))));
+			}
+		}
+	}
+
+	friend dd atan2(const dd& y, const dd& x) {
+		const dd pi = constants<dd>::pi();
+
+		if (y <= x && y > -x) {
+			return atan(y / x);
+		}
+		if (y > x && y > -x) {
+			return pi * 0.5 - atan(x / y);
+		}
+		if (y > x && y <= -x) {
+			if (y >= 0.) {
+				return pi + atan(y / x);
+			} else {
+				return -pi + atan(y / x);
+			}
+		}
+		return -pi * 0.5 - atan(x / y);
+	}
+
+	static dd sinh_origin(const dd& x) {
+		dd r, y;
+		int i;
+
+		r = 0.;
+		y = 1.;
+		for (i=1; i<=25 ; i++) {
+			y *= x;
+			y /= i;
+			if (i % 2 != 0) {
+				r += y;
+			}
+		}
+
+		return r;
+	}
+
+	friend dd sinh(const dd& x) {
+		if (x >= -0.5 && x <= 0.5) {
+			return sinh_origin(x);
+		} else {
+			dd tmp;
+			tmp = exp(x);
+			return (tmp - 1./tmp) * 0.5;
+		}
+	}
+
+	friend dd cosh(const dd& x) {
+		dd tmp;
+		tmp = exp(x);
+		return (tmp + 1./tmp) * 0.5;
+	}
+
+	friend dd tanh(const dd& x) {
+		return sinh(x) / cosh(x);
+	}
+
+	friend dd asinh(const dd& x) {
+		if (x < -0.5) {
+			return -log(-x + sqrt(1. + dd(x) * x));
+		} else if (x <= 0.5) {
+			return log1p((1. + x / (1. + sqrt(1. + dd(x) * x))) * x);
+		} else {
+			return log(x + sqrt(1. + dd(x) * x));
+		}
+	}
+
+	friend dd acosh(const dd& x) {
+		if (x == 1.) {
+			return dd(0.);
+		} else if (x <= 1.5) {
+			dd y(x - 1.);
+			return log1p(y + sqrt(y * (dd(x) + 1.)));
+		} else {
+			return log(x + sqrt(dd(x) * x - 1.));
+		}
+	}
+
+	friend dd atanh(const dd& x) {
+		if (x < -0.5) {
+			return 0.5 * log((1. + x) / (1. - dd(x)));
+		} else if (x <= 0.5) {
+			return 0.5 * log1p(2. * x / (1. - dd(x)));
+		} else {
+			return 0.5 * log((1. + dd(x)) / (1. - x));
+		}
+	}
 };
 
 } // namespace kv

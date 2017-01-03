@@ -38,8 +38,6 @@ int main()
 	std::cout << x / y << "\n";
 	std::cout << cp::i() << "\n";
 	std::cout << abs(x) << "\n";
-	// we don't have math functions for dd
-	#ifndef TEST_DD
 	std::cout << arg(x) << "\n";
 	std::cout << sqrt(x) << "\n";
 	std::cout << pow(x, y) << "\n";
@@ -59,5 +57,4 @@ int main()
 	std::cout << asinh(x) << "\n";
 	std::cout << acosh(x) << "\n";
 	std::cout << atanh(x) << "\n";
-	#endif // TEST_DD
 }

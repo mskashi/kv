@@ -40,6 +40,24 @@ int main()
 	d = a / b;
 	std::cout << d << "\n";
 
+	// basic four operations with constant
+	d = a + 2;
+	std::cout << d << "\n";
+	d = a - 2;
+	std::cout << d << "\n";
+	d = a * 2;
+	std::cout << d << "\n";
+	d = a / 2;
+	std::cout << d << "\n";
+	d = 2 + a;
+	std::cout << d << "\n";
+	d = 2 - a;
+	std::cout << d << "\n";
+	d = 2 * a;
+	std::cout << d << "\n";
+	d = 2 / a;
+	std::cout << d << "\n";
+
 	// standard functions
 	d = sqrt(a);
 	std::cout << d << "\n";
