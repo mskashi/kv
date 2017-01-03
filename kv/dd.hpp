@@ -1109,6 +1109,7 @@ class dd {
 		} else {
 			dd tmp;
 			tmp = exp(x);
+			if (tmp == 0.) return -dd(std::numeric_limits<double>::infinity(), 0.);
 			return (tmp - 1./tmp) * 0.5;
 		}
 	}
@@ -1116,6 +1117,7 @@ class dd {
 	friend dd cosh(const dd& x) {
 		dd tmp;
 		tmp = exp(x);
+		if (tmp == 0.) return dd(std::numeric_limits<double>::infinity(), 0.);
 		return (tmp + 1./tmp) * 0.5;
 	}
 

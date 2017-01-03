@@ -123,7 +123,9 @@ int main()
 	std::cout << acos(itv(-0.25, 0.25)) << "\n";
 	std::cout << atan2(itv(1.), itv(1.)) << "\n";
 	std::cout << sinh(itv(-0.25, 0.25)) << "\n";
+	std::cout << sinh(itv(-std::numeric_limits<itv::base_type>::infinity(), -10)) << "\n";
 	std::cout << cosh(itv(-0.25, 0.25)) << "\n";
+	std::cout << cosh(itv(-std::numeric_limits<itv::base_type>::infinity(), -10)) << "\n";
 	std::cout << tanh(itv(-0.25, 0.25)) << "\n";
 	std::cout << asinh(itv(-0.25, 0.25)) << "\n";
 	std::cout << acosh(itv(1.5, 2.)) << "\n";

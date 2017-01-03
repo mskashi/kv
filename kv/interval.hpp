@@ -281,54 +281,80 @@ template <class T> class interval {
 		interval r;
 		T tmp;
 
+		using std::abs;
+
 		rop<T>::begin();
-		if (x.inf > 0.) {
-			if (y.inf > 0.) {
-				r.inf = rop<T>::mul_down(x.inf, y.inf);
-				r.sup = rop<T>::mul_up(x.sup, y.sup);
-			} else if (y.sup < 0.) {
-				r.inf = rop<T>::mul_down(x.sup, y.inf);
-				r.sup = rop<T>::mul_up(x.inf, y.sup);
+		if (x.inf >= 0.) {
+			if (x.sup == 0.) {
+				if (abs(y.inf) == std::numeric_limits<T>::infinity()
+				 || abs(y.sup) == std::numeric_limits<T>::infinity()) {
+					r = whole();
+				} else {
+					r = interval(0., 0.);
+				} 
 			} else {
-				r.inf = rop<T>::mul_down(x.sup, y.inf);
-				if (r.inf != r.inf) r = 0.;
-				r.sup = rop<T>::mul_up(x.sup, y.sup);
-				if (r.sup != r.sup) r = 0.;
+				if (y.inf >= 0.) {
+					if (y.sup == 0.) {
+						if (abs(x.inf) == std::numeric_limits<T>::infinity()
+						 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
+							r = whole();
+						} else {
+							r = interval(0., 0.);
+						} 
+					} else {
+						r.inf = rop<T>::mul_down(x.inf, y.inf);
+						r.sup = rop<T>::mul_up(x.sup, y.sup);
+					}
+				} else if (y.sup <= 0.) {
+					r.inf = rop<T>::mul_down(x.sup, y.inf);
+					r.sup = rop<T>::mul_up(x.inf, y.sup);
+				} else {
+					r.inf = rop<T>::mul_down(x.sup, y.inf);
+					r.sup = rop<T>::mul_up(x.sup, y.sup);
+				}
 			}
-		} else if (x.sup < 0.) {
-			if (y.inf > 0.) {
-				r.inf = rop<T>::mul_down(x.inf, y.sup);
-				r.sup = rop<T>::mul_up(x.sup, y.inf);
-			} else if (y.sup < 0.) {
+		} else if (x.sup <= 0.) {
+			if (y.inf >= 0.) {
+				if (y.sup == 0.) {
+					if (abs(x.inf) == std::numeric_limits<T>::infinity()
+					 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
+						r = whole();
+					} else {
+						r = interval(0., 0.);
+					} 
+				} else {
+					r.inf = rop<T>::mul_down(x.inf, y.sup);
+					r.sup = rop<T>::mul_up(x.sup, y.inf);
+				}
+			} else if (y.sup <= 0.) {
 				r.inf = rop<T>::mul_down(x.sup, y.sup);
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
 			} else {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
-				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
-				if (r.sup != r.sup) r = 0.;
 			}
 		} else {
-			if (y.inf > 0.) {
-				r.inf = rop<T>::mul_down(x.inf, y.sup);
-				if (r.inf != r.inf) r = 0.;
-				r.sup = rop<T>::mul_up(x.sup, y.sup);
-				if (r.sup != r.sup) r = 0.;
-			} else if (y.sup < 0.) {
+			if (y.inf >= 0.) {
+				if (y.sup == 0.) {
+					if (abs(x.inf) == std::numeric_limits<T>::infinity()
+					 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
+						r = whole();
+					} else {
+						r = interval(0., 0.);
+					} 
+				} else {
+					r.inf = rop<T>::mul_down(x.inf, y.sup);
+					r.sup = rop<T>::mul_up(x.sup, y.sup);
+				}
+			} else if (y.sup <= 0.) {
 				r.inf = rop<T>::mul_down(x.sup, y.inf);
-				if (r.inf != r.inf) r = 0.;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
-				if (r.sup != r.sup) r = 0.;
 			} else {
 				r.inf = rop<T>::mul_down(x.inf, y.sup);
-				if (r.inf != r.inf) r = 0.;
 				tmp = rop<T>::mul_down(x.sup, y.inf);
-				if (tmp != tmp) r = 0.;
 				if (tmp < r.inf) r.inf = tmp;
 				r.sup = rop<T>::mul_up(x.inf, y.inf);
-				if (r.sup != r.sup) r = 0.;
 				tmp = rop<T>::mul_up(x.sup, y.sup);
-				if (tmp != tmp) r = 0.;
 				if (tmp > r.sup) r.sup = tmp;
 			}
 		}
@@ -340,17 +366,24 @@ template <class T> class interval {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, interval >::type operator*(const interval& x, const C& y) {
 		interval r;
 
+		using std::abs;
+
 		rop<T>::begin();
 		if (y > 0.) {
 			r.inf = rop<T>::mul_down(x.inf, T(y));
 			r.sup = rop<T>::mul_up(x.sup, T(y));
-		} else {
+		} else if (y < 0.) {
 			r.inf = rop<T>::mul_down(x.sup, T(y));
 			r.sup = rop<T>::mul_up(x.inf, T(y));
+		} else {
+			if (abs(x.inf) == std::numeric_limits<T>::infinity()
+			 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
+				r = whole();
+			} else {
+				r = interval(0., 0.);
+			} 
 		}
 		rop<T>::end();
-		if (r.inf != r.inf) r = 0.;
-		if (r.sup != r.sup) r = 0.;
 
 		return r;
 	}
@@ -362,17 +395,24 @@ template <class T> class interval {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, interval >::type operator*(const C& x, const interval& y) {
 		interval r;
 
+		using std::abs;
+
 		rop<T>::begin();
-		if (x >= 0.) {
+		if (x > 0.) {
 			r.inf = rop<T>::mul_down(T(x), y.inf);
 			r.sup = rop<T>::mul_up(T(x), y.sup);
-		} else {
+		} else if (x < 0.) {
 			r.inf = rop<T>::mul_down(T(x), y.sup);
 			r.sup = rop<T>::mul_up(T(x), y.inf);
+		} else {
+			if (abs(y.inf) == std::numeric_limits<T>::infinity()
+			 || abs(y.sup) == std::numeric_limits<T>::infinity()) {
+				r = whole();
+			} else {
+				r = interval(0., 0.);
+			} 
 		}
 		rop<T>::end();
-		if (r.inf != r.inf) r = 0.;
-		if (r.sup != r.sup) r = 0.;
 
 		return r;
 	}
@@ -1679,6 +1719,9 @@ template <class T> class interval {
 		if (x >= -0.5 && x <= 0.5) {
 			return sinh_origin(x);
 		} else {
+			if (x == -std::numeric_limits<T>::infinity()) {
+				return -interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
+			}
 			interval tmp;
 			tmp = exp_point(x);
 			return (tmp - 1./tmp) * 0.5;
@@ -1690,6 +1733,9 @@ template <class T> class interval {
 	}
 
 	static interval cosh_point(const T& x) {
+		if (x == -std::numeric_limits<T>::infinity()) {
+			return interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
+		}
 		interval tmp;
 		tmp = exp_point(x);
 		return (tmp + 1./tmp) * 0.5;

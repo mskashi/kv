@@ -32,7 +32,9 @@ int main()
 	std::cout << atan(x) << "\n";
 	std::cout << atan2(x, y) << "\n";
 	std::cout << sinh(x) << "\n";
+	std::cout << sinh(-std::numeric_limits<kv::dd>::infinity()) << "\n";
 	std::cout << cosh(x) << "\n";
+	std::cout << cosh(-std::numeric_limits<kv::dd>::infinity()) << "\n";
 	std::cout << tanh(x) << "\n";
 	std::cout << asinh(x) << "\n";
 	std::cout << acosh(x) << "\n";
