@@ -41,6 +41,7 @@ int main()
 	std::cout << cp::i() << "\n";
 	std::cout << abs(x) << "\n";
 	std::cout << arg(x) << "\n";
+	std::cout << conj(x) << "\n";
 	std::cout << sqrt(x) << "\n";
 	std::cout << pow(x, y) << "\n";
 	std::cout << pow(2., y) << "\n";

@@ -293,6 +293,10 @@ template <class T> class complex {
 		return atan2(x.im, x.re);
 	}
 
+	friend complex conj(const complex& x) {
+		return complex(x.re, -x.im);
+	}
+
 	friend complex sqrt(const complex& x) {
 		T a, r;
 		r = sqrt(abs(x));

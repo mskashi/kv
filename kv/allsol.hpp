@@ -66,6 +66,14 @@
 #define UNIFY_REST 1
 #endif
 
+#ifndef EXISTENCE_RATIO
+#define EXISTENCE_RATIO 0.8
+#endif
+
+#ifndef ITER_STOP_RATIO
+#define ITER_STOP_RATIO 0.9
+#endif
+
 
 namespace kv {
 
@@ -657,7 +665,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 		}
 #endif
 
-		if (proper_subset(K, I)) {
+		if (proper_subset(K, I) && allsol_sub::widthratio_max(K, I) < EXISTENCE_RATIO ) {
 			#pragma omp critical (solutions)
 			{
 			// check whether the solution is already found or not
@@ -715,7 +723,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 					I1 = intersect(K, I1);
 					tmp = allsol_sub::widthratio_min(I1, K);
 					K = I1;
-					if (tmp > 0.9) break;
+					if (tmp > ITER_STOP_RATIO) break;
 				}
 				solutions.push_back(K);
 				count_ex++;
