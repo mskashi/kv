@@ -454,6 +454,7 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 	typename std::list< ub::vector< interval<T> > >::iterator p, p2;
 	int i, j, k, mi;
 	T tmp, tmp2;
+	T wmax;
 	bool r, M_calculated, flag, flag2, flag3;
 	interval<T> A, B, J, J2, Itmp;
 
@@ -575,8 +576,20 @@ std::list< ub::vector < interval<T> > >* rest=NULL
 #if USE_ZERODIVIDE == 2
 		flag3 = false; // division of I occurs or not
 #endif
+
+		// maximum width for using TRIM
+		wmax = 0.;
+		for (i=0; i<s; i++) {
+			tmp = width(I(i));
+			if (tmp > wmax) wmax = tmp;
+		}
+		wmax *= RECOVER_RATIO;
+
 		for (i=0; i<s; i++) {
 			for (j=0; j<s; j++) {
+				// do not use TRIM for narrow component
+				if (width(I(j)) < wmax) continue;
+
 				B = fdi(i, j);
 
 				// calculate back A from mvf

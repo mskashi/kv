@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODESCALE_HPP
-#define ODESCAPE_HPP
+#define ODESCALE_HPP
 
 #include <boost/numeric/ublas/vector.hpp>
 

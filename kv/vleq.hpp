@@ -50,7 +50,7 @@ bool vleq(
 	EmRA = E - prod(R, a);
 	norm1 = max_norm(EmRA);
 	rop<T>::begin();
-	norm1 = rop<T>::sub_down(1., norm1);
+	norm1 = rop<T>::sub_down(T(1.), norm1);
 	rop<T>::end();
 
 	if (norm1 <= 0.) return false;

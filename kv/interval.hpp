@@ -687,7 +687,7 @@ template <class T> class interval {
 	}
 
 	friend bool proper_subset(const interval& x, const interval& y) {
-		return y.inf < x.inf && x.sup < y.sup;
+		return subset(x, y) && (y.inf < x.inf || x.sup < y.sup);
 	}
 
 	friend bool overlap(const interval& x, const interval& y) {
@@ -1050,7 +1050,7 @@ template <class T> class interval {
 			return interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
 		}
 		if (x == -std::numeric_limits<T>::infinity()) {
-			return interval(0.);
+			return interval(0., std::numeric_limits<T>::denorm_min());
 		}
 
 		remainder = interval((1./sqrt(constants<interval>::e())).lower(), sqrt(constants<interval>::e()).upper());
