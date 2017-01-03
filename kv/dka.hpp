@@ -6,7 +6,7 @@
 #define DKA_HPP
 
 #include <limits>
-#include <cstdlib>
+#include <cmath>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/math/constants/constants.hpp>
 #include "kv/interval.hpp"

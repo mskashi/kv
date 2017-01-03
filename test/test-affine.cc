@@ -20,6 +20,12 @@ int main()
 	afd a, b, c, d;
 	int i;
 
+	#ifdef TEST_DD
+	std::cout.precision(34);
+	#else
+	std::cout.precision(17);
+	#endif
+
 	// initialize from interval
 	a = itv(2., 3.);
 	std::cout << a << "\n";

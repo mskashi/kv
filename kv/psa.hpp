@@ -873,6 +873,360 @@ template <class T> class psa {
 		return r * 1.;
 	}
 
+	friend psa asin (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = asin(x.v(0)) + integrate(1 / sqrt(1 - taylor * taylor));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
+	friend psa acos (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = acos(x.v(0)) + integrate(-1 / sqrt(1 - taylor * taylor));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
+	friend psa atan (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = atan(x.v(0)) + integrate(1 / (1 + taylor * taylor));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
+	friend psa asinh (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = asinh(x.v(0)) + integrate(1 / sqrt(1 + taylor * taylor));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
+	friend psa acosh (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = acosh(x.v(0)) + integrate(1 / sqrt(taylor * taylor - 1));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
+	friend psa atanh (const psa& x) {
+		psa h, hn, r;
+		psa taylor;
+		int i;
+		int old_size;
+		bool save_uh, save_rh;
+		T save_domain;
+
+		save_uh = use_history();
+		save_rh = record_history();
+		save_domain = domain();
+
+		use_history() = false;
+		record_history() = false;
+
+		h = x; h.v(0) = 0.;
+
+		if (mode() == 2) {
+			domain() = evalrange(x);
+		}
+		taylor.v.resize(2);
+		taylor.v(0) = x.v(0);
+		taylor.v(1) = 1;
+		taylor = setorder(taylor, x.v.size()-2);
+
+		taylor = atanh(x.v(0)) + integrate(1 / (1 - taylor * taylor));
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+		if (mode() == 2) {
+			domain() = save_domain;
+		}
+
+		r = taylor.v(0);
+		hn = 1.;
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+				}
+			}
+			hn *= h;
+			r += taylor.v(i) * hn;
+		}
+
+		use_history() = save_uh;
+		record_history() = save_rh;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
+	}
+
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value && ! boost::is_integral<C>::value, psa >::type pow(const psa& a, const C& b) {
 		return pow(a, psa(b));
 	}

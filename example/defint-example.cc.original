@@ -83,21 +83,6 @@ struct Twilight {
 	}
 };
 
-// from
-//  David H. Bailey, Xiaoye S. Li and Karthik Jeyabalan:
-//  A comparison of three high-precision quadrature schemes,
-//  Experimental Mathematics, vol. 14 (2005), no. 3, pg 317-329.
-//  http://www.davidhbailey.com/dhbpapers/quadrature-em.pdf
-
-struct AMM {
-	template <class T> T operator() (const T& x) {
-		T tmp, tmp2;
-		tmp = 1. + x * x;
-		tmp2 = sqrt(1. + tmp);
-		return atan(tmp2) / tmp / tmp2;
-	}
-};
-
 
 int main() {
 	std::cout.precision(17);
@@ -113,5 +98,5 @@ int main() {
 	std::cout << kv::defint_autostep(Twilight(2), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
 	std::cout << kv::defint_autostep(Twilight(3), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
 	std::cout << kv::defint_autostep(Twilight(4), itv(0), kv::constants<itv>::pi() / 2, 8) << "\n";
-	std::cout << kv::defint_autostep(AMM(), itv(0), itv(1.), 12) << "\n";
+
 }

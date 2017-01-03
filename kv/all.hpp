@@ -27,6 +27,7 @@
 #include <kv/interval-vector.hpp>
 #include <kv/interval-conv.hpp>
 #include <kv/jointrange.hpp>
+#include <kv/kkt.hpp>
 #include <kv/kraw-approx.hpp>
 #include <kv/lobachevsky.hpp>
 #include <kv/lp.hpp>

@@ -48,6 +48,12 @@ int main()
 	std::cout << pow(a, a) << "\n";
 	std::cout << tan(a / 100) << "\n";
 	std::cout << tanh(a / 100) << "\n";
+	std::cout << asin(a / 100) << "\n";
+	std::cout << acos(a / 100) << "\n";
+	std::cout << atan(a / 100) << "\n";
+	std::cout << asinh(a / 100) << "\n";
+	std::cout << acosh(a + 2) << "\n";
+	std::cout << atanh(a / 100) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";
@@ -85,6 +91,12 @@ int main()
 	std::cout << pow(a, a) << "\n";
 	std::cout << tan(a / 100) << "\n";
 	std::cout << tanh(a / 100) << "\n";
+	std::cout << asin(a / 100) << "\n";
+	std::cout << acos(a / 100) << "\n";
+	std::cout << atan(a / 100) << "\n";
+	std::cout << asinh(a / 100) << "\n";
+	std::cout << acosh(a + 2) << "\n";
+	std::cout << atanh(a / 100) << "\n";
 
 	// integrate
 	std::cout << integrate(a) << "\n";

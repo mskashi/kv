@@ -14,6 +14,7 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
@@ -98,15 +99,13 @@ template <class T> class affine {
 	friend inline T rad(const affine& x) {
 		int i, xs;
 		T r(0.);
-		T tmp;
 
 		xs = x.a.size();
 
 		rop<T>::begin();
 		for (i=1; i<xs; i++) {
-			// r = rop<T>::add_up(r, abs(x.a(i)));
-			tmp = (x.a(i) >= 0.) ? x.a(i) : -x.a(i);
-			r = rop<T>::add_up(r, tmp);
+			using std::abs;
+			r = rop<T>::add_up(r, abs(x.a(i)));
 		}
 		#if AFFINE_SIMPLE >= 1
 		r = rop<T>::add_up(r, x.er);
@@ -602,7 +601,8 @@ template <class T> class affine {
 		#endif
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
-		r.er = rop<T>::add_up(rop<T>::mul_up(x.er, (T)((y >= 0.) ? y : -y)), err);
+		using std::abs;
+		r.er = rop<T>::add_up(rop<T>::mul_up(x.er, T(abs(y))), err);
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -639,7 +639,8 @@ template <class T> class affine {
 		#endif
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
-		r.er = rop<T>::add_up(rop<T>::mul_up(y.er, (T)((x >= 0.) ? x : -x)), err);
+		using std::abs;
+		r.er = rop<T>::add_up(rop<T>::mul_up(y.er, T(abs(x))), err);
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -840,7 +841,8 @@ template <class T> class affine {
 
 		#if AFFINE_SIMPLE >= 1
 		rop<T>::begin();
-		err = rop<T>::add_up(err, rop<T>::add_up(rop<T>::mul_up((y.a(0) >= 0.) ? y.a(0) : -y.a(0), x.er), rop<T>::mul_up((x.a(0) >= 0.) ? x.a(0) : -x.a(0), y.er)));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::add_up(rop<T>::mul_up(abs(y.a(0)), x.er), rop<T>::mul_up(abs(x.a(0)), y.er)));
 		rop<T>::end();
 		#endif
 
@@ -925,7 +927,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
@@ -978,7 +981,8 @@ template <class T> class affine {
 		#if AFFINE_SIMPLE >= 1
 		// r.er = x.er / abs(y) + err;
 		rop<T>::begin();
-		r.er = rop<T>::add_up(err, rop<T>::div_up(x.er, (T)((y >= 0.) ? y : -y)));
+		using std::abs;
+		r.er = rop<T>::add_up(err, rop<T>::div_up(x.er, T(abs(y))));
 		rop<T>::end();
 		#else
 		r.a(maxnum()) = err;
@@ -1062,7 +1066,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
@@ -1125,7 +1130,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
@@ -1189,7 +1195,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
@@ -1257,7 +1264,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
@@ -1324,7 +1332,8 @@ template <class T> class affine {
 		err = rop<T>::add_up(err, rop<T>::sub_up(r.a(0), l));
 		#if AFFINE_SIMPLE >= 1
 		// err += abs(a) * x.er;
-		err = rop<T>::add_up(err, rop<T>::mul_up(((a >= 0.) ? a : -a), x.er));
+		using std::abs;
+		err = rop<T>::add_up(err, rop<T>::mul_up(abs(a), x.er));
 		#endif
 		rop<T>::end();
 
