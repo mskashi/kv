@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -1722,15 +1722,15 @@ template <class T> class interval {
 	}
 
 	static interval sinh_point(const T& x) {
+		interval tmp;
 		if (x >= -0.5 && x <= 0.5) {
 			return sinh_origin(x);
-		} else {
-			if (x == -std::numeric_limits<T>::infinity()) {
-				return -interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
-			}
-			interval tmp;
+		} else if (x > 0.) {
 			tmp = exp_point(x);
-			return (tmp - 1./tmp) * 0.5;
+			return (tmp - 1. / tmp) * 0.5;
+		} else {
+			tmp = exp_point(-x);
+			return (1. / tmp - tmp) * 0.5;
 		}
 	}
 
@@ -1739,12 +1739,14 @@ template <class T> class interval {
 	}
 
 	static interval cosh_point(const T& x) {
-		if (x == -std::numeric_limits<T>::infinity()) {
-			return interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
-		}
 		interval tmp;
-		tmp = exp_point(x);
-		return (tmp + 1./tmp) * 0.5;
+		if (x >= 0.) {
+			tmp = exp_point(x);
+			return (tmp + 1. / tmp) * 0.5;
+		} else {
+			tmp = exp_point(-x);
+			return (1. / tmp + tmp) * 0.5;
+		}
 	}
 
 	friend interval cosh(const interval& I) {

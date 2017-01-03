@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -1103,21 +1103,27 @@ class dd {
 	}
 
 	friend dd sinh(const dd& x) {
+		dd tmp;
 		if (x >= -0.5 && x <= 0.5) {
 			return sinh_origin(x);
-		} else {
-			dd tmp;
+		} else if (x > 0.) {
 			tmp = exp(x);
-			if (tmp == 0.) return -dd(std::numeric_limits<double>::infinity(), 0.);
-			return (tmp - 1./tmp) * 0.5;
+			return (tmp - 1. / tmp) * 0.5;
+		} else {
+			tmp = exp(-x);
+			return (1. / tmp - tmp) * 0.5;
 		}
 	}
 
 	friend dd cosh(const dd& x) {
 		dd tmp;
-		tmp = exp(x);
-		if (tmp == 0.) return dd(std::numeric_limits<double>::infinity(), 0.);
-		return (tmp + 1./tmp) * 0.5;
+		if (x >= 0.) {
+			tmp = exp(x);
+			return (tmp + 1. / tmp) * 0.5;
+		} else {
+			tmp = exp(-x);
+			return (1. / tmp + tmp) * 0.5;
+		}
 	}
 
 	friend dd tanh(const dd& x) {
