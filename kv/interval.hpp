@@ -1001,7 +1001,7 @@ template <class T> class interval {
 		int i;
 
 		if (x == std::numeric_limits<T>::infinity()) {
-			return interval((std::numeric_limits<T>::max()), std::numeric_limits<T>::infinity());
+			return interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
 		}
 		if (x == -std::numeric_limits<T>::infinity()) {
 			return interval(0.);
@@ -1520,6 +1520,9 @@ template <class T> class interval {
 	static interval asin_point(const T& x) {
 		const interval pih = constants<interval>::pi() * 0.5;
 
+		if (x < -1. || x > 1.) {
+			throw std::domain_error("interval: asin domain error");
+		}
 		if (x == 1) return pih;
 		if (x == -1) return -pih;
 		using std::abs;
@@ -1559,6 +1562,9 @@ template <class T> class interval {
 	static interval acos_point(const T& x) {
 		const interval pi = constants<interval>::pi();
 
+		if (x < -1. || x > 1.) {
+			throw std::domain_error("interval: acos domain error");
+		}
 		if (x == 1.) return interval(0.);
 		if (x == -1.) return pi;
 		using std::abs;
@@ -1727,6 +1733,9 @@ template <class T> class interval {
 	}
 
 	static interval acosh_point(const T& x) {
+		if (x < 1.) {
+			throw std::domain_error("interval: acosh domain error");
+		}
 		if (x == 1.) {
 			return interval(0.);
 		} else if (x <= 1.5) {
@@ -1742,6 +1751,11 @@ template <class T> class interval {
 	}
 
 	static interval atanh_point(const T& x) {
+		if (x < -1. || x > 1.) {
+			throw std::domain_error("interval: atanh domain error");
+		}
+		if (x == -1.) return interval(-std::numeric_limits<T>::infinity(), -(std::numeric_limits<T>::max)());
+		if (x == 1.) return interval((std::numeric_limits<T>::max)(), std::numeric_limits<T>::infinity());
 		if (x < -0.5) {
 			return 0.5 * log((1. + x) / (1. - interval(x)));
 		} else if (x <= 0.5) {
@@ -1759,32 +1773,89 @@ template <class T> class interval {
 
 template <class T> struct constants< interval<T> > {
 	static interval<T> pi() {
-		// static is used so that string is evaluated only "one time"
+		/*
 		static const interval<T> tmp(
 			"3.1415926535897932384626433832795028841971693993751",
 			"3.1415926535897932384626433832795028841971693993752"
 		);
+		*/
+		static interval<T> tmp(0.);
+		if (tmp.lower() != 0.) return tmp;
+
+		tmp = 16. * interval<T>::atan_origin(1. / interval<T>(5.)) - 4. * interval<T>::atan_origin(1. / interval<T>(239.));
 		return tmp;
 	}
 
 	static interval<T> e() {
+		/*
 		static const interval<T> tmp(
 			"2.7182818284590452353602874713526624977572470936999",
 			"2.7182818284590452353602874713526624977572470937000"
 		);
 		return tmp;
+		*/
+		static interval<T> tmp(0.);
+		if (tmp.lower() != 0.) return tmp;
+
+		static const interval<T> remainder("1", "2.71828182845904524");
+		interval<T> y;
+		int i;
+
+		tmp = 1.;
+		y = 1.;
+		for (i=1;  ; i++) {
+			y /= (T)i;
+			if (mag(y) * remainder.upper() < std::numeric_limits<T>::epsilon()) {
+				tmp += y * remainder;
+				break;
+			} else {
+				tmp += y;
+			}
+		}
+
+		return tmp;
 	}
 
 	static interval<T> ln2() {
+		/*
 		static const interval<T> tmp(
 			"0.69314718055994530941723212145817656807550013436025",
 			"0.69314718055994530941723212145817656807550013436026"
 		);
+		*/
+		static interval<T> tmp(0.);
+		if (tmp.lower() != 0.) return tmp;
+
+		interval<T> y, x2, x2m1, cinv, xn, xn2, t;
+		int i;
+
+		x2 = sqrt(sqrt(interval<T>(2.)));
+		x2m1 = x2 - 1.;
+		cinv = 1. / interval<T>::hull(x2, 1.);
+		tmp = 0.;
+		xn = -1.;
+		xn2 = -1.;
+		for (i=1;  ; i++) {
+			xn = -xn * x2m1; 
+			xn2 = -xn2 * cinv * x2m1;
+			t = xn2 / (T)i;
+			if (mag(t) < std::numeric_limits<T>::epsilon()) {
+				tmp += t;
+				break;
+			} else {
+				tmp += xn / (T)i;
+			}
+		}
+
+		tmp = tmp * 4.;
+
 		return tmp;
 	}
+
 	static interval<T> str(const std::string& s) {
 		return interval<T>(s, s);
 	}
+
 	static interval<T> str(const std::string& s1, const std::string& s2) {
 		return interval<T>(s1, s2);
 	}

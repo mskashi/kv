@@ -69,10 +69,10 @@ class dd {
 	}
 
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
-		static const double th = ldexp(1., 996);
-		static const double c1 = ldexp(1., -28);
-		static const double c2 = ldexp(1., 28);
-		static const double th2 = ldexp(1., 1023);
+		static const double th = std::ldexp(1., 996);
+		static const double c1 = std::ldexp(1., -28);
+		static const double c2 = std::ldexp(1., 28);
+		static const double th2 = std::ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 
@@ -600,13 +600,32 @@ class dd {
 		}
 	}
 
+	friend dd ceil(const dd& x) {
+		double z1, z2, z3, z4;
+		z1 = std::ceil(x.a1);
+		if (z1 != x.a1) {
+			return dd(z1, 0.);
+		} else {
+			z2 = std::ceil(x.a2);
+			twosum(z1, z2, z3, z4);
+			return dd(z3, z4);
+		}
+	}
+
 	friend dd frexp(const dd& x, int* m) {
 		double z1, z2;
 		z1 = std::frexp(x.a1, m);
 		if (*m == 0) {
 			return x;
 		}
-		z2 = ldexp(x.a2, -(*m));
+		z2 = std::ldexp(x.a2, -(*m));
+		return dd(z1, z2);
+	}
+
+	friend dd ldexp(const dd& x, int m) {
+		double z1, z2;
+		z1 = std::ldexp(x.a1, m);
+		z2 = std::ldexp(x.a2, m);
 		return dd(z1, z2);
 	}
 
@@ -616,6 +635,27 @@ class dd {
 
 	operator double() const {
 		return (double)a1;
+	}
+
+	static dd pi() {
+		static const dd tmp(
+			"3.1415926535897932384626433832795028841971693993751"
+		);
+		return tmp;
+	}
+
+	static dd e() {
+		static const dd tmp(
+			"2.7182818284590452353602874713526624977572470937000"
+		);
+		return tmp;
+	}
+
+	static dd ln2() {
+		static const dd tmp(
+			"0.69314718055994530941723212145817656807550013436026"
+		);
+		return tmp;
 	}
 
 	friend dd pow(const dd& x, int y) {
@@ -724,10 +764,10 @@ class dd {
 
 		if (x_i >= 0.) {
 			// r *= pow(constants<dd>::e(), (int)x_i);
-			r *= ipower(constants<dd>::e(), (double)x_i);
+			r *= ipower(e(), (double)x_i);
 		} else {
 			// r /= pow(constants<dd>::e(), -(int)x_i);
-			r /= ipower(constants<dd>::e(), -(double)x_i);
+			r /= ipower(e(), -(double)x_i);
 		}
 
 		return r;
@@ -800,7 +840,7 @@ class dd {
 			r += xn / i;
 		}
 
-		r += constants<dd>::ln2() * p;
+		r += ln2() * p;
 
 		return r;
 	}
@@ -872,65 +912,65 @@ class dd {
 	}
 
 	friend dd sin(const dd& I) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
-		if (I >= pi) {
-			return sin(I - pi * 2.);
+		if (I >= p) {
+			return sin(I - p * 2.);
 		}
 
-		if (I <= -pi * 3. / 4.) {
-			return -sin_origin(I + pi);
+		if (I <= -p * 3. / 4.) {
+			return -sin_origin(I + p);
 		}
-		if (I <= -pi * 0.5) {
-			return -cos_origin(-pi * 0.5 - I);
+		if (I <= -p * 0.5) {
+			return -cos_origin(-p * 0.5 - I);
 		}
-		if (I <= -pi * 0.25) {
-			return -cos_origin(I + pi * 0.5);
+		if (I <= -p * 0.25) {
+			return -cos_origin(I + p * 0.5);
 		}
 		if (I <= 0.) {
 			return -sin_origin(-I);
 		}
-		if (I <= pi * 0.25) {
+		if (I <= p * 0.25) {
 			return sin_origin(I);
 		}
-		if (I <= pi * 0.5) {
-			return cos_origin(pi * 0.5 - I);
+		if (I <= p * 0.5) {
+			return cos_origin(p * 0.5 - I);
 		}
-		if (I <= pi * 3. / 4.) {
-			return cos_origin(I - pi * 0.5);
+		if (I <= p * 3. / 4.) {
+			return cos_origin(I - p * 0.5);
 		}
-		return sin_origin(pi - I);
+		return sin_origin(p - I);
 	}
 
 	friend dd cos(const dd& I) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
-		if (I >= pi) {
-			return cos(I - pi * 2.);
+		if (I >= p) {
+			return cos(I - p * 2.);
 		}
 
-		if (I <= -pi * 3. / 4.) {
-			return -cos_origin(I + pi);
+		if (I <= -p * 3. / 4.) {
+			return -cos_origin(I + p);
 		}
-		if (I <= -pi * 0.5) {
-			return -sin_origin(-pi * 0.5 - I);
+		if (I <= -p * 0.5) {
+			return -sin_origin(-p * 0.5 - I);
 		}
-		if (I <= -pi * 0.25) {
-			return sin_origin(I + pi * 0.5);
+		if (I <= -p * 0.25) {
+			return sin_origin(I + p * 0.5);
 		}
 		if (I <= 0.) {
 			return cos_origin(-I);
 		}
-		if (I <= pi * 0.25) {
+		if (I <= p * 0.25) {
 			return cos_origin(I);
 		}
-		if (I <= pi * 0.5) {
-			return sin_origin(pi * 0.5 - I);
+		if (I <= p * 0.5) {
+			return sin_origin(p * 0.5 - I);
 		}
-		if (I <= pi * 3. / 4.) {
-			return -sin_origin(I - pi * 0.5);
+		if (I <= p * 3. / 4.) {
+			return -sin_origin(I - p * 0.5);
 		}
-		return -cos_origin(pi - I);
+		return -cos_origin(p - I);
 	}
 
 	friend dd tan(const dd& x) {
@@ -958,25 +998,25 @@ class dd {
 	}
 
 	friend dd atan(const dd& x) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
 		if (x < -(std::sqrt(2.) + 1.)) {
-			return -pi * 0.5 - atan_origin(1. / x);
+			return -p * 0.5 - atan_origin(1. / x);
 		}
 		if (x < -(std::sqrt(2.) - 1.)) {
-			return -pi * 0.25 + atan_origin((1. + x)/(1 - x));
+			return -p * 0.25 + atan_origin((1. + x)/(1 - x));
 		}
 		if (x < (std::sqrt(2.) - 1.)) {
 			return atan_origin(x);
 		}
 		if (x < (std::sqrt(2.) + 1.)) {
-			return pi * 0.25 + atan_origin((x - 1.)/(x + 1.));
+			return p * 0.25 + atan_origin((x - 1.)/(x + 1.));
 		}
-		return pi * 0.5 - atan_origin(1. / x);
+		return p * 0.5 - atan_origin(1. / x);
 	}
 
 	friend dd asin(const dd& x) {
-		const dd pih = constants<dd>::pi() * 0.5;
+		const dd pih = pi() * 0.5;
 
 		if (x == 1) return pih;
 		if (x == -1) return -pih;
@@ -993,28 +1033,28 @@ class dd {
 	}
 
 	static dd pih_m_atan(const dd& I) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
 		if (I < -(std::sqrt(2.) + 1.)) {
-			return pi + atan_origin(1. / I);
+			return p + atan_origin(1. / I);
 		}
 		if (I < -(std::sqrt(2.) - 1.)) {
-			return pi * 0.75 - atan_origin((1. + I)/(1 - I));
+			return p * 0.75 - atan_origin((1. + I)/(1 - I));
 		}
 		if (I < (std::sqrt(2.) - 1.)) {
-			return pi * 0.5 - atan_origin(I);
+			return p * 0.5 - atan_origin(I);
 		}
 		if (I < (std::sqrt(2.) + 1.)) {
-			return pi * 0.25 - atan_origin((I - 1.)/(I + 1.));
+			return p * 0.25 - atan_origin((I - 1.)/(I + 1.));
 		}
 		return atan_origin(1. / I);
 	}
 
 	friend dd acos(const dd& x) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
 		if (x == 1.) return dd(0.);
-		if (x == -1.) return pi;
+		if (x == -1.) return p;
 		using std::abs;
 		if (abs(x) < std::sqrt(6.) / 3.) {
 			return pih_m_atan(x / sqrt(1. - dd(x) * x));
@@ -1028,22 +1068,22 @@ class dd {
 	}
 
 	friend dd atan2(const dd& y, const dd& x) {
-		const dd pi = constants<dd>::pi();
+		const dd p = pi();
 
 		if (y <= x && y > -x) {
 			return atan(y / x);
 		}
 		if (y > x && y > -x) {
-			return pi * 0.5 - atan(x / y);
+			return p * 0.5 - atan(x / y);
 		}
 		if (y > x && y <= -x) {
 			if (y >= 0.) {
-				return pi + atan(y / x);
+				return p + atan(y / x);
 			} else {
-				return -pi + atan(y / x);
+				return -p + atan(y / x);
 			}
 		}
-		return -pi * 0.5 - atan(x / y);
+		return -p * 0.5 - atan(x / y);
 	}
 
 	static dd sinh_origin(const dd& x) {
@@ -1111,6 +1151,8 @@ class dd {
 	}
 
 	friend dd atanh(const dd& x) {
+		if (x == -1.) return -dd(std::numeric_limits<double>::infinity(), 0.);
+		if (x == 1.) return dd(std::numeric_limits<double>::infinity(), 0.);
 		if (x < -0.5) {
 			return 0.5 * log((1. + x) / (1. - dd(x)));
 		} else if (x <= 0.5) {
@@ -1128,7 +1170,7 @@ template <> class numeric_limits<kv::dd> {
 	public:
 
 	static kv::dd epsilon() {
-		static const kv::dd tmp(ldexp(1., -105));
+		static const kv::dd tmp(std::ldexp(1., -105));
 		return tmp;
 	}
 	static kv::dd infinity() {
@@ -1139,7 +1181,7 @@ template <> class numeric_limits<kv::dd> {
 
 	static kv::dd max() {
 		static const double tmp = numeric_limits<double>::max();
-		static const kv::dd tmp2(tmp, ldexp(tmp, -54));
+		static const kv::dd tmp2(tmp, std::ldexp(tmp, -54));
 		return tmp2;
 	}
 
@@ -1164,5 +1206,25 @@ template <> class numeric_limits<kv::dd> {
 	static const int max_exponent10 = 308;
 };
 } // namespace std
+
+namespace kv {
+template <> struct constants<dd> {
+	static dd pi() {
+		return dd::pi();
+	}
+
+	static dd e() {
+		return dd::e();
+	}
+
+	static dd ln2() {
+		return dd::ln2();
+	}
+
+	static dd str(const std::string& s) {
+		return dd(s);
+	}
+};
+} // namespace kv
 
 #endif // DD_HPP

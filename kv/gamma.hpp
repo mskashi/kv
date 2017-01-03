@@ -41,7 +41,7 @@ class Gamma_nopower {
 template <class T>
 interval<T> gamma_r(const interval<T>& x) {
 	interval<T> result;
-	interval<T> th(std::numeric_limits<T>::digits * log(2.));
+	interval<T> th(std::numeric_limits<T>::digits * std::log(2.));
 
 	/*
 	result = defint_power(Gamma_nopower(), interval<T>(0.), interval<T>(GAMMA_TH1), GAMMA_ORDER, x - 1);
@@ -243,7 +243,7 @@ template <class TT> struct Digamma {
 // return high precision output if x is in [1,2]
 template <class T> interval<T> digamma_plus(const interval<T>& x) {
 	interval<T> result, tmp;
-	interval<T> th(std::numeric_limits<T>::digits * log(2.));
+	interval<T> th(std::numeric_limits<T>::digits * std::log(2.));
 	
 	/*
 	result = defint_singular(Digamma_0< interval<T> >(x), (interval<T>)0., (interval<T>)DIGAMMA_TH1, DIGAMMA_ORDER);
@@ -332,7 +332,7 @@ template <class TT> struct Trigamma {
 // return high precision output if x is in [1,2]
 template <class T> interval<T> trigamma_plus(const interval<T>& x) {
 	interval<T> result, tmp;
-	interval<T> th(std::numeric_limits<T>::digits * log(2.));
+	interval<T> th(std::numeric_limits<T>::digits * std::log(2.));
 	
 	/*
 	result = defint_singular(Trigamma_0< interval<T> >(x), (interval<T>)0., (interval<T>)TRIGAMMA_TH1, TRIGAMMA_ORDER);

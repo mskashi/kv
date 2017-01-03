@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RMPFR_HPP
@@ -136,6 +136,41 @@ template <int N> struct rop < mpfr<N> > {
 		mpfr<N> r;
 		mpfr_set_str(r.a, s.c_str(), 10, MPFR_RNDD);
 		return r;
+	}
+};
+
+template <int N> struct constants< interval< mpfr<N> > > {
+	static interval< mpfr<N> > pi() {
+		static interval< mpfr<N> > tmp(0);
+		if (tmp.lower() != 0) return tmp;
+		mpfr_const_pi(tmp.lower().a, MPFR_RNDD);
+		mpfr_const_pi(tmp.upper().a, MPFR_RNDU);
+		return tmp;
+	}
+
+	static interval< mpfr<N> > e() {
+		static interval< mpfr<N> > tmp(0);
+		if (tmp.lower() != 0) return tmp;
+		mpfr<N> one(1);
+		mpfr_exp(tmp.lower().a, one.a, MPFR_RNDD);
+		mpfr_exp(tmp.upper().a, one.a, MPFR_RNDU);
+		return tmp;
+	}
+
+	static interval< mpfr<N> > ln2() {
+		static interval< mpfr<N> > tmp(0);
+		if (tmp.lower() != 0) return tmp;
+		mpfr_const_log2(tmp.lower().a, MPFR_RNDD);
+		mpfr_const_log2(tmp.upper().a, MPFR_RNDU);
+		return tmp;
+	}
+
+	static interval< mpfr<N> > str(const std::string& s) {
+		return interval< mpfr<N> >(s, s);
+	}
+
+	static interval< mpfr<N> > str(const std::string& s1, const std::string& s2) {
+		return interval< mpfr<N> >(s1, s2);
 	}
 };
 

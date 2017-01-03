@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_HWROUND_HPP
@@ -13,10 +13,10 @@ namespace kv {
 template <> struct rop <dd> {
 
 	static void twoproduct_up(const double& a, const double& b, double& x, double& y) {
-		static const double th = ldexp(1., 996);
-		static const double c1 = ldexp(1., -28);
-		static const double c2 = ldexp(1., 28);
-		static const double th2 = ldexp(1., 1023);
+		static const double th = std::ldexp(1., 996);
+		static const double c1 = std::ldexp(1., -28);
+		static const double c2 = std::ldexp(1., 28);
+		static const double th2 = std::ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 		volatile double v1, v2, v3, v4, v5, v6;
@@ -52,10 +52,10 @@ template <> struct rop <dd> {
 	}
 
 	static void twoproduct_down(const double& a, const double& b, double& x, double& y) {
-		static const double th = ldexp(1., 996);
-		static const double c1 = ldexp(1., -28);
-		static const double c2 = ldexp(1., 28);
-		static const double th2 = ldexp(1., 1023);
+		static const double th = std::ldexp(1., 996);
+		static const double c1 = std::ldexp(1., -28);
+		static const double c2 = std::ldexp(1., 28);
+		static const double th2 = std::ldexp(1., 1023);
 
 		double na, nb, a1, a2, b1, b2;
 		volatile double v1, v2, v3, v4, v5, v6;

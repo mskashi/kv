@@ -34,12 +34,15 @@ int main()
 	std::cout << x << "\n";
 	x = floor(x);
 	std::cout << x << "\n";
+	x = ceil(x);
+	std::cout << x << "\n";
 
 	int e;
 
 	x = frexp(x, &e);
 	std::cout << x << "\n";
 	std::cout << e << "\n";
+	std::cout << ldexp(x, 5) << "\n";;
 
 	std::cout << (double)x << "\n";
 	std::cout << (int)x << "\n";

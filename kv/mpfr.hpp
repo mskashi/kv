@@ -9,6 +9,7 @@
 #include <limits>
 #include <string>
 #include <kv/convert.hpp>
+#include <kv/constants.hpp>
 #include <mpfr.h>
 
 namespace kv {
@@ -380,6 +381,14 @@ template <int N = 53> class mpfr {
 		return r;
 	}
 
+	friend mpfr ceil(const mpfr& x) {
+		mpfr r;
+
+		mpfr_ceil(r.a, x.a);
+
+		return r;
+	}
+
 	friend mpfr frexp(const mpfr& x, int* m) {
 		mpfr_exp_t e;
 		mpfr r;
@@ -387,6 +396,14 @@ template <int N = 53> class mpfr {
 		mpfr_frexp(&e, r.a, x.a, MPFR_RNDN);
 
 		*m = e;
+
+		return r;
+	}
+
+	friend mpfr ldexp(const mpfr& x, int m) {
+		mpfr r;
+
+		mpfr_mul_2si(r.a, x.a, m, MPFR_RNDN);
 
 		return r;
 	}
@@ -630,5 +647,35 @@ template <int N> class numeric_limits< kv::mpfr<N> > {
 	static const float_denorm_style has_denorm = denorm_absent;
 };
 } // namespace std
+
+namespace kv {
+template <int N> struct constants< mpfr<N> > {
+	static mpfr<N> pi() {
+		static mpfr<N> tmp(0);
+		if (tmp != 0) return tmp;
+		mpfr_const_pi(tmp.a, MPFR_RNDN);
+		return tmp;
+	}
+
+	static mpfr<N> e() {
+		static mpfr<N> tmp(0);
+		if (tmp != 0) return tmp;
+		mpfr<N> one(1);
+		mpfr_exp(tmp.a, one.a, MPFR_RNDN);
+		return tmp;
+	}
+
+	static mpfr<N> ln2() {
+		static mpfr<N> tmp(0);
+		if (tmp != 0) return tmp;
+		mpfr_const_log2(tmp.a, MPFR_RNDN);
+		return tmp;
+	}
+
+	static mpfr<N> str(const std::string& s) {
+		return mpfr<N>(s);
+	}
+};
+} // namespace kv
 
 #endif // MPFR_HPP

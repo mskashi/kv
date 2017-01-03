@@ -38,9 +38,11 @@ int main()
 	std::cout << acosh(x) << "\n";
 	std::cout << atanh(x) << "\n";
 	std::cout << floor(z + 3) << "\n";
+	std::cout << ceil(z + 3) << "\n";
 	int i;
 	std::cout << frexp(z / 7., &i) << "\n";
 	std::cout << i << "\n";
+	std::cout << ldexp(z, 5) << "\n";
 	std::cout << std::boolalpha;
 	std::cout << (z < 0.2) << "\n";
 	std::cout << (z < "0.100001") << "\n";
