@@ -2,6 +2,8 @@
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 
+namespace ub = boost::numeric::ublas;
+
 struct SimpleHarmonic {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x, T t){
 		ub::vector<T> y(2);

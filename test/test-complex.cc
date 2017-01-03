@@ -32,6 +32,8 @@ int main()
 
 	x = cp(1., 2.);
 	y = cp(3., 4.);
+	// below is possible because int->double conversion allowed
+	x = kv::complex<int>(1, 2);
 	std::cout << x + y << "\n";
 	std::cout << x - y << "\n";
 	std::cout << x * y << "\n";

@@ -42,6 +42,11 @@ template <class T> class complex {
 		im = 0.;
 	}
 
+	template <class C> explicit complex(const complex<C>& x, typename boost::enable_if_c< acceptable_n<C, complex>::value >::type* =0) {
+		re = x.real();
+		im = x.imag();
+	}
+
 	template <class C1, class C2> complex(const C1& x, const C2& y, typename boost::enable_if_c< acceptable_n<C1, complex>::value && acceptable_n<C2, complex>::value >::type* =0) {
 		re = x;
 		im = y;
@@ -50,6 +55,12 @@ template <class T> class complex {
 	template <class C> typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator=(const C& x) {
 		re = x;
 		im = 0.;
+		return *this;
+	}
+
+	template <class C> typename boost::enable_if_c< acceptable_n<C, complex>::value, complex& >::type operator=(const complex<C>& x) {
+		re = x.real();
+		im = x.imag();
 		return *this;
 	}
 
@@ -176,11 +187,25 @@ template <class T> class complex {
 
 	friend complex operator/(const complex& x, const complex& y) {
 		complex r;
-		T tmp;
+		T tmp, tmp2;
 
+		#if 0
 		tmp = y.re * y.re + y.im * y.im;
 		r.re = (y.re * x.re + y.im * x.im) / tmp;
 		r.im = (y.re * x.im - x.re * y.im) / tmp;
+		#endif
+		using std::abs;
+		if (abs(y.re) > abs(y.im)) {
+			tmp2 = y.im / y.re;
+			tmp = y.re + y.im * tmp2;
+			r.re = (x.re + tmp2 * x.im) / tmp;
+			r.im = (x.im - x.re * tmp2) / tmp;
+		} else {
+			tmp2 = y.re / y.im;
+			tmp = y.re * tmp2 + y.im;
+			r.re = (tmp2 * x.re + x.im) / tmp;
+			r.im = (tmp2 * x.im - x.re) / tmp;
+		}
 
 		return r;
 	}
@@ -201,6 +226,22 @@ template <class T> class complex {
 		tmp = y.re * y.re + y.im * y.im;
 		r.re = (y.re * x) / tmp;
 		r.im = (- x * y.im) / tmp;
+
+		#if 0
+		T tmp2;
+		using std::abs;
+		if (abs(y.re) > abs(y.im)) {
+			tmp2 = y.im / y.re;
+			tmp = y.re + y.im * tmp2;
+			r.re = x / tmp;
+			r.im = (- x * tmp2) / tmp;
+		} else {
+			tmp2 = y.re / y.im;
+			tmp = y.re * tmp2 + y.im;
+			r.re = (tmp2 * x) / tmp;
+			r.im = (- x) / tmp;
+		}
+		#endif
 
 		return r;
 	}

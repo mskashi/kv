@@ -39,12 +39,39 @@ int main()
 	std::cout << kv::defint_autostep(p04, start, end, 12);
 	std::cout << "\n";
 
+	P05 p05;
+
+	p05.start_time(start);
+	p05.stop_time(end);
+
+	std::cout << kv::defint_autostep(p05, start, end, 12);
+	std::cout << "\n";
+
+#if 0
+	// not differentiable at x = 0
+	P07 p07;
+
+	p07.start_time(start);
+	p07.stop_time(end);
+
+	std::cout << kv::defint_autostep(p07, start, end, 12);
+	std::cout << "\n";
+#endif
+
 	P08 p08;
 
 	p08.start_time(start);
 	p08.stop_time(end);
 
 	std::cout << kv::defint_autostep(p08, start, end, 12);
+	std::cout << "\n";
+
+	P09 p09;
+
+	p09.start_time(start);
+	p09.stop_time(end);
+
+	std::cout << kv::defint_autostep(p09, start, end, 12);
 	std::cout << "\n";
 
 	P10 p10;
@@ -123,6 +150,17 @@ int main()
 
 	std::cout << kv::defint_autostep(p18, start, end, 12);
 	std::cout << "\n";
+
+#if 0
+	// not differentiable at x = 0
+	P19 p19;
+
+	p19.start_time(start);
+	p19.stop_time(end);
+
+	std::cout << kv::defint_autostep(p19, start, end, 12);
+	std::cout << "\n";
+#endif
 
 	P20 p20;
 

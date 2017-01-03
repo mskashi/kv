@@ -19,9 +19,10 @@
 #include <kv/matrix-inversion.hpp>
 #include <kv/make-candidate.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 bool

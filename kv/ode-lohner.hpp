@@ -27,11 +27,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv {
 
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 int

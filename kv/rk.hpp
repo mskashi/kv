@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RK_HPP
@@ -11,9 +11,9 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 void

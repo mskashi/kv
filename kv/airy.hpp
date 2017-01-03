@@ -11,9 +11,11 @@
 #include <kv/ode-maffine.hpp>
 #include <kv/gamma.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
+
 
 struct Airy_p {
 	template <class T> ub::vector<T> operator() (const ub::vector<T> & x, const T& t) {

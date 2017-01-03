@@ -31,20 +31,27 @@ class Gamma_nopower {
 	}
 };
 
-#define GAMMA_TH1 0.25
-#define GAMMA_TH2 40.
-#define GAMMA_ORDER 14
+// #define GAMMA_TH1 0.25
+// #define GAMMA_TH2 40.
+#if !defined(GAMMA_ORDER)
+#define GAMMA_ORDER 18
+#endif
 
 // 1 \le x \le 2
 template <class T>
 interval<T> gamma_r(const interval<T>& x) {
 	interval<T> result;
+	interval<T> th(std::numeric_limits<T>::digits * log(2.));
 
+	/*
 	result = defint_power(Gamma_nopower(), interval<T>(0.), interval<T>(GAMMA_TH1), GAMMA_ORDER, x - 1);
 
 	result += defint_autostep(Gamma< interval<T> >(x), interval<T>(GAMMA_TH1), interval<T>(GAMMA_TH2), GAMMA_ORDER);
+	*/
 
-	result += interval<T>(0., (exp(-interval<T>(GAMMA_TH2)) * (interval<T>(GAMMA_TH2) + 1.)).upper());
+	result = defint_power_autostep(Gamma< interval<T> >(x), Gamma_nopower(), interval<T>(0.), th, GAMMA_ORDER, x - 1);
+
+	result += interval<T>(0., (exp(-th) * (th + 1.)).upper());
 
 	return result;
 }
@@ -196,21 +203,28 @@ template <class TT> struct Digamma {
 	}
 };
 
-#define DIGAMMA_TH1 0.125
-#define DIGAMMA_TH2 35
-#define DIGAMMA_ORDER 14
+// #define DIGAMMA_TH1 0.125
+// #define DIGAMMA_TH2 35
+#if !defined(DIGAMMA_ORDER)
+#define DIGAMMA_ORDER 16
+#endif
 
 // work for x > 0
 // return high precision output if x is in [1,2]
 template <class T> interval<T> digamma_plus(const interval<T>& x) {
 	interval<T> result, tmp;
+	interval<T> th(std::numeric_limits<T>::digits * log(2.));
 	
+	/*
 	result = defint_singular(Digamma_0< interval<T> >(x), (interval<T>)0., (interval<T>)DIGAMMA_TH1, DIGAMMA_ORDER);
 
 	result += defint_autostep(Digamma< interval<T> >(x), (interval<T>)DIGAMMA_TH1, (interval<T>)DIGAMMA_TH2, DIGAMMA_ORDER);
+	*/
 
-	tmp = exp(- interval<T>(DIGAMMA_TH2));
-	result += interval<T>::hull(- 1. / ((1. - tmp) * x) * exp(- x * DIGAMMA_TH2), tmp / DIGAMMA_TH2);
+	result = defint_singular_autostep(Digamma< interval<T> >(x), Digamma_0< interval<T> >(x), interval<T>(0.), th, DIGAMMA_ORDER);
+
+	tmp = exp(-th);
+	result += interval<T>::hull(- 1. / ((1. - tmp) * x) * exp(- x * th), tmp / th);
 
 	return result;
 }
@@ -271,20 +285,27 @@ template <class TT> struct Trigamma {
 	}
 };
 
-#define TRIGAMMA_TH1 0.125
-#define TRIGAMMA_TH2 35
+// #define TRIGAMMA_TH1 0.125
+// #define TRIGAMMA_TH2 35
+#if !defined(TRIGAMMA_ORDER)
 #define TRIGAMMA_ORDER 14
+#endif
 
 // work for x > 0
 // return high precision output if x is in [1,2]
 template <class T> interval<T> trigamma_plus(const interval<T>& x) {
 	interval<T> result, tmp;
+	interval<T> th(std::numeric_limits<T>::digits * log(2.));
 	
+	/*
 	result = defint_singular(Trigamma_0< interval<T> >(x), (interval<T>)0., (interval<T>)TRIGAMMA_TH1, TRIGAMMA_ORDER);
 
 	result += defint_autostep(Trigamma< interval<T> >(x), (interval<T>)TRIGAMMA_TH1, (interval<T>)TRIGAMMA_TH2, TRIGAMMA_ORDER);
+	*/
 
-	tmp = DIGAMMA_TH2 * x;
+	result = defint_singular_autostep(Trigamma< interval<T> >(x), Trigamma_0< interval<T> >(x), interval<T>(0.), th, TRIGAMMA_ORDER);
+
+	tmp = th * x;
 	result += interval<T>::hull(0., exp(-tmp) * (tmp + 1) / (x * x));
 
 	return result;

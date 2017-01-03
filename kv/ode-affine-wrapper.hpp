@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_W_HPP
@@ -9,10 +9,10 @@
 
 #include <kv/ode-affine.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
 
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 int

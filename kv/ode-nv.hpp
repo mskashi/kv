@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_NV_HPP
@@ -21,11 +21,9 @@
 #endif
 
 
-namespace ub = boost::numeric::ublas;
-
-
 namespace kv{
 
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 void

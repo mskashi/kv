@@ -33,11 +33,14 @@ class Loba_nolog {
 template <class T>
 interval<T> loba_origin(const interval<T>& x) {
 	if (x == 0.) return interval<T>(0.);
+	#if 0
 	if (x.lower() <= LOBA_TH) {
 		return -defint_log_singular(Loba_nolog(), interval<T>(0.), x, LOBA_ORDER);
 	} else {
 		return -defint_log_singular(Loba_nolog(), interval<T>(0.), interval<T>(LOBA_TH), LOBA_ORDER) - defint_autostep(Loba(), interval<T>(LOBA_TH), x, LOBA_ORDER);
 	}
+	#endif
+	return -defint_log_singular_autostep(Loba(), Loba_nolog(), interval<T>(0.), x, LOBA_ORDER);
 }
 
 template <class T>

@@ -14,9 +14,10 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 void

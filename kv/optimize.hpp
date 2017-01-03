@@ -16,10 +16,10 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <kv/autodif.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>

@@ -16,10 +16,10 @@
 #include <kv/convert.hpp>
 
 
+namespace kv {
+
 namespace ub = boost::numeric::ublas;
 
-
-namespace kv {
 
 template <class T> class autodif;
 template <class C, class T> struct convertible<C, autodif<T> > {

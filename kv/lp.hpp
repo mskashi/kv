@@ -13,10 +13,10 @@
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 
-namespace ub = boost::numeric::ublas;
-
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class T> inline T lp_minimize(ub::vector<T>& objfunc, std::list< ub::vector<T> >& constraints)
 {

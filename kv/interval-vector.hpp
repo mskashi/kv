@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_VECTOR_HPP
@@ -11,9 +11,10 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <kv/interval.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template <class T> inline ub::vector<T> mid (const ub::vector< interval<T> >& I) {
 	int i;

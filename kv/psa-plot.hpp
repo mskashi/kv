@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_PLOT_HPP
@@ -10,9 +10,10 @@
 #include <kv/psa.hpp>
 #include <kv/gnuplot.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
 
 template<class T1, class T2>
 void psa_plot(const psa<T1>& x, const T2& offset, const gnuplot& g, int div = 50 , int t=1)

@@ -1,41 +1,62 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
 #define DKA_HPP
 
-// Durand Kerner Aberth algorithm
-
-#include "kv/complex.hpp"
-#include "kv/psa.hpp"
+#include <limits>
+#include <cstdlib>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/math/constants/constants.hpp>
-
-namespace ub = boost::numeric::ublas;
+#include "kv/interval.hpp"
+#include "kv/rdouble.hpp"
+#include "kv/complex.hpp"
 
 namespace kv {
 
+namespace ub = boost::numeric::ublas;
+
 template <class T>
-ub::vector< complex<T> > dka(const psa< complex<T> >& p, T tor = 1e2)
+static T inline eval_polynomial (const ub::vector<T>& p, const T& x)
+{
+	int i;
+	T r;
+	int s = p.size();
+
+	r = p(s-1);
+	for (i=s-2; i>=0; i--) {
+		r = r * x + p(i);
+	}
+
+	return r;
+}
+
+// Durand Kerner Aberth algorithm
+
+template <class T>
+bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& result, T epsilon = std::numeric_limits<T>::epsilon())
 {
 	int i, j;
-	int s = p.v.size();
+	int s = p.size();
 	int n = s - 1;
 	ub::vector< complex<T> > a(s);
 	complex<T> c;
-	psa<T> b;
-	T r, tmp, m1, m2;
-	psa<T> db;
-	ub::vector< complex<T> > x(n);
+	ub::vector<T> b;
+	T r, tmp, norm1, norm2;
+	ub::vector<T> db;
+	ub::vector< complex<T> > x(n), dx(n);
 	T pi = boost::math::constants::pi<T>();
-	complex<T> f, df, tmp2;
+	complex<T> f, df;
 	bool flag;
 
+	if (p(n).real() == 0. && p(n).imag() == 0.) {
+		return false;
+	}
 
 	// make equation b(r) = 0
 
-	for (i=0; i<s; i++) a(i) = p.v(i);
+	for (i=0; i<s; i++) a(i) = p(i);
 
 	c = -a(n-1) / (a(n) * n);
 	for (i=1; i<=n; i++) {
@@ -44,32 +65,32 @@ ub::vector< complex<T> > dka(const psa< complex<T> >& p, T tor = 1e2)
 		}
 	}
 
-	b.v.resize(s);
-	for (i=0; i<n-1; i++) b.v(i) = -abs(a(i));
-	b.v(n-1) = 0.;
-	b.v(n) = abs(a(n));
+	b.resize(s);
+	for (i=0; i<n-1; i++) b(i) = -abs(a(i));
+	b(n-1) = 0.;
+	b(n) = abs(a(n));
 
 	// calculate initial radius for Newton's method
 	// r = 2^n such that g(2^n) > 0 and g(2^(n-1)) < 0
 
 	r = 1.;
 	while (true) {
-		if (eval(b, r) > 0.) break;
+		if (eval_polynomial(b, r) > 0.) break;
 		r *= 2.;
 	}
 
 	// db(r) = b'(r)
 
-	db.v.resize(n);
-	for (i=1; i<s; i++) db.v(i-1) = b.v(i) * i;
+	db.resize(n);
+	for (i=1; i<s; i++) db(i-1) = b(i) * i;
 
 	// calculate radius by Newton's method for equation b(r) = 0
 
 	while (true) {
-		tmp = eval(b, r) / eval(db, r);
+		tmp = eval_polynomial(b, r) / eval_polynomial(db, r);
 		r -= tmp;
 		using std::abs;
-		if (abs(tmp) < abs(r) * std::numeric_limits<T>::epsilon() * tor) break;
+		if (abs(tmp) < abs(r) * epsilon) break;
 	}
 
 	// set Aberth's initial values
@@ -80,29 +101,91 @@ ub::vector< complex<T> > dka(const psa< complex<T> >& p, T tor = 1e2)
 	// Durand Kerner algorithm
 
 	while (true) {
-		m1 = 0.;
-		m2 = 0.;
-		flag = false;
 		for (i=0; i<n; i++) {
-			f = eval(p, x(i));
-			df = p.v(n);
+			f = eval_polynomial(p, x(i));
+			df = p(n);
 			for (j=0; j<n; j++) {
 				if (j == i) continue;
 				df *= x(i) - x(j);
 			}
-			tmp2 = f / df;
-			if (tmp2.real() != tmp2.real() || tmp2.imag() != tmp2.imag()) { // isnan
-				flag = true; break;
+			dx(i) = f / df;
+			if (dx(i).real() != dx(i).real() && dx(i).imag() != dx(i).imag()) { // NaN check
+				dx(i) = 0.;
 			}
-			if (abs(tmp2) > m1) m1 = abs(tmp2);
-			if (abs(x(i)) > m2) m2 = abs(x(i));
-			x(i) -= tmp2;
 		}
-		if (flag) break;
-		if (m1 < m2 * std::numeric_limits<T>::epsilon() * tor) break;
+
+		x -= dx;
+
+		norm1 = 1.;
+		norm2 = 0.;
+		for (i=0; i<n; i++) {
+			norm1 = std::max(norm1, abs(x(i)));
+			norm2 = std::max(norm2, abs(dx(i)));
+		}
+		if (norm2 <= norm1 * epsilon) break;
 	}
 
-	return x;
+	result = x;
+	return true;
+}
+
+// error estimation using Smith's theorem
+
+template <class T>
+ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< interval<T> > >& p, const ub::vector< complex<T> >& x)
+{
+	int i, j;
+	int s = p.size();
+	int n = s - 1;
+	ub::vector< complex< interval<T> > > x2, x3(n);
+	complex< interval<T> > f, df, tmp;
+	T err;
+	bool flag;
+
+	x2 = x;
+
+	for (i=0; i<n; i++) {
+		f = eval_polynomial(p, x2(i));
+		df = p(n);
+		for (j=0; j<n; j++) {
+			if (j == i) continue;
+			df *= x2(i) - x2(j);
+		}
+		if (zero_in(df.real()) && zero_in(df.imag())) {
+			err = std::numeric_limits<T>::infinity();
+		} else {
+			err = abs(n * f / df).upper();
+		}
+		x3(i).real() = x2(i).real() + err * interval<T>(-1., 1.);
+		x3(i).imag() = x2(i).imag() + err * interval<T>(-1., 1.);
+	}
+
+	return x3;
+}
+
+// verified Durand Kerner Aberth
+
+template <class T>
+bool vdka(const ub::vector< complex< interval<T> > >& p, ub::vector< complex< interval<T> > >& result, T epsilon = std::numeric_limits<T>::epsilon())
+{
+	int i;
+	int s = p.size();
+	int n = s - 1;
+	ub::vector< complex< T > > p2(s), x2;
+
+	if (zero_in(p(n).real()) && zero_in(p(n).imag())) {
+		return false;
+	}
+
+	for (i=0; i<s; i++) {
+		p2(i).real() = mid(p(i).real());
+		p2(i).imag() = mid(p(i).imag());
+	}
+
+	dka(p2, x2, epsilon);
+
+	result = smith_error(p, x2);
+	return true;
 }
 
 } // namespace kv

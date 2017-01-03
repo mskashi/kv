@@ -8,7 +8,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 /*
- *  伊理, 藤野: 数値計算の常識, pp.95-96 の方法
+ *  from "Iri, Fujino: Suuchi Keisan no Joushiki, pp.95-96"
  */
 
 namespace kv {

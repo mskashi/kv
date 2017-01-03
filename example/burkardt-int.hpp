@@ -29,7 +29,7 @@ struct P01 {
 
 struct P03 {
 	template <class T> T operator() (T x){
-		return (2./3.) * x * sqrt(x);
+		return sqrt(x);
 	}
 
 	template<class T>
@@ -47,6 +47,24 @@ struct P03 {
 
 struct P04 {
 	template <class T> T operator() (T x){
+		return 0.92 * cosh(x) - cos(x);
+	}
+
+	template<class T>
+	void start_time(kv::interval<T>& x) {
+
+		x = -1.;
+	}
+
+	template<class T>
+	void stop_time(kv::interval<T>& x) {
+
+		x = 1.;
+	}
+};
+
+struct P05 {
+	template <class T> T operator() (T x){
 		return 1. / (x*x*x*x + x*x + 0.9);
 	}
 
@@ -63,9 +81,47 @@ struct P04 {
 	}
 };
 
+struct P07 {
+	template <class T> T operator() (T x){
+		return 1. / sqrt(x);
+	}
+
+	template<class T>
+	void start_time(kv::interval<T>& x) {
+
+		x = 0.;
+	}
+
+	template<class T>
+	void stop_time(kv::interval<T>& x) {
+
+		x = 1.;
+	}
+};
+
 struct P08 {
 	template <class T> T operator() (T x){
 		return 1. / (1. + x*x*x*x);
+	}
+
+	template<class T>
+	void start_time(kv::interval<T>& x) {
+
+		x = 0.;
+	}
+
+	template<class T>
+	void stop_time(kv::interval<T>& x) {
+
+		x = 1.;
+	}
+};
+
+struct P09 {
+	template <class T> T operator() (T x){
+		static T pi = kv::constants<T>::pi();
+
+		return 2. / (2. + sin(10 * pi * x));
 	}
 
 	template<class T>
@@ -155,7 +211,9 @@ struct P13 {
 
 struct P14 {
 	template <class T> T operator() (T x){
-		return sqrt(50.) * exp(-50. * 3.1415926535897932 * x * x);
+		static T pi = kv::constants<T>::pi();
+
+		return sqrt((T)50.) * exp(-50. * pi * x * x);
 	}
 
 	template<class T>
@@ -191,7 +249,9 @@ struct P15 {
 
 struct P16 {
 	template <class T> T operator() (T x){
-		return 50. / (3.1415926535897932 * (2500. * x * x + 1.));
+		static T pi = kv::constants<T>::pi();
+
+		return 50. / (pi * (2500. * x * x + 1.));
 	}
 
 	template<class T>
@@ -210,7 +270,9 @@ struct P16 {
 struct P17 {
 	template <class T> T operator() (T x){
 		T tmp;
-		tmp = sin(50. * 3.1415926535897932 * x);
+		static T pi = kv::constants<T>::pi();
+
+		tmp = sin(50. * pi * x);
 		return tmp * tmp;
 	}
 
@@ -230,6 +292,24 @@ struct P17 {
 struct P18 {
 	template <class T> T operator() (T x){
 		return x / (exp(x) + 1.);
+	}
+
+	template<class T>
+	void start_time(kv::interval<T>& x) {
+
+		x = 0.;
+	}
+
+	template<class T>
+	void stop_time(kv::interval<T>& x) {
+
+		x = 1.;
+	}
+};
+
+struct P19 {
+	template <class T> T operator() (T x){
+		return log(x);
 	}
 
 	template<class T>

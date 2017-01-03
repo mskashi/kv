@@ -13,9 +13,11 @@
 #include <kv/complex.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-namespace ub = boost::numeric::ublas;
 
 namespace kv {
+
+namespace ub = boost::numeric::ublas;
+
 
 template <class T> bool cardano(const ub::vector< complex< interval<T> > > &in, ub::vector< complex< interval<T> > >& out)
 {
