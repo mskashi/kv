@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DD_HPP
@@ -207,7 +207,7 @@ struct conv_dd {
 				carry /= 10;
 			}
 
-			while (buf[offset + emax] == 0 && emax >= 0) {
+			while (emax >= 0 && buf[offset + emax] == 0) {
 				emax--;
 			}
 		}
@@ -233,7 +233,7 @@ struct conv_dd {
 				carry %= pm;
 			}
 
-			while (buf[offset + emin] == 0 && emin < 0) {
+			while (emin < 0 && buf[offset + emin] == 0) {
 				emin++;
 			}
 		}
@@ -288,7 +288,7 @@ struct conv_dd {
 			}
 
 			// delete zeros of tail
-			while (result[offset2 + result_min] == 0 && result_min < 0) {
+			while (result_min < 0 && result[offset2 + result_min] == 0) {
 				result_min++;
 			}
 
@@ -369,7 +369,7 @@ struct conv_dd {
 				// use 'f' like format
 
 				// delete zeros of tail
-				while (result[offset2 + result_min] == 0 && result_min < 0) {
+				while (result_min < 0 && result[offset2 + result_min] == 0) {
 					result_min++;
 				}
 
@@ -574,7 +574,7 @@ struct conv_dd {
 				result1.push_back(carry % 2);
 				carry = carry / 2;
 			}
-			while (table[offset + table_max] == 0 && table_max >= 0) {
+			while (table_max >= 0 && table[offset + table_max] == 0) {
 				table_max--;
 			}
 		}
@@ -625,7 +625,7 @@ struct conv_dd {
 				}
 			}
 
-			while (table[offset + table_min] == 0 && table_min < 0) {
+			while (table_min < 0 && table[offset + table_min] == 0) {
 				table_min++;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2015-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef KKT_HPP
@@ -21,24 +21,28 @@ namespace ub = boost::numeric::ublas;
 
 template <class T>
 T alpha_plus(const T& x) {
+	using std::pow;
 	if (x <= 0.) return 0.;
 	else return pow(x, 3);
 }
 
 template <class T>
 T alpha_minus(const T& x) {
+	using std::pow;
 	if (x >= 0.) return 0.;
 	else return -pow(x, 3);
 }
 
 template <class T>
 T alpha_plus_d(const T& x) {
+	using std::pow;
 	if (x <= 0.) return 0.;
 	else return 3 * pow(x, 2);
 }
 
 template <class T>
 T alpha_minus_d(const T& x) {
+	using std::pow;
 	if (x >= 0.) return 0.;
 	else return -3 * pow(x, 2);
 }

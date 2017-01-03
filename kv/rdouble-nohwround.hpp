@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_NOHWROUND_HPP
@@ -10,6 +10,7 @@
 #include <limits>
 #include <cmath>
 #include <kv/conv-double.hpp>
+#include <kv/fpu53.hpp>
 
 namespace kv {
 

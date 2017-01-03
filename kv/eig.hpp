@@ -60,6 +60,7 @@ template <class T> bool house(const ub::matrix<T>& x, ub::matrix<T>& v, T& beta)
 	if (sigma == 0.){
 		beta = 0.;
 	} else {
+		using std::sqrt;
 		mu = sqrt(x(0,0) * x(0,0) + sigma);
 		if (x(0,0) <= 0.){
 			v(0,0) = x(0,0) - mu;
@@ -315,6 +316,7 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 			tra = A(i-1,i-1) + A(j-1,j-1);
 			det = A(i-1,i-1)*A(j-1,j-1)-A(i-1,j-1)*A(j-1,i-1);
 			tmp = tra*tra-4*det;// Complex!
+			using std::sqrt;
 			tmp1 = sqrt(tmp);
 			am = 0.5*(tra + tmp1);
 			ap = 0.5*(tra - tmp1);
@@ -421,6 +423,7 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 				using std::abs;
 				x_norm += abs(x(k))*abs(x(k));
 			}
+			using std::sqrt;
 			x_norm = sqrt(x_norm);
 			for (k = 0; k < n; k++) {
 				X(k,i-1) /= x_norm;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef COMPLEX_HPP
@@ -300,9 +300,9 @@ template <class T> class complex {
 
 	friend complex sqrt(const complex& x) {
 		T a, r;
+		using std::sqrt;
 		r = sqrt(abs(x));
 		a = arg(x) * 0.5;
-		using std::sqrt;
 		using std::cos;
 		using std::sin;
 		return complex(r * cos(a), r * sin(a));

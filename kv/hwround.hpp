@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef HWROUND_HPP
@@ -68,20 +68,25 @@ struct hwround {
 // for Visual C++ (Visual C++ do not have fenv.h)
 
 struct hwround {
+	static unsigned int *current_word() {
+		static unsigned int cw = 0;
+		return &cw;
+	}
+
 	static void roundnear() {
-		_controlfp(_RC_NEAR, _MCW_RC);
+		_controlfp_s(current_word(), _RC_NEAR, _MCW_RC);
 	}
 
 	static void rounddown() {
-		_controlfp(_RC_DOWN, _MCW_RC);
+		_controlfp_s(current_word(), _RC_DOWN, _MCW_RC);
 	}
 
 	static void roundup() {
-		_controlfp(_RC_UP, _MCW_RC);
+		_controlfp_s(current_word(), _RC_UP, _MCW_RC);
 	}
 
 	static void roundchop() {
-		_controlfp(_RC_UP, _MCW_RC);
+		_controlfp_s(current_word(), _RC_UP, _MCW_RC);
 	}
 };
 
