@@ -6,7 +6,7 @@
 namespace ub = boost::numeric::ublas;
 
 // f: R->R
-inline kv::autodif<double> testfunc1(const kv::autodif<double>& x) {
+kv::autodif<double> testfunc1(const kv::autodif<double>& x) {
 	kv::autodif<double> tmp;
 
 	tmp = x * x - 1.;
@@ -14,7 +14,7 @@ inline kv::autodif<double> testfunc1(const kv::autodif<double>& x) {
 }
 
 // f: R->R (use template)
-template <class T> inline T testfunc2(const T& x) {
+template <class T> T testfunc2(const T& x) {
 	T tmp;
 
 	tmp = x * x - 1.;
@@ -22,12 +22,12 @@ template <class T> inline T testfunc2(const T& x) {
 }
 
 // f: R^n->R
-template <class T> inline T testfunc3(const ub::vector<T>& x) {
+template <class T> T testfunc3(const ub::vector<T>& x) {
 	return atan(x(0) * x(0) + 2. * x(1) * x(1) - 1.);
 }
 
 // f: R^n->R^n
-template <class T> inline ub::vector<T> testfunc4(const ub::vector<T>& x) {
+template <class T> ub::vector<T> testfunc4(const ub::vector<T>& x) {
 	ub::vector<T> y(2);
 
 	y(0) = 2. * x(0) * x(0) * x(1) - 1.;

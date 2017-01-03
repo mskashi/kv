@@ -1,12 +1,20 @@
+#ifndef BURKARDT_NON_HPP
+#define BURKARDT_NON_HPP
+
+/*
+ * nonlinear equation example set from
+ *  http://people.sc.fsu.edu/~jburkardt/f_src/test_nonlin/test_nonlin.html
+ *  http://people.sc.fsu.edu/~jburkardt/f_src/test_nonlin/test_nonlin.f90
+ */
+
 #include <boost/numeric/ublas/vector.hpp>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
 
 namespace ub = boost::numeric::ublas;
 
-class GenRosen {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct GenRosen {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int i;
@@ -30,9 +38,8 @@ class GenRosen {
 	}
 };
 
-class Powell {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Powell {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 
 		y(0) = x(0) + 10. * x(1);
@@ -54,9 +61,8 @@ class Powell {
 	}
 };
 
-class Wood {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Wood {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 		T tmp1, tmp2;
 
@@ -82,9 +88,8 @@ class Wood {
 	}
 };
 
-class Watson {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Watson {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int i, j, k;
@@ -132,9 +137,8 @@ class Watson {
 	}
 };
 
-class Chebyquad {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Chebyquad {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int i, j;
@@ -179,9 +183,8 @@ class Chebyquad {
 	}
 };
 
-class Brown {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Brown {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int i, j;
@@ -217,9 +220,8 @@ class Brown {
 	}
 };
 
-class DBVP {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct DBVP {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int k;
@@ -252,9 +254,8 @@ class DBVP {
 	}
 };
 
-class DIntEq {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct DIntEq {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int j, k;
@@ -293,9 +294,8 @@ class DIntEq {
 	}
 };
 
-class VDim {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct VDim {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int j;
@@ -327,9 +327,8 @@ class VDim {
 	}
 };
 
-class Broyden {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Broyden {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int k;
@@ -358,9 +357,8 @@ class Broyden {
 	}
 };
 
-class BroydenBand {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct BroydenBand {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 		int k, k1, k2, j;
@@ -396,9 +394,8 @@ class BroydenBand {
 	}
 };
 
-class Hammarling2x2 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Hammarling2x2 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(4);
 
 		y(0) = (x(0) * x(0) + x(1) * x(2)) - 0.0001;
@@ -420,9 +417,8 @@ class Hammarling2x2 {
 	}
 };
 
-class Hammarling3x3 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Hammarling3x3 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(9);
 
 		y(0) = (x(0) * x(0) + x(1) * x(3) + x(2) * x(6)) - 0.0001;
@@ -451,9 +447,8 @@ class Hammarling3x3 {
 	}
 };
 
-class P17 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct P17 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
 		y(0) = x(0) + x(1) - 3.;
@@ -473,13 +468,12 @@ class P17 {
 	}
 };
 
-class P19 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct P19 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
 
-		y(0) = x(0) * (x(0)*x(0) + x(1) * x(1));
-		y(1) = x(1) * (x(0)*x(0) + x(1) * x(1));
+		y(0) = x(0) * (x(0) * x(0) + x(1) * x(1));
+		y(1) = x(1) * (x(0) * x(0) + x(1) * x(1));
 
 		return y;
 	}
@@ -495,9 +489,8 @@ class P19 {
 	}
 };
 
-class P20 {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct P20 {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(1);
 
 		y(0) = x(0) * (x(0) - 5.) * (x(0) - 5.);
@@ -516,9 +509,8 @@ class P20 {
 	}
 };
 
-class Chandrasekhar {
-	public:
-	template <class T> ub::vector<T> operator() (ub::vector<T> x){
+struct Chandrasekhar {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		int s = x.size();
 		ub::vector<T> y(s);
 
@@ -555,3 +547,5 @@ class Chandrasekhar {
 		}
 	}
 };
+
+#endif // BURKARDT_NON_HPP

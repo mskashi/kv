@@ -4,6 +4,7 @@
 #include <kv/allsol-simple.hpp>
 #include <kv/allsol.hpp>
 #include <kv/autodif.hpp>
+#include <kv/bessel.hpp>
 #include <kv/cardano-ferrari.hpp>
 #include <kv/complex.hpp>
 #include <kv/constants.hpp>
@@ -13,7 +14,6 @@
 #include <kv/dd.hpp>
 #include <kv/defint.hpp>
 #include <kv/defint-singular.hpp>
-#include <kv/digamma.hpp>
 #include <kv/dka.hpp>
 #include <kv/doubleintegral.hpp>
 #include <kv/fpu53.hpp>
@@ -28,6 +28,7 @@
 #include <kv/lp.hpp>
 #include <kv/make-candidate.hpp>
 #include <kv/matrix-inversion.hpp>
+#include <kv/mpfr.hpp>
 #include <kv/newton.hpp>
 #include <kv/ode-affine-wrapper.hpp>
 #include <kv/ode-affine.hpp>
@@ -50,6 +51,7 @@
 #include <kv/qr.hpp>
 #include <kv/rdd.hpp>
 #include <kv/rdouble.hpp>
+#include <kv/rmpfr.hpp>
 #include <kv/rk.hpp>
 #include <kv/rkf45.hpp>
 #include <kv/strobomap.hpp>

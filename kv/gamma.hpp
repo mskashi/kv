@@ -186,7 +186,7 @@ interval<T> lgamma(const interval<T>& x) {
 			tmp =  interval<T>::hull(tmp, lgamma_point(m));
 		}
 		if (x.upper() > 0.) {
-			m = digamma_zero(1.5);
+			m = digamma_zero((T)1.5);
 			if (zero_in(m)) { // error
 				m = m2;
 			}
