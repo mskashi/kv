@@ -13,6 +13,14 @@ struct Func {
 	}
 };
 
+// 1 dimentional version
+
+struct Func1 {
+	template <class T> T operator() (const T& x) {
+		return x - cos(x);
+	}
+};
+
 int main()
 {
 	ub::vector<double> x;
@@ -28,6 +36,15 @@ int main()
 	x(1) = 0.01;
 
 	b = kv::krawczyk_approx(Func(), x, ix, 5, 1);
+	if (b == false) {
+		std::cout << "fail\n";
+	}
+
+	// 1 dimentional version
+
+	itv iy;
+
+	b = kv::krawczyk_approx(Func1(), 0.7, iy, 5, 1);
 	if (b == false) {
 		std::cout << "fail\n";
 	}

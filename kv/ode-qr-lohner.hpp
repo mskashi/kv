@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_QR_LOHNER_HPP
@@ -50,9 +50,10 @@ odelong_qr_lohner(
 	ub::vector< interval<T> > x, x1;
 	interval<T> t, t1;
 	ub::matrix< interval<T> > M;
-	int r, r2;
+	int ret_ode, ret_ode2;
 	int ret_val = 0;
 	bool bo;
+	bool ret_callback;
 
 	ub::matrix<T> Q, Q2, R, Q2t;
 	ub::matrix< interval<T> > AQ, QAQ, Q2i;
@@ -83,8 +84,8 @@ odelong_qr_lohner(
 		p2 = p;
 		p2.set_autostep(true);
 		// NOTICE: below must be autodif version of ode
-		r = ode_lohner(f, Iad, t, t1, p2, &result_tmp);
-		if (r == 0) break;
+		ret_ode = ode_lohner(f, Iad, t, t1, p2, &result_tmp);
+		if (ret_ode == 0) break;
 
 		fc = c;
 		// Step size should be same as above ode call.
@@ -95,8 +96,8 @@ odelong_qr_lohner(
 		p2 = p;
 		p2.set_autostep(false);
 		while (1) {
-			r2 = ode_lohner(f, fc, t, t1, p2);
-			if (r2 != 0) break;
+			ret_ode2 = ode_lohner(f, fc, t, t1, p2);
+			if (ret_ode2 != 0) break;
 			p2.order++;
 			std::cout << "increase order: " << p2.order << "\n";
 		}
@@ -152,9 +153,14 @@ odelong_qr_lohner(
 				result_psa(i).v(j) = result_tmp(i).v(j).v;
 			}
 		}
-		callback(t, t1, x, x1, result_psa);
+		ret_callback = callback(t, t1, x, x1, result_psa);
 
-		if (r == 2) {
+		if (ret_callback == false) {
+			ret_val = 3;
+			break;
+		}
+
+		if (ret_ode == 2) {
 			ret_val = 2;
 			break;
 		}
@@ -169,6 +175,9 @@ odelong_qr_lohner(
 	}
 	if (ret_val == 1) {
 		end = t;
+	}
+	if (ret_val == 3) {
+		end = t1;
 	}
 
 	return ret_val;
@@ -189,12 +198,11 @@ odelong_qr_lohner(
 	ub::vector< interval<T> > x;
 	ub::matrix< interval<T> > M, M_tmp;
 	int r;
-	interval<T> end2 = end;
 
 	autodif< interval<T> >::split(init, x, M);
 	int s2 = M.size2();
 
-	r = odelong_qr_lohner(f, x, start, end2, p, callback, &M_tmp);
+	r = odelong_qr_lohner(f, x, start, end, p, callback, &M_tmp);
 
 	if (r == 0) return 0;
 
@@ -208,8 +216,6 @@ odelong_qr_lohner(
 		}
 	}
 	
-	if (r == 1) end = end2;
-
 	return r;
 }
 

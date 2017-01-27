@@ -2,7 +2,9 @@
 #include <limits>
 
 #include <kv/ode-maffine.hpp>
+#include <kv/ode-maffine0.hpp>
 #include <kv/ode-maffine2.hpp>
+#include <kv/ode-affine.hpp>
 #include <kv/ode-qr.hpp>
 #include <kv/ode-qr-lohner.hpp>
 
@@ -28,9 +30,10 @@ struct Lorenz {
 namespace kv {
 
 template <class T> struct ode_callback_sample : ode_callback<T> {
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
+	virtual bool operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
 		std::cout << "t: " << end << "\n";
 		std::cout << x_e << "\n";
+		return true;
 	}
 };
 
@@ -41,10 +44,9 @@ namespace kv {
 template <class T> struct ode_callback_sample2 : ode_callback<T> {
 	int n;
 
-	ode_callback_sample2(int n) :n(n) {
-	}
+	ode_callback_sample2(int n) :n(n) {}
 
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
+	virtual bool operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
 		int i, j;
 		interval<T> t;
 		ub::vector< interval<T> > y;
@@ -60,94 +62,12 @@ template <class T> struct ode_callback_sample2 : ode_callback<T> {
 			std::cout << "t: " << start + t << "\n";
 			std::cout << y << "\n";
 		}
+		return true;
 	}
 };
 
 } // namespace kv
 
-namespace kv {
-
-template <class T> struct ode_callback_dense_print : ode_callback<T> {
-	interval<T> start_g;
-	interval<T> step;
-
-	ode_callback_dense_print(interval<T> start, interval<T> step) : start_g(start), step(step) {
-	}
-
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
-		int i, j;
-		interval<T> t;
-		ub::vector< interval<T> > y;
-		psa< interval <T> > tmp;
-		int s = result.size();
-		y.resize(s);
-
-		for (i = (int)ceil(((start - start_g) / step).lower()); i<=(int)floor(((end - start_g) / step).upper()); i++) {
-			t = start_g + step * i - start;
-			for (j=0; j<s; j++) {
-				tmp = result(j);
-				y(j) = eval(tmp, t);
-			}
-			std::cout << "t: " << start + t << "\n";
-			std::cout << y << "\n";
-		}
-	}
-};
-
-} // namespace kv
-
-namespace kv {
-
-template <class T> struct ode_callback_list : ode_callback<T> {
-	std::list< interval<T> > &start_list;
-	std::list< interval<T> > &end_list;
-	std::list< ub::vector< psa< interval<T> > > > &psa_list;
-
-	ode_callback_list(std::list< interval<T> >& start_list, std::list< interval<T> >& end_list, std::list< ub::vector< psa< interval<T> > > >& psa_list) : start_list(start_list), end_list(end_list), psa_list(psa_list) {
-	}
-
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
-		start_list.push_back(start);
-		end_list.push_back(end);
-		psa_list.push_back(result);
-	}
-};
-
-} // namespace kv
-
-
-namespace kv {
-
-template <class T> struct ode_callback_dense_list : ode_callback<T> {
-	interval<T> start_g;
-	interval<T> step;
-	std::list< interval<T> > &time_list;
-	std::list< ub::vector< interval<T> > > &value_list;
-
-	ode_callback_dense_list(interval<T> start, interval<T> step, std::list< interval<T> >& time_list, std::list< ub::vector< interval<T> > >& value_list) : start_g(start), step(step), time_list(time_list), value_list(value_list) {
-	}
-
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
-		int i, j;
-		interval<T> t;
-		ub::vector< interval<T> > y;
-		psa< interval <T> > tmp;
-		int s = result.size();
-		y.resize(s);
-
-		for (i = (int)ceil(((start - start_g) / step).lower()); i<=(int)floor(((end - start_g) / step).upper()); i++) {
-			t = start_g + step * i - start;
-			for (j=0; j<s; j++) {
-				tmp = result(j);
-				y(j) = eval(tmp, t);
-			}
-			time_list.push_back(start + t);
-			value_list.push_back(y);
-		}
-	}
-};
-
-} // namespace kv
 
 int main()
 {
@@ -163,8 +83,10 @@ int main()
 
 	std::cout.precision(17);
 
+	// using ode_callback_sample
+
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -174,7 +96,17 @@ int main()
 	}
 
 	ix = x;
-	end = 1.;
+	end = 0.125;
+	r = kv::odelong_maffine0(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
+	if (!r) {
+		std::cout << "No Solution\n";
+	} else {
+		std::cout << ix << "\n";
+		std::cout << end << "\n";
+	}
+
+	ix = x;
+	end = 0.125;
 	r = kv::odelong_maffine2(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -184,7 +116,17 @@ int main()
 	}
 
 	ix = x;
-	end = 1.;
+	end = 0.125;
+	r = kv::odelong_affine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
+	if (!r) {
+		std::cout << "No Solution\n";
+	} else {
+		std::cout << ix << "\n";
+		std::cout << end << "\n";
+	}
+
+	ix = x;
+	end = 0.125;
 	r = kv::odelong_qr(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -194,7 +136,7 @@ int main()
 	}
 
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_qr_lohner(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -203,8 +145,10 @@ int main()
 		std::cout << end << "\n";
 	}
 
+	// using ode_callback_sample2
+
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample2<double>(3));
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -213,8 +157,10 @@ int main()
 		std::cout << end << "\n";
 	}
 
+	// test for ode_callback_dense_print in ode-callback.hpp
+
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_dense_print<double>(itv(0.), itv(0.125)));
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -227,8 +173,10 @@ int main()
 	std::list< kv::interval<double> > end_list;
 	std::list< ub::vector< kv::psa< kv::interval<double> > > > psa_list;
 
+	// test for ode_callback_list in ode-callback.hpp
+
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_list<double>(start_list, end_list, psa_list));
 	if (!r) {
 		std::cout << "No Solution\n";
@@ -250,11 +198,13 @@ int main()
 		ps++; pe++; pp++;
 	}
 
+	// test for ode_callback_dense_list in ode-callback.hpp
+
 	std::list< kv::interval<double> > time_list;
 	std::list< ub::vector< kv::interval<double> > > value_list;
 
 	ix = x;
-	end = 1.;
+	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_dense_list<double>(itv(0.), itv(0.125), time_list, value_list));
 	if (!r) {
 		std::cout << "No Solution\n";

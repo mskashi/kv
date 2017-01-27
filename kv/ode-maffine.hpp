@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2016-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE_HPP
@@ -236,10 +236,11 @@ odelong_maffine(
 	int s = init.size();
 	ub::vector< affine<T> > x, x1;
 	interval<T> t, t1;
-	int r;
+	int ret_ode;
 	ub::matrix< interval<T> > M, M_tmp;
 	ub::matrix< interval<T> >* M_p;
 	int ret_val = 0;
+	bool ret_callback;
 
 	ub::vector< psa< interval<T> > > result_tmp;
 
@@ -251,16 +252,16 @@ odelong_maffine(
 		M = ub::identity_matrix< interval<T> >(s);
 	}
 
-	
 	x = init;
 	t = start;
 	p.set_autostep(true);
+
 	while (true) {
 		x1 = x;
 		t1 = end;
 
-		r = ode_maffine(f, x1, t, t1, p, M_p, &result_tmp);
-		if (r == 0) {
+		ret_ode = ode_maffine(f, x1, t, t1, p, M_p, &result_tmp);
+		if (ret_ode == 0) {
 			if (ret_val == 1) {
 				init = x1;
 				if (mat != NULL) *mat = M;
@@ -280,13 +281,21 @@ odelong_maffine(
 			std::cout << to_interval(x1) << "\n";
 		}
 
-		callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
+		ret_callback = callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
 
-		if (r == 2) {
+		if (ret_callback == false) {
+			init = x1;
+			if (mat != NULL) *mat = M;
+			end = t1;
+			return 3;
+		}
+
+		if (ret_ode == 2) {
 			init = x1;
 			if (mat != NULL) *mat = M;
 			return 2;
 		}
+
 		t = t1;
 		x = x1;
 	}
@@ -307,21 +316,19 @@ odelong_maffine(
 	ub::vector< affine<T> > x;
 	int maxnum_save;
 	int r;
-	interval<T> end2 = end;
 
 	maxnum_save = affine<T>::maxnum();
 	affine<T>::maxnum() = 0;
 
 	x = init;
 
-	r = odelong_maffine(f, x, start, end2, p, callback);
+	r = odelong_maffine(f, x, start, end, p, callback);
 
 	affine<T>::maxnum() = maxnum_save;
 
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));
-	if (r == 1) end = end2;
 
 	return r;
 }
@@ -343,7 +350,6 @@ odelong_maffine(
 	ub::matrix< interval<T> > M, M_tmp;
 	int maxnum_save;
 	int r;
-	interval<T> end2 = end;
 
 	autodif< interval<T> >::split(init, xi, M);
 	int s2 = M.size2();
@@ -353,7 +359,7 @@ odelong_maffine(
 
 	x = xi;
 
-	r = odelong_maffine(f, x, start, end2, p, callback, &M_tmp);
+	r = odelong_maffine(f, x, start, end, p, callback, &M_tmp);
 
 	affine<T>::maxnum() = maxnum_save;
 
@@ -369,8 +375,6 @@ odelong_maffine(
 		}
 	}
 	
-	if (r == 1) end = end2;
-
 	return r;
 }
 

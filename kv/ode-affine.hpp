@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_HPP
@@ -369,8 +369,9 @@ odelong_affine(
 	int s = init.size();
 	ub::vector< affine<T> > x, x1;
 	interval<T> t, t1;
-	int r;
+	int ret_ode;
 	int ret_val = 0;
+	bool ret_callback;
 
 	ub::vector< psa< interval<T> > > result_tmp;
 
@@ -378,12 +379,13 @@ odelong_affine(
 	x = init;
 	t = start;
 	p.set_autostep(true);
+
 	while (1) {
 		x1 = x;
 		t1 = end;
 
-		r = ode_affine(f, x1, t, t1, p, &result_tmp);
-		if (r == 0) {
+		ret_ode = ode_affine(f, x1, t, t1, p, &result_tmp);
+		if (ret_ode == 0) {
 			if (ret_val == 1) {
 				init = x1;
 				end = t;
@@ -398,10 +400,17 @@ odelong_affine(
 
 		callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
 		
-		if (r == 2) {
+		if (ret_callback == false) {
+			init = x1;
+			end = t1;
+			return 3;
+		}
+
+		if (ret_ode == 2) {
 			init = x1;
 			return 2;
 		}
+
 		t = t1;
 		x = x1;
 	}
@@ -422,21 +431,19 @@ odelong_affine(
 	ub::vector< affine<T> > x;
 	int maxnum_save;
 	int r;
-	interval<T> end2 = end;
 
 	maxnum_save = affine<T>::maxnum();
 	affine<T>::maxnum() = 0;
 
 	x = init;
 
-	r = odelong_affine(f, x, start, end2, p, callback);
+	r = odelong_affine(f, x, start, end, p, callback);
 
 	affine<T>::maxnum() = maxnum_save;
 
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));
-	if (r == 1) end = end2;
 
 	return r;
 }

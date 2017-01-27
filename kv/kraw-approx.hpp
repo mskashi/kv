@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef KRAW_APPROX_HPP
@@ -113,6 +113,43 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 	} else {
 		return false;
 	}
+}
+
+
+namespace krawczyk_approx_sub {
+
+// generate 1-d vector function from scalar function
+template <class F>
+struct MakeVec {
+	F f;
+	MakeVec(F f): f(f) {}
+
+	template <class T> ub::vector<T> operator()(const ub::vector<T>& x) {
+		ub::vector<T> r(1);
+		r(0) = f(x(0));
+		return r;
+	}
+};
+
+} // namespace krawczyk_approx_sub;
+
+
+// 1 dimensional version
+
+template <class T, class F>
+bool
+krawczyk_approx(F f, const T& c, interval<T>& result, int newton_max = 2, int verbose = 1)
+{
+	ub::vector<T> in(1);
+	ub::vector< interval<T> > out;
+	krawczyk_approx_sub::MakeVec<F> g(f);
+	bool r;
+
+	in(0) = c;
+	r = krawczyk_approx(g, in, out, newton_max, verbose);
+	result = out(0);
+
+	return r;
 }
 
 } // namespace kv

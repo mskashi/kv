@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_W_HPP
@@ -156,16 +156,14 @@ odelong_wrapper(F f, ub::vector< interval<T> >& init, const interval<T>& start, 
 	int i;
 	ub::vector< affine<T> > x;
 	int r;
-	interval<T> end2 = end;
 
 	affine<T>::maxnum() = 0;
 	x = init;
 
-	r = odelong_wrapper(f, x, start, end2, p);
+	r = odelong_wrapper(f, x, start, end, p);
 	if (r == 0) return 0;
 
 	for (i=0; i<s; i++) init(i) = to_interval(x(i));
-	if (r == 1) end = end2;
 
 	return r;
 }

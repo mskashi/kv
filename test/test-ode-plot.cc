@@ -29,10 +29,9 @@ template <class T> struct ode_callback_psaplot : ode_callback<T> {
 	gnuplot g;
 	int n;
 
-	ode_callback_psaplot(gnuplot g, int n) : g(g), n(n) {
-	}
+	ode_callback_psaplot(gnuplot g, int n) : g(g), n(n) {}
 
-	virtual void operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
+	virtual bool operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
 		int i, j;
 		int s = result.size();
 
@@ -40,6 +39,7 @@ template <class T> struct ode_callback_psaplot : ode_callback<T> {
 			psa< interval<T> >::domain() = interval<T>(0., (end - start).upper());
 			psa_plot(result(j), mid(start), g, n, j+1);
 		}
+		return true;
 	}
 };
 
