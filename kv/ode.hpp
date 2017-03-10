@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_HPP
@@ -22,6 +22,10 @@
 
 #ifndef ODE_FAST
 #define ODE_FAST 1
+#endif
+
+#ifndef ODE_STEP_COMPONENT
+#define ODE_STEP_CONPONENT 0
 #endif
 
 #ifndef ODE_RESTART_RATIO
@@ -60,8 +64,15 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 	ub::vector< interval<T> > result;
 
 	T radius, radius_tmp;
+
+	#if ODE_STEP_COMPONENT == 1
+	ub::vector<T> tolerance(n);
+	#else
 	T tolerance;
+	#endif
+
 	int n_rad;
+
 	#if ODE_RESTART_RATIO == 1
 	T max_ratio;
 	#endif
@@ -72,11 +83,17 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 	bool save_mode, save_uh, save_rh;
 
+	#if ODE_STEP_COMPONENT == 1
+	for (i=0; i<n; i++) {
+		tolerance(i) = std::max(T(1.), norm(init(i))) * p.epsilon;
+	}
+	#else
 	m = 1.;
 	for (i=0; i<n; i++) {
 		m = std::max(m, norm(init(i)));
 	}
 	tolerance = m * p.epsilon;
+	#endif
 
 	x = init;
 	torg.v.resize(2);
@@ -108,6 +125,26 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 
 	if (p.autostep) {
 		// use two non-zero coefficients of higher order term
+		#if ODE_STEP_COMPONENT == 1
+		radius = std::numeric_limits<T>::infinity();
+		for (i=0; i<n; i++) {
+			radius_tmp = 0.;
+			n_rad = 0;
+			for (j = p.order; j>=1; j--) {
+				#if ODE_COEF_MID == 1
+				using std::abs;
+				m = abs(mid(x(i).v(j)));
+				#else
+				m = norm(x(i).v(j));
+				#endif
+				if (m == 0.) continue;
+				radius_tmp = std::max(radius_tmp, (T)std::pow((double)m, 1./j));
+				n_rad++;
+				if (n_rad == 2) break;
+			}
+			radius = std::min(radius, std::pow((double)(tolerance(i)), 1./p.order) / radius_tmp);
+		}
+		#else // ODE_STEP_COMPONENT
 		radius = 0.;
 		n_rad = 0;
 		for (j = p.order; j>=1; j--) {
@@ -121,13 +158,12 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 				#endif
 			}
 			if (m == 0.) continue;
-			radius_tmp = std::pow((double)m, 1./j);
-			// std::cout << j << " " << m << " " << radius_tmp << "\n";
-			if (radius_tmp > radius) radius = radius_tmp;
+			radius = std::max(radius, (T)std::pow((double)m, 1./j));
 			n_rad++;
 			if (n_rad == 2) break;
 		}
 		radius = std::pow((double)tolerance, 1./p.order) / radius;
+		#endif // ODE_STEP_COMPONENT
 	}
 
 	psa< interval<T> >::mode() = 2;
@@ -193,10 +229,16 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 		if (p.autostep && resized == false) {
 			resized = true;
 			m = 0.;
+			#if ODE_STEP_COMPONENT == 1
+			for (i=0; i<n; i++) {
+				m = std::max(m, (rad(eval(z(i), deltat)) - rad(init(i))) / tolerance(i));
+			}
+			#else
 			for (i=0; i<n; i++) {
 				m = std::max(m, rad(eval(z(i), deltat)) - rad(init(i)));
 			}
 			m = m / tolerance;
+			#endif
 			if (restart > 0) {
 				radius /= std::max(1., std::pow((double)m, 1. / p.order));
 			} else {
@@ -232,7 +274,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			std::cout << "ode: radius changed: " << radius;
 		}
 		#if ODE_RESTART_RATIO == 1
-		radius *= std::max(std::min(0.5, 0.5 / max_ratio), 0.125);
+		radius *= std::max(std::min((T)0.5, (T)0.5 / max_ratio), (T)0.125);
 		#else
 		radius *= 0.5;
 		#endif

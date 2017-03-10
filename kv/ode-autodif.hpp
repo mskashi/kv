@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_HPP
@@ -144,8 +144,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 				#endif
 			}
 			if (m == 0.) continue;
-			radius_tmp = std::pow((double)m, 1./j);
-			if (radius_tmp > radius) radius = radius_tmp;
+			radius = std::max(radius, (T)std::pow((double)m, 1./j));
 			n_rad++;
 			if (n_rad == 2) break;
 		}
@@ -279,7 +278,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			std::cout << "ode: radius changed: " << radius;
 		}
 		#if ODE_RESTART_RATIO == 1
-		radius *= std::max(std::min(0.5, 0.5 / max_ratio), 0.125);
+		radius *= std::max(std::min((T)0.5, (T)0.5 / max_ratio), (T)0.125);
 		#else
 		radius *= 0.5;
 		#endif
