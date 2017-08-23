@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -23,6 +23,10 @@
 
 #ifndef DD_NEW_SQRT
 #define DD_NEW_SQRT 1
+#endif
+
+#ifndef KV_USE_TPFMA
+#define KV_USE_TPFMA 0
 #endif
 
 
@@ -78,6 +82,12 @@ class dd {
 		y = a - x;
 	}
 
+#if KV_USE_TPFMA == 1
+	static void twoproduct(const double& a, const double& b, double& x, double& y) {
+		x = a * b;
+		y = fma(a, b, -x);
+	}
+#else // KV_USE_TPFMA
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
 		static const double th = std::ldexp(1., 996);
 		static const double c1 = std::ldexp(1., -28);
@@ -111,6 +121,7 @@ class dd {
 			y = (((a1 * b1 - x) + a2 * b1) + a1 * b2) + a2 * b2;
 		}
 	}
+#endif // KV_USE_TPFMA
 
 	dd() {
 		a1 = 0.;

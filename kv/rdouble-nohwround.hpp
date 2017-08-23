@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_NOHWROUND_HPP
@@ -11,6 +11,12 @@
 #include <cmath>
 #include <kv/conv-double.hpp>
 #include <kv/fpu53.hpp>
+
+
+#ifndef KV_USE_TPFMA
+#define KV_USE_TPFMA 0
+#endif
+
 
 namespace kv {
 
@@ -45,6 +51,12 @@ template <> struct rop <double> {
 		y = a - x;
 	}
 
+#if KV_USE_TPFMA == 1
+	static void twoproduct(const double& a, const double& b, double& x, double& y) {
+		x = a * b;
+		y = fma(a, b, -x);
+	}
+#else // KV_USE_TPFMA
 	static void twoproduct(const double& a, const double& b, double& x, double& y) {
 		static const double th = std::ldexp(1., 996);
 		static const double c1 = std::ldexp(1., -28);
@@ -73,11 +85,12 @@ template <> struct rop <double> {
 		split(na, a1, a2);
 		split(nb, b1, b2);
 		if (std::fabs(x) > th2) {
-			y = a2 * b2 - ((((x * 0.5) - (a1 * 0.5)  * b1) * 2. - a2 * b1) - a1 * b2);
+			y = ((((a1 * 0.5) * b1 - (x * 0.5)) * 2 + a2 * b1) + a1 * b2) + a2 * b2;
 		} else {
-			y = a2 * b2 - (((x - a1 * b1) - a2 * b1) - a1 * b2);
+			y = (((a1 * b1 - x) + a2 * b1) + a1 * b2) + a2 * b2;
 		}
 	}
+#endif // KV_USE_TPFMA
 
 	// succ and pred by Rump
 

@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_HWROUND_HPP
 #define RDD_HWROUND_HPP
 
+#include <cmath>
 #include <kv/hwround.hpp>
 
 
@@ -12,10 +13,27 @@
 #define DD_NEW_SQRT 1
 #endif
 
+#ifndef KV_USE_TPFMA
+#define KV_USE_TPFMA 0
+#endif
+
+
 namespace kv {
 
 template <> struct rop <dd> {
 
+#if KV_USE_TPFMA == 1
+	static void twoproduct_up(const double& a, const double& b, double& x, double& y) {
+		volatile double v1, v2, v3, v4;
+		x = a * b;
+		hwround::roundup();
+		v1 = a; v2 = b; v3 = x;
+		// y = fma(a, b, -x);
+		v4 = fma(v1, v2, -v3);
+		y = v4;
+		hwround::roundnear();
+	}
+#else // KV_USE_TPFMA
 	static void twoproduct_up(const double& a, const double& b, double& x, double& y) {
 		static const double th = std::ldexp(1., 996);
 		static const double c1 = std::ldexp(1., -28);
@@ -54,7 +72,20 @@ template <> struct rop <dd> {
 		y = v2;
 		hwround::roundnear();
 	}
+#endif // KV_USE_TPFMA
 
+#if KV_USE_TPFMA == 1
+	static void twoproduct_down(const double& a, const double& b, double& x, double& y) {
+		volatile double v1, v2, v3, v4;
+		x = a * b;
+		hwround::rounddown();
+		v1 = a; v2 = b; v3 = x;
+		// y = fma(a, b, -x);
+		v4 = fma(v1, v2, -v3);
+		y = v4;
+		hwround::roundnear();
+	}
+#else // KV_USE_TPFMA
 	static void twoproduct_down(const double& a, const double& b, double& x, double& y) {
 		static const double th = std::ldexp(1., 996);
 		static const double c1 = std::ldexp(1., -28);
@@ -93,6 +124,7 @@ template <> struct rop <dd> {
 		y = v2;
 		hwround::roundnear();
 	}
+#endif // KV_USE_TPFMA
 
 	static dd add_up(const dd& x, const dd& y) {
 		double z1, z2, z3, z4;

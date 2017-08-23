@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
@@ -49,6 +49,9 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 	T pi = boost::math::constants::pi<T>();
 	complex<T> f, df;
 
+	using std::abs;
+	using std::pow;
+
 	if (p(n).real() * p(n).real() + p(n).imag() * p(n).imag() == 0.) {
 		return false;
 	}
@@ -68,27 +71,24 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 	for (i=0; i<n-1; i++) b(i) = -abs(a(i));
 	b(n-1) = 0.;
 	b(n) = abs(a(n));
+	// prepare for the case where b(0)...b(n-2) are 0.
+	b(0) = std::min(b(0), -std::numeric_limits<T>::epsilon());
 
-	// calculate initial radius for Newton's method
-	// r = 2^n such that g(2^n) > 0 and g(2^(n-1)) < 0
-
-	r = 1.;
-	while (true) {
-		if (eval_polynomial(b, r) > 0.) break;
-		r *= 2.;
+	// initial guess for b(r) = 0
+	r = 0.;
+	for (i=0; i<n-1; i++) {
+		tmp = pow(n * abs(b[i]/b[n]), 1.0/(n-i));
+		if (tmp > r) r = tmp;
 	}
 
 	// db(r) = b'(r)
-
 	db.resize(n);
 	for (i=1; i<s; i++) db(i-1) = b(i) * i;
 
 	// calculate radius by Newton's method for equation b(r) = 0
-
 	while (true) {
 		tmp = eval_polynomial(b, r) / eval_polynomial(db, r);
 		r -= tmp;
-		using std::abs;
 		if (abs(tmp) < n * abs(r) * epsilon) break;
 	}
 
