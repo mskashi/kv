@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_PLOT_HPP
@@ -8,7 +8,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 
 #include <kv/psa.hpp>
-#include <kv/gnuplot.hpp>
+#include <kv/matplotlib.hpp>
 
 
 namespace kv {
@@ -16,7 +16,7 @@ namespace kv {
 namespace ub = boost::numeric::ublas;
 
 template<class T1, class T2>
-void psa_plot(const psa<T1>& x, const T2& offset, const gnuplot& g, int div = 50 , int t=1)
+void psa_plot(const psa<T1>& x, const T2& offset, const matplotlib& g, int div = 50, const char * color = "blue") 
 {
 	double s, e, off, p1, p2, l1, u1, l2, u2;
 	int i;
@@ -33,8 +33,8 @@ void psa_plot(const psa<T1>& x, const T2& offset, const gnuplot& g, int div = 50
 		u1 = eval(x, (T1)p1).upper();
 		l2 = eval(x, (T1)p2).lower();
 		u2 = eval(x, (T1)p2).upper();
-		g.line(off + p1, l1, off + p2, l2, t);
-		g.line(off + p1, u1, off + p2, u2, t);
+		g.line(off + p1, l1, off + p2, l2, color);
+		g.line(off + p1, u1, off + p2, u2, color);
 	}
 }
 

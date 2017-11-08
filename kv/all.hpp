@@ -21,7 +21,6 @@
 #include <kv/fpu53.hpp>
 #include <kv/gamma.hpp>
 #include <kv/geoseries.hpp>
-#include <kv/gnuplot.hpp>
 #include <kv/hypergeom.hpp>
 #include <kv/hwround.hpp>
 #include <kv/interval.hpp>
@@ -33,6 +32,7 @@
 #include <kv/lobachevsky.hpp>
 #include <kv/lp.hpp>
 #include <kv/make-candidate.hpp>
+#include <kv/matplotlib.hpp>
 #include <kv/matrix-inversion.hpp>
 #include <kv/mpfr.hpp>
 #include <kv/newton.hpp>

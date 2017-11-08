@@ -5,7 +5,7 @@ typedef kv::affine<double> afd;
 
 int main()
 {
-	kv::gnuplot g;
+	kv::matplotlib g;
 	g.open();
 	g.screen(-3,-3,3,3);
 	g.send_command("set size ratio -1");

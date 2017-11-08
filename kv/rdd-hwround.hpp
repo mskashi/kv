@@ -6,6 +6,7 @@
 #define RDD_HWROUND_HPP
 
 #include <cmath>
+#include <limits>
 #include <kv/hwround.hpp>
 
 
@@ -347,6 +348,7 @@ template <> struct rop <dd> {
 			}
 		}
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -433,6 +435,7 @@ template <> struct rop <dd> {
 			}
 		}
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
 
 		return dd(z3, z4);
@@ -468,7 +471,6 @@ template <> struct rop <dd> {
 		} else {
 			tmp = std::sqrt(v5 + v6) + v1;
 		}
-		hwround::roundup();
 		v2 /= tmp;
 		z2 = v2;
 		hwround::roundnear();

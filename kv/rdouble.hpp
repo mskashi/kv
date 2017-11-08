@@ -1,15 +1,19 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_HPP
 #define RDOUBLE_HPP
 
 #ifdef KV_NOHWROUND
-#include <kv/rdouble-nohwround.hpp>
+  #include <kv/rdouble-nohwround.hpp>
 #else
-#include <kv/rdouble-hwround.hpp>
-#endif
+  #ifdef KV_USE_AVX512
+    #include <kv/rdouble-avx512.hpp>
+  #else
+    #include <kv/rdouble-hwround.hpp>
+  #endif
+#endif 
 
 namespace kv {
 template <> struct constants< interval<double> > {

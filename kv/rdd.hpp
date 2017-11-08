@@ -1,14 +1,18 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_HPP
 #define RDD_HPP
 
 #ifdef KV_NOHWROUND
-#include <kv/rdd-nohwround.hpp>
+  #include <kv/rdd-nohwround.hpp>
 #else
-#include <kv/rdd-hwround.hpp>
+  #ifdef KV_USE_AVX512
+    #include <kv/rdd-avx512.hpp>
+  #else
+    #include <kv/rdd-hwround.hpp>
+  #endif
 #endif
 
 namespace kv {

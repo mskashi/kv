@@ -10,8 +10,7 @@ typedef kv::interval<double> itv;
 int main()
 {
 	kv::psa<itv> c;
-	kv::gnuplot g;
-	// g.open("/usr/bin/gnuplot", "x11");
+	kv::matplotlib g;
 	g.open();
 	g.screen(-0.1,-5,0.3,5);
 

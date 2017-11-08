@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef JOINTRANGE_HPP
@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <boost/numeric/ublas/vector.hpp>
 #include <kv/affine.hpp>
-#include <kv/gnuplot.hpp>
+#include <kv/matplotlib.hpp>
 
 
 namespace kv {
@@ -17,7 +17,7 @@ namespace ub = boost::numeric::ublas;
 
 
 template<class T>
-void jointrange(const affine<T>& x, const affine<T>& y, const gnuplot& g, int t=1)
+void jointrange(const affine<T>& x, const affine<T>& y, const matplotlib& g, const char *color = "blue")
 {
 	int n, i, j, s;
 	T tmp;
@@ -80,9 +80,9 @@ void jointrange(const affine<T>& x, const affine<T>& y, const gnuplot& g, int t=
 			dy += s * vy(j);
 		}
 		g.line(vx(0)+dx+vx(i), vy(0)+dy+vy(i), 
-		       vx(0)+dx-vx(i), vy(0)+dy-vy(i), t);
+		       vx(0)+dx-vx(i), vy(0)+dy-vy(i), color);
 		g.line(vx(0)-dx+vx(i), vy(0)-dy+vy(i), 
-		       vx(0)-dx-vx(i), vy(0)-dy-vy(i), t);
+		       vx(0)-dx-vx(i), vy(0)-dy-vy(i), color);
 	}
 }
 

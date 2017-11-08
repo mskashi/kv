@@ -142,17 +142,24 @@ bool check_sqrt_down()
 	return result;
 }
 
+void check(bool (*f)(), const char *str) {
+	if (f()) {
+		std::cout << str << ": OK\n";
+	} else {
+		std::cout << str << ": NG\n";
+	}
+}
+
 int main()
 {
-	std::cout << "all test should be 1.\n";
-	std::cout << "add_up: " << check_add_up() << "\n";
-	std::cout << "add_down: " << check_add_down() << "\n";
-	std::cout << "sub_up: " << check_sub_up() << "\n";
-	std::cout << "sub_down: " << check_sub_down() << "\n";
-	std::cout << "mul_up: " << check_mul_up() << "\n";
-	std::cout << "mul_down: " << check_mul_down() << "\n";
-	std::cout << "div_up: " << check_div_up() << "\n";
-	std::cout << "div_down: " << check_div_down() << "\n";
-	std::cout << "sqrt_up: " << check_sqrt_up() << "\n";
-	std::cout << "sqrt_down: " << check_sqrt_down() << "\n";
+	check(check_add_up, "add_up");
+	check(check_add_down, "add_down");
+	check(check_sub_up, "sub_up");
+	check(check_sub_down, "sub_down");
+	check(check_mul_up, "mul_up");
+	check(check_mul_down, "mul_down");
+	check(check_div_up, "div_up");
+	check(check_div_down, "div_down");
+	check(check_sqrt_up, "sqrt_up");
+	check(check_sqrt_down, "sqrt_down");
 }

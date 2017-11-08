@@ -26,10 +26,10 @@ struct Lorenz {
 namespace kv {
 
 template <class T> struct ode_callback_psaplot : ode_callback<T> {
-	gnuplot g;
+	matplotlib g;
 	int n;
 
-	ode_callback_psaplot(gnuplot g, int n) : g(g), n(n) {}
+	ode_callback_psaplot(matplotlib g, int n) : g(g), n(n) {}
 
 	virtual bool operator()(const interval<T>& start, const interval<T>& end, const ub::vector< interval<T> >& x_s, const ub::vector< interval<T> >& x_e, const ub::vector< psa< interval<T> > >& result) const {
 		int i, j;
@@ -37,7 +37,7 @@ template <class T> struct ode_callback_psaplot : ode_callback<T> {
 
 		for (j=0; j<s; j++) {
 			psa< interval<T> >::domain() = interval<T>(0., (end - start).upper());
-			psa_plot(result(j), mid(start), g, n, j+1);
+			psa_plot(result(j), mid(start), g, n);
 		}
 		return true;
 	}
@@ -51,7 +51,7 @@ int main()
 	int i;
 	ub::vector<itv> ix;
 	int r;
-	kv::gnuplot g;
+	kv::matplotlib g;
 
 	itv end;
 
@@ -61,8 +61,7 @@ int main()
 
 	std::cout.precision(17);
 
-	// g.open();
-	g.open("/usr/bin/gnuplot", "x11");
+	g.open();
 	g.screen(0, -50, 1, 50);
 
 	end = 1.;

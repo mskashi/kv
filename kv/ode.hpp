@@ -25,7 +25,7 @@
 #endif
 
 #ifndef ODE_STEP_COMPONENT
-#define ODE_STEP_CONPONENT 0
+#define ODE_STEP_COMPONENT 0
 #endif
 
 #ifndef ODE_RESTART_RATIO
