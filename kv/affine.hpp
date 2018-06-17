@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -1696,6 +1696,10 @@ template <class T> class ep_reduce_v {
 		T m1, m2, tmp;
 		using std::abs;
 		m1 = abs(v(0));
+		if (s == 1) {
+			score = m1;
+			return;
+		}
 		m2 = abs(v(1));
 		if (m2 > m1) {
 			tmp = m2; m2 = m1; m1 = tmp;

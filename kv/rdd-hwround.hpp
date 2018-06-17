@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_HWROUND_HPP
@@ -131,21 +131,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 + y.a1, 0.);
+		}
+
 		dd::twosum(x.a1, y.a1, z1, z2);
 
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<dd>::max)();
+			z1 = -(std::numeric_limits<dd>::max)().a1;
+			z2 = -(std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return std::numeric_limits<dd>::infinity();
 
 		hwround::roundup();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 + v3;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			z3 = -(std::numeric_limits<dd>::max)().a1;
+			z4 = -(std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -154,21 +166,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 + y.a1, 0.);
+		}
+
 		dd::twosum(x.a1, y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<dd>::max)();
-		} else if (z1 == -std::numeric_limits<double>::infinity()) {
+		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
+		} else if (z1 == std::numeric_limits<double>::infinity()) {
+			z1 = (std::numeric_limits<dd>::max)().a1;
+			z2 = (std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return -std::numeric_limits<dd>::infinity();
 
 		hwround::rounddown();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 + v3;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == std::numeric_limits<double>::infinity()) {
+			z3 = (std::numeric_limits<dd>::max)().a1;
+			z4 = (std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -177,21 +201,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 - y.a1, 0.);
+		}
+
 		dd::twosum(x.a1, -y.a1, z1, z2);
 
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<dd>::max)();
+			z1 = -(std::numeric_limits<dd>::max)().a1;
+			z2 = -(std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return std::numeric_limits<dd>::infinity();
 
 		hwround::roundup();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 - v3;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			z3 = -(std::numeric_limits<dd>::max)().a1;
+			z4 = -(std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -200,21 +236,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 - y.a1, 0.);
+		}
+
 		dd::twosum(x.a1, -y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<dd>::max)();
-		} else if (z1 == -std::numeric_limits<double>::infinity()) {
+		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
+		} else if (z1 == std::numeric_limits<double>::infinity()) {
+			z1 = (std::numeric_limits<dd>::max)().a1;
+			z2 = (std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return -std::numeric_limits<dd>::infinity();
 
 		hwround::rounddown();
 		v1 = z2; v2 = x.a2; v3 = y.a2;
 		v1 += v2 - v3;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == std::numeric_limits<double>::infinity()) {
+			z3 = (std::numeric_limits<dd>::max)().a1;
+			z4 = (std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -223,22 +271,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3, v4, v5;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 * y.a1, 0.);
+		}
+
 		twoproduct_up(x.a1, y.a1, z1, z2);
 
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<dd>::max)();
+			z1 = -(std::numeric_limits<dd>::max)().a1;
+			z2 = -(std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return std::numeric_limits<dd>::infinity();
 
 		hwround::roundup();
 		v1 = z2; v2 = x.a1; v3 = x.a2; v4 = y.a1; v5 = y.a2;
 		v1 += v2 * v5 + v3 * v4 + v3 * v5;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
 
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			z3 = -(std::numeric_limits<dd>::max)().a1;
+			z4 = -(std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -247,21 +306,33 @@ template <> struct rop <dd> {
 		double z1, z2, z3, z4;
 		volatile double v1, v2, v3, v4, v5;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 * y.a1, 0.);
+		}
+
 		twoproduct_down(x.a1, y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<dd>::max)();
-		} else if (z1 == -std::numeric_limits<double>::infinity()) {
+		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
+		} else if (z1 == std::numeric_limits<double>::infinity()) {
+			z1 = (std::numeric_limits<dd>::max)().a1;
+			z2 = (std::numeric_limits<dd>::max)().a2;
 		}
-		// if (z1 != z1) return -std::numeric_limits<dd>::infinity();
 
 		hwround::rounddown();
 		v1 = z2; v2 = x.a1; v3 = x.a2; v4 = y.a1; v5 = y.a2;
 		v1 += v2 * v5 + v3 * v4 + v3 * v5;
 		z2 = v1;
 		hwround::roundnear();
+
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == std::numeric_limits<double>::infinity()) {
+			z3 = (std::numeric_limits<dd>::max)().a1;
+			z4 = (std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -271,16 +342,17 @@ template <> struct rop <dd> {
 		volatile double v1, v2, v3, v4, v5, v6, v7, v8;
 		volatile double tmp;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 / y.a1, 0.);
+		}
+
 		z1 = x.a1 / y.a1;
 
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			return -(std::numeric_limits<dd>::max)();
-		}
-		// if (z1 != z1) return std::numeric_limits<dd>::infinity();
-		if (std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
-			return dd(z1, 0.);
+			z1 = -(std::numeric_limits<dd>::max)().a1;
+			z2 = -(std::numeric_limits<dd>::max)().a2;
 		}
 
 		if (y.a1 >= 0.) {
@@ -350,6 +422,13 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == -std::numeric_limits<double>::infinity()) {
+			z3 = -(std::numeric_limits<dd>::max)().a1;
+			z4 = -(std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}
@@ -359,16 +438,17 @@ template <> struct rop <dd> {
 		volatile double v1, v2, v3, v4, v5, v6, v7, v8;
 		volatile double tmp;
 
+		if (std::fabs(x.a1) == std::numeric_limits<double>::infinity() || std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
+			return dd(x.a1 / y.a1, 0.);
+		}
+
 		z1 = x.a1 / y.a1;
 
-		if (z1 == std::numeric_limits<double>::infinity()) {
-			return (std::numeric_limits<dd>::max)();
-		} else if (z1 == -std::numeric_limits<double>::infinity()) {
+		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
-		}
-		// if (z1 != z1) return -std::numeric_limits<dd>::infinity();
-		if (std::fabs(y.a1) == std::numeric_limits<double>::infinity()) {
-			return dd(z1, 0.);
+		} else if (z1 == std::numeric_limits<double>::infinity()) {
+			z1 = (std::numeric_limits<dd>::max)().a1;
+			z2 = (std::numeric_limits<dd>::max)().a2;
 		}
 
 		if (y.a1 >= 0.) {
@@ -437,6 +517,13 @@ template <> struct rop <dd> {
 		hwround::roundnear();
 
 		dd::twosum(z1, z2, z3, z4);
+
+		if (z3 == -std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		} else if (z3 == std::numeric_limits<double>::infinity()) {
+			z3 = (std::numeric_limits<dd>::max)().a1;
+			z4 = (std::numeric_limits<dd>::max)().a2;
+		}
 
 		return dd(z3, z4);
 	}

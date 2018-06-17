@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -162,6 +162,9 @@ class dd {
 		}
 		z2 += x.a2 + y.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -175,6 +178,9 @@ class dd {
 		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -192,6 +198,9 @@ class dd {
 		}
 		z2 += y.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -224,6 +233,9 @@ class dd {
 		}
 		z2 += x.a2 - y.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -237,6 +249,9 @@ class dd {
 		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -254,6 +269,9 @@ class dd {
 		}
 		z2 -= y.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -302,6 +320,9 @@ class dd {
 		#endif
 
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -315,6 +336,9 @@ class dd {
 		}
 		z2 += x.a2 * y;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -332,6 +356,9 @@ class dd {
 		}
 		z2 += x * y.a2;
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -375,6 +402,9 @@ class dd {
 			z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
 		}
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -398,6 +428,9 @@ class dd {
 			z2 = (((z3 + x.a1) + x.a2) + z4) / y;
 		}
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}
@@ -424,6 +457,9 @@ class dd {
 			z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
 		}
 		twosum(z1, z2, z3, z4);
+		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			return dd(z3, 0.);
+		}
 
 		return dd(z3, z4);
 	}

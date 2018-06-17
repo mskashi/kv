@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -512,6 +512,9 @@ template <class T> class psa {
 		// h = x - a;
 		h = x; h.v(0) = 0.;
 
+		using std::sin;
+		using std::cos;
+
 		table[0] = sin(a);
 		table[1] = cos(a);
 		table[2] = -table[0];
@@ -568,6 +571,9 @@ template <class T> class psa {
 		a = x.v(0);
 		// h = x - a;
 		h = x; h.v(0) = 0.;
+
+		using std::sin;
+		using std::cos;
 
 		table[0] = cos(a);
 		table[1] = -sin(a);
@@ -626,6 +632,8 @@ template <class T> class psa {
 		// h = x - a;
 		h = x; h.v(0) = 0.;
 
+		using std::exp;
+
 		ea = exp(a);
 
 		r = ea;
@@ -673,6 +681,8 @@ template <class T> class psa {
 		a = x.v(0);
 		// h = x - a;
 		h = x; h.v(0) = 0.;
+
+		using std::sqrt;
 
 		sqrt_a = sqrt(a);
 
@@ -727,6 +737,8 @@ template <class T> class psa {
 		// h = x - a;
 		h = x; h.v(0) = 0.;
 
+		using std::log;
+
 		r = log(a);
 		hn = 1.;
 		xn = -1.;
@@ -778,6 +790,9 @@ template <class T> class psa {
 		a = x.v(0);
 		// h = x - a;
 		h = x; h.v(0) = 0.;
+
+		using std::sinh;
+		using std::cosh;
 
 		table[0] = sinh(a);
 		table[1] = cosh(a);
@@ -831,6 +846,9 @@ template <class T> class psa {
 		a = x.v(0);
 		// h = x - a;
 		h = x; h.v(0) = 0.;
+
+		using std::sinh;
+		using std::cosh;
 
 		table[0] = cosh(a);
 		table[1] = sinh(a);
@@ -898,6 +916,9 @@ template <class T> class psa {
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
 
+		using std::asin;
+		using std::sqrt;
+
 		taylor = asin(x.v(0)) + integrate(1 / sqrt(1 - taylor * taylor));
 
 		use_history() = save_uh;
@@ -956,6 +977,9 @@ template <class T> class psa {
 		taylor.v(0) = x.v(0);
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
+
+		using std::acos;
+		using std::sqrt;
 
 		taylor = acos(x.v(0)) + integrate(-1 / sqrt(1 - taylor * taylor));
 
@@ -1016,6 +1040,8 @@ template <class T> class psa {
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
 
+		using std::atan;
+
 		taylor = atan(x.v(0)) + integrate(1 / (1 + taylor * taylor));
 
 		use_history() = save_uh;
@@ -1074,6 +1100,9 @@ template <class T> class psa {
 		taylor.v(0) = x.v(0);
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
+
+		// using std::asinh;
+		using std::sqrt;
 
 		taylor = asinh(x.v(0)) + integrate(1 / sqrt(1 + taylor * taylor));
 
@@ -1134,6 +1163,9 @@ template <class T> class psa {
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
 
+		// using std::acosh;
+		using std::sqrt;
+
 		taylor = acosh(x.v(0)) + integrate(1 / sqrt(taylor * taylor - 1));
 
 		use_history() = save_uh;
@@ -1192,6 +1224,8 @@ template <class T> class psa {
 		taylor.v(0) = x.v(0);
 		taylor.v(1) = 1;
 		taylor = setorder(taylor, x.v.size()-2);
+
+		// using std::atanh;
 
 		taylor = atanh(x.v(0)) + integrate(1 / (1 - taylor * taylor));
 

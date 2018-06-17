@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_HPP
 #define DEFINT_HPP
 
-// Definit Integration
+// Definite Integration
 
 #include <cmath>
 #include <limits>
