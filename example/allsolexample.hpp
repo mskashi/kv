@@ -161,7 +161,7 @@ struct GE1 {
 	}
 };
 
-// 篠原能材: 数値解析の基礎 問3.8.2
+// Yoshitane Shinohara: Suuchikaiseki no Kiso, q. 3.8.2
 struct Shinohara1 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
@@ -191,7 +191,7 @@ struct Shinohara1 {
 	}
 };
 
-// 篠原能材: 数値解析の基礎 問3.8.3
+// Yoshitane Shinohara: Suuchikaiseki no Kiso, q. 3.8.3
 struct Shinohara2 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(2);
@@ -224,7 +224,7 @@ struct Shinohara2 {
 };
 
 
-// 篠原能材: 数値解析の基礎 演習問題3.8
+// Yoshitane Shinohara: Suuchikaiseki no Kiso, ex. 3.8
 struct Shinohara3 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
 		ub::vector<T> y(5);
@@ -260,14 +260,13 @@ struct Shinohara3 {
 
 
 /*
-  http://nlab.ee.tokushima-u.ac.jp/nishio/Pub-Data/WORK/W153.pdf
-  SPICEを用いた複数個の動作点解析 -全解探索への挑戦-
-  に出てきた例題。元は、
+  Problem taken from
+  http://nlab.ee.tokushima-u.ac.jp/nishio/Pub-Data/WORK/W153.pdf, 
   http://200.13.98.241/~martin/syop/tareas3/kuno_seader_homotopy.pdf
   Computing All Real Solutions to Systems of Nonlinear Equations
   with a Global Fixed-Point Homotopy
-  に出てくる、Himmelblauを少し変形したもの。
-  7つ解があるが、ホモトピー法でうまく解が見つからないことがあるらしい。
+  This equation has 7 solutions and difficult to find all solution
+  by homotopy method.
  */
 
 struct ModifiedHimmelblau {
@@ -292,7 +291,7 @@ struct ModifiedHimmelblau {
 };
 
 //
-// 2013/07/25のゼミで平八郎君が適当に作った例題
+// made by Heihachiro Yoshii on 2013/07/25
 //
 
 struct Heihachiro {
@@ -316,10 +315,6 @@ struct Heihachiro {
 	}
 };
 
-
-//
-// 山村先生の論文によく出てくる区分線形な方程式
-//
 
 struct Yamamura2 {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){

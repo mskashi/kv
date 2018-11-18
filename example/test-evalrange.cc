@@ -8,8 +8,9 @@
 #include <kv/interval-vector.hpp>
 
 /*
- * http://ci.nii.ac.jp/naid/110003291707 にあった5変数関数の像の評価を
- * 区間演算、affine, 平均値形式で比較
+ * comparison of interval, affine, mean value form
+ * in evaluation of a 5 variable function.
+ * The function is taken from http://ci.nii.ac.jp/naid/110003291707
  */
 
 namespace ub = boost::numeric::ublas;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef KRAW_APPROX_HPP
@@ -32,19 +32,21 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 
 	ub::vector< interval<T> > I, fc, fi, Rfc, C, K;
 	ub::matrix< interval<T> > fdc, fdi, M;
+	ub::vector<T> c2, minus;
 	ub::matrix<T> R;
-	int i;
+	int i, j;
 	bool r;
 	ub::vector<T> newton_step;
 	T tmp, tmp2;
 
-	C = c;
+	c2 = c;
 
 	// Newton iteration
 	// use interval<T> for argument of f
 	// preparing for the case that f can not accept T.
 
 	for (i=0; i<newton_max; i++) {
+		C = c2;
 		try {
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(C)), fc, fdc);
 		}
@@ -53,13 +55,25 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 		}
 		r = invert(mid(fdc), R);
 		if (!r) return false;
-		C = C - prod(R, fc);
-		C = mid(C);
-		if (verbose >= 1) {
-			std::cout << "newton" << i << ": " << C << "\n";
+
+		minus = prod(R, mid(fc));
+
+		tmp = 1.;
+		tmp2 = 0.;
+		for (j=0; j<s; j++) {
+			using std::abs;
+			tmp = std::max(tmp, abs(c2(j)));
+			tmp2 = std::max(tmp2, abs(minus(j)));
 		}
+
+		c2 = c2 - minus;
+		if (verbose >= 1) {
+			std::cout << "newton" << i << ": " << c2 << "\n";
+		}
+		if (tmp2 <= tmp * std::numeric_limits<T>::epsilon()) break;
 	}
 
+	C = c2;
 	try {
 		autodif< interval<T> >::split(f(autodif< interval<T> >::init(C)), fc, fdc);
 	}
@@ -79,8 +93,8 @@ krawczyk_approx(F f, const ub::vector<T>& c, ub::vector< interval<T> >& result, 
 
 	I = C;
 	for (i=0; i<s; i++) {
-		tmp = std::numeric_limits<T>::epsilon() * norm(I(i)) * s * 2;
-		tmp2 = std::numeric_limits<T>::min() * s * 2;
+		tmp = std::numeric_limits<T>::epsilon() * norm(I(i)) * (s+1) * 2;
+		tmp2 = std::numeric_limits<T>::min() * (s+1) * 2;
 		if (newton_step(i) < tmp) newton_step(i) = tmp;
 		if (newton_step(i) < tmp2) newton_step(i) = tmp2;
 		I(i) += newton_step(i) * interval<T>(-1., 1.);
@@ -147,8 +161,8 @@ krawczyk_approx(F f, const T& c, interval<T>& result, int newton_max = 2, int ve
 
 	in(0) = c;
 	r = krawczyk_approx(g, in, out, newton_max, verbose);
+	if (!r) return r;
 	result = out(0);
-
 	return r;
 }
 

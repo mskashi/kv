@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AUTODIF_HPP
@@ -265,7 +265,11 @@ template <class T> class autodif {
 
 		using std::pow;
 		r.v = pow(x.v, y);
-		r.d = (y * pow(x.v, y - 1)) * x.d;
+		if (y == 0) {
+			r.d = T(0.) * x.d;
+		} else {
+			r.d = (y * pow(x.v, y - 1)) * x.d;
+		}
 		return r;
 	}
 

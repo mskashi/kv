@@ -1,12 +1,16 @@
 #include <boost/timer.hpp>
 #include <kv/allsol.hpp>
 
-
 /*
- * 神澤他: 有限ステップで停止する非線形方程式のすべての解を精度保証付きで
- * 求めるアルゴリズム,
- * 電子情報通信学会論文誌A, Vol. J80-A, No.7, pp.1130-1137 (1997.7)
- * の中の例題
+ * Examples taken from:
+ * 
+ * Yuchi Kanzawa, Masahide Kashiwagi, Shin'ichi Oishi, Haruyuki Nakamura:
+ * An Algorithm of Finding All Solutions with Guaranteed Accuracy
+ * for Nonlinear Equations within Finite Steps
+ * IEICE transactions A, Vol. J80-A, No.7, pp.1130-1137 (1997.7)
+ * (in Japanese)
+ * 
+ * https://search.ieice.org/bin/summary.php?id=j80-a_7_1130
  */
 
 namespace ub = boost::numeric::ublas;

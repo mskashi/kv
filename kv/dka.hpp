@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
@@ -8,10 +8,10 @@
 #include <limits>
 #include <cmath>
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/math/constants/constants.hpp>
-#include "kv/interval.hpp"
-#include "kv/rdouble.hpp"
-#include "kv/complex.hpp"
+#include <kv/interval.hpp>
+#include <kv/rdouble.hpp>
+#include <kv/complex.hpp>
+#include <kv/constants.hpp>
 
 namespace kv {
 
@@ -35,19 +35,19 @@ static T inline eval_polynomial (const ub::vector<T>& p, const T& x)
 // Durand Kerner Aberth algorithm
 
 template <class T>
-bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsilon = std::numeric_limits<T>::epsilon())
+bool dka(const ub::vector< kv::complex<T> >& p, ub::vector< kv::complex<T> >& x, T epsilon = std::numeric_limits<T>::epsilon())
 {
 	int i, j;
 	int s = p.size();
 	int n = s - 1;
-	ub::vector< complex<T> > a(s);
-	complex<T> c;
+	ub::vector< kv::complex<T> > a(s);
+	kv::complex<T> c;
 	ub::vector<T> b;
 	T r, tmp, norm1, norm2, norm3;
 	ub::vector<T> db;
-	ub::vector< complex<T> > dx(n);
-	T pi = boost::math::constants::pi<T>();
-	complex<T> f, df;
+	ub::vector< kv::complex<T> > dx(n);
+	T pi = kv::constants<T>::pi();
+	kv::complex<T> f, df;
 
 	using std::abs;
 	using std::pow;
@@ -96,7 +96,7 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 
 	x.resize(n);
 	for (i=0; i<n; i++) {
-		x(i) = c + r * exp((2. * i * pi / n + pi / (2. * n)) * complex<T>::i());
+		x(i) = c + r * exp((2. * i * pi / n + pi / (2. * n)) * kv::complex<T>::i());
 	}
 
 	// max(|pi|)
@@ -140,13 +140,13 @@ bool dka(const ub::vector< complex<T> >& p, ub::vector< complex<T> >& x, T epsil
 // error estimation using Smith's theorem
 
 template <class T>
-ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< interval<T> > >& p, const ub::vector< complex<T> >& x)
+ub::vector< kv::complex< interval<T> > > smith_error(const ub::vector< kv::complex< interval<T> > >& p, const ub::vector< kv::complex<T> >& x)
 {
 	int i, j;
 	int s = p.size();
 	int n = s - 1;
-	ub::vector< complex< interval<T> > > x2, x3(n);
-	complex< interval<T> > f, df;
+	ub::vector< kv::complex< interval<T> > > x2, x3(n);
+	kv::complex< interval<T> > f, df;
 	T err;
 	ub::vector<int> unified(n);
 	bool flag;
@@ -200,12 +200,12 @@ ub::vector< complex< interval<T> > > smith_error(const ub::vector< complex< inte
 // verified Durand Kerner Aberth
 
 template <class T>
-bool vdka(const ub::vector< complex< interval<T> > >& p, ub::vector< complex< interval<T> > >& result, T epsilon = std::numeric_limits<T>::epsilon())
+bool vdka(const ub::vector< kv::complex< interval<T> > >& p, ub::vector< kv::complex< interval<T> > >& result, T epsilon = std::numeric_limits<T>::epsilon())
 {
 	int i;
 	int s = p.size();
 	int n = s - 1;
-	ub::vector< complex< T > > p2(s), x2;
+	ub::vector< kv::complex< T > > p2(s), x2;
 
 	if (zero_in(p(n).real() * p(n).real() + p(n).imag() * p(n).imag())) {
 		return false;

@@ -55,7 +55,7 @@ int main()
 	allsol(Shinohara1(), I);
 	cout << t.elapsed() << " sec\n";
 
-	// (2,0)が重解らしい?
+	// has multiple root (2,0)
 	Shinohara2().range(I);
 	std::cout << "Shinohara2\n";
 	t.restart();

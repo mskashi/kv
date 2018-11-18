@@ -1,5 +1,5 @@
 kv - a C++ Library for Verified Numerical Computation
-version 0.4.44
+version 0.4.45
 
 http://verifiedby.me/kv/
 
