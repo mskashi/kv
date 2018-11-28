@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_HPP
@@ -176,6 +176,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
+				radius = mid(end2 - start);
 				ret_val = 2;
 			} else {
 				ret_val = 1;
@@ -195,7 +196,7 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			w = f(z, t);
 		}
 		catch (std::domain_error& e) {
-			if (restart < p.restart_max) {
+			if (p.autostep && restart < p.restart_max) {
 				psa< interval<T> >::use_history() = false;
 				if (p.verbose == 1) {
 					std::cout << "ode: radius changed: " << radius;
@@ -226,9 +227,9 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			z(i).v(p.order) += newton_step(i) * interval<T>(-1., 1.);
 		}
 
-		if (p.autostep && resized == false) {
+		if (p.autostep && ret_val != 2 && resized == false) {
 			resized = true;
-			m = 0.;
+			m = (std::numeric_limits<T>::min)();
 			#if ODE_STEP_COMPONENT == 1
 			for (i=0; i<n; i++) {
 				m = std::max(m, (rad(eval(z(i), deltat)) - rad(init(i))) / tolerance(i));
@@ -239,12 +240,13 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			}
 			m = m / tolerance;
 			#endif
-			if (restart > 0) {
-				radius /= std::max(1., std::pow((double)m, 1. / p.order));
+			radius_tmp = radius / std::pow((double)m, 1. / p.order);
+			if (radius_tmp >= radius && restart > 0) {
+				// do nothing, not continue
 			} else {
-				radius /= std::pow((double)m, 1. / p.order);
+				radius = radius_tmp;
+				continue;
 			}
-			continue;
 		}
 
 		w = f(z, t);

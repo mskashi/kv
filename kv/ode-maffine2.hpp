@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE2_HPP
@@ -171,7 +171,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 	ub::vector< affine<T> > s1_save;
 	ub::vector< interval<T> > s2i_save;
 
-	interval<T> deltat, deltat_n;
+	interval<T> deltat_n;
 	ub::vector< psa< interval<T> > > psa_result;
 
 	int r;
@@ -194,9 +194,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 		*result_psa = psa_result;
 	}
 
-	deltat = end2 - start;
-	deltat_n = 1.;
-	for (i=0; i<p.order; i++) deltat_n *= deltat;
+	deltat_n = pow(end2 - start, p.order);
 
 	I2.resize(n);
 	for (i=0; i<n; i++) {

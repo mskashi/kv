@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2016-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE_HPP
@@ -114,8 +114,6 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	int ret_val;
 	interval<T> end2 = end;
 
-	ode_param<T> p2 = p;
-	p2.set_autostep(false);
 
 	I.resize(n);
 	c.resize(n);
@@ -145,22 +143,29 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		}
 	}
 
-	#if 0
-	// fixed stepsize
+	ode_param<T> p2 = p;
+
+	p2.set_autostep(true);
+	p2.set_epsilon(std::numeric_limits<T>::infinity());
+
 	r = ode(g, fdI_tmp, start, end2, p2);
-	if (r == 0) {
+	if (r == 0) return 0;
+	if (r == 1) {
 		if (p.autostep == false) return 0;
-		// autostep
-		r = ode(g, fdI_tmp, start, end2, p);
-		if (r == 0) return 0;
 		ret_val = 1;
 	}
-	#endif
+
+#if 0
+	p2.set_autostep(false);
+
 	r = ode(g, fdI_tmp, start, end2, p2);
 	if (r == 0) {
 		if (p.autostep == false) return 0;
 		for (i=0; i<p.restart_max; i++) {
-			end2 = start + (end2 - start) * 0.5;
+			if (p.verbose == 1) {
+				std::cout << "ode_maffine: radius changed: " << end2-start << " -> " << (end2-start)*0.5 << "\n";
+			}
+			end2 = mid(start + (end2 - start) * 0.5);
 			r = ode(g, fdI_tmp, start, end2, p2);
 			if (r != 0) {
 				ret_val = 1;
@@ -169,6 +174,7 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 		}
 		if (r == 0) return 0;
 	}
+#endif
 
 	fdI.resize(n, n);
 	k = 0;
@@ -179,13 +185,17 @@ ode_maffine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interv
 	}
 
 	fc = c;
+
+	ode_param<T> p3 = p;
+	p3.set_autostep(false);
+
 	while (true) {
 		// fixed stepsize
-		r = ode(f, fc, start, end2, p2);
+		r = ode(f, fc, start, end2, p3);
 		if (r != 0) break;
-		p2.order++;
+		p3.order++;
 		if (p.verbose == 1) {
-			std::cout << "ode_maffine: increase order: " << p2.order << "\n";
+			std::cout << "ode_maffine: increase order: " << p3.order << "\n";
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE0_HPP
@@ -45,9 +45,6 @@ ode_maffine0(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 
 	ub::vector< affine<T> > result;
 
-	ub::vector< psa< autodif< interval<T> > > > *result_tmp_p;
-	ub::vector< psa< autodif< interval<T> > > > result_tmp;
-
 
 	int maxnum_save;
 
@@ -68,29 +65,11 @@ ode_maffine0(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 		c(i) = mid(I(i));
 	}
 
-	// prepare for result_psa if needed
-	if (result_psa != NULL) {
-		result_tmp_p = &result_tmp;
-	} else {
-		result_tmp_p = NULL;
-	}
-
 	Iad = autodif< interval<T> >::init(I);
 	// NOTICE: below must be autodif version of ode
-	r = ode(f, Iad, start, end2, p, result_tmp_p);
+	r = ode(f, Iad, start, end2, p, result_psa);
 	if (r == 0) return 0;
 	ret_val = r;
-
-	// store result_tmp to *result_psa without autodif information
-	if (result_psa != NULL) {
-		(*result_psa).resize(n);
-		for (i=0; i<n; i++) {
-			(*result_psa)(i).v.resize(result_tmp(i).v.size());
-			for (j=0; j<result_tmp(i).v.size(); j++) {
-				(*result_psa)(i).v(j) = result_tmp(i).v(j).v;
-			}
-		}
-	}
 
 	fc = c;
 	// Step size should be same as above ode call.

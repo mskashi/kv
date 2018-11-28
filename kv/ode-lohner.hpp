@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_LOHNER_HPP
@@ -137,6 +137,7 @@ ode_lohner(F f, ub::vector< interval<T> >& init, const interval<T>& start, inter
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
+				radius = mid(end2 - start);
 				ret_val = 2;
 			} else {
 				ret_val = 1;
@@ -360,6 +361,7 @@ ode_lohner(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& s
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
+				radius = mid(end2 - start);
 				ret_val = 2;
 			} else {
 				ret_val = 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_QR_HPP
@@ -61,7 +61,6 @@ odelong_qr(
 	ub::vector< interval<T> > y, y1, y2, tmp;
 
 	ub::vector< psa< interval<T> > > result_psa;
-	ub::vector< psa< autodif< interval<T> > > > result_tmp;
 
 
 	if (mat != NULL) {
@@ -85,7 +84,7 @@ odelong_qr(
 		p2 = p;
 		p2.set_autostep(true);
 		// NOTICE: below must be autodif version of ode
-		ret_ode = ode(f, Iad, t, t1, p2, &result_tmp);
+		ret_ode = ode(f, Iad, t, t1, p2, &result_psa);
 		if (ret_ode == 0) break;
 
 		fc = c;
@@ -146,14 +145,6 @@ odelong_qr(
 			std::cout << x1 << "\n";
 		}
 
-		// store result_tmp to result_psa without autodif information
-		result_psa.resize(s);
-		for (i=0; i<s; i++) {
-			result_psa(i).v.resize(result_tmp(i).v.size());
-			for (j=0; j<result_tmp(i).v.size(); j++) {
-				result_psa(i).v(j) = result_tmp(i).v(j).v;
-			}
-		}
 		ret_callback = callback(t, t1, x, x1, result_psa);
 
 		if (ret_callback == false) {

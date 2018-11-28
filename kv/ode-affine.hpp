@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AFFINE_HPP
@@ -153,6 +153,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
+				radius = mid(end2 - start);
 				ret_val = 2;
 			} else {
 				ret_val = 1;
@@ -172,7 +173,7 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			w = f(z, t);
 		}
 		catch (std::domain_error& e) {
-			 if (restart < p.restart_max) {
+			 if (p.autostep && restart < p.restart_max) {
 				psa< affine<T> >::use_history() = false;
 				if (p.verbose == 1) {
 					std::cout << "ode: radius changed: " << radius;
@@ -218,19 +219,20 @@ ode_affine(F f, ub::vector< affine<T> >& init, const interval<T>& start, interva
 			#endif
 		}
 
-		if (p.autostep && resized == false) {
+		if (p.autostep && ret_val != 2 && resized == false) {
 			resized = true;
-			m = 0.;
+			m = (std::numeric_limits<T>::min)();
 			for (i=0; i<n; i++) {
 				m = std::max(m, rad(eval(z(i), (affine<T>)deltat)) - rad(init(i)));
 			}
 			m = m / tolerance;
-			if (restart > 0) {
-				radius /= std::max(1., std::pow((double)m, 1. / p.order));
+			radius_tmp = radius / std::pow((double)m, 1. / p.order);
+			if (radius_tmp >= radius && restart > 0) {
+				// do nothing, not continue
 			} else {
-				radius /= std::pow((double)m, 1. / p.order);
+				radius = radius_tmp;
+				continue;
 			}
-			continue;
 		}
 
 		w = f(z, t);

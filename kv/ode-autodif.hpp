@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_AUTODIF_HPP
@@ -43,7 +43,7 @@ namespace ub = boost::numeric::ublas;
 
 template <class T, class F>
 int
-ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::vector< psa< autodif< interval<T> > > >* result_psa = NULL) {
+ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::vector< psa< interval<T> > >* result_psa = NULL) {
 	int n = init.size();
 	int i, j, k, km;
 
@@ -161,6 +161,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			end2 = mid(start + radius);
 			if (end2 >= end.lower()) {
 				end2 = end;
+				radius = mid(end2 - start);
 				ret_val = 2;
 			} else {
 				ret_val = 1;
@@ -180,7 +181,7 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			w = f(z, t);
 		}
 		catch (std::domain_error& e) {
-			if (restart < p.restart_max) {
+			if (p.autostep && restart < p.restart_max) {
 				psa< autodif< interval<T> > >::use_history() = false;
 				if (p.verbose == 1) {
 					std::cout << "ode: radius changed: " << radius;
@@ -224,9 +225,9 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 			}
 		}
 
-		if (p.autostep && resized == false) {
+		if (p.autostep && ret_val != 2 && resized == false) {
 			resized = true;
-			m = 0.;
+			m = (std::numeric_limits<T>::min)();
 			for (i=0; i<n; i++) {
 				evalz = eval(z(i), autodif< interval<T> >(deltat));
 				m = std::max(m, rad(evalz.v) - rad(new_init(i).v));
@@ -236,12 +237,13 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 				}
 			}
 			m = m / tolerance;
-			if (restart > 0) {
-				radius /= std::max(1., std::pow((double)m, 1. / p.order));
+			radius_tmp = radius / std::pow((double)m, 1. / p.order);
+			if (radius_tmp >= radius && restart > 0) {
+				// do nothing, not continue
 			} else {
-				radius /= std::pow((double)m, 1. / p.order);
+				radius = radius_tmp;
+				continue;
 			}
-			continue;
 		}
 
 		w = f(z, t);
@@ -320,7 +322,16 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 
 		init = result;
 		if (ret_val == 1) end = end2;
-		if (result_psa != NULL) *result_psa = w;
+		if (result_psa != NULL) {
+			// store w to *result_psa without autodif information
+			(*result_psa).resize(n);
+			for (i=0; i<n; i++) {
+				(*result_psa)(i).v.resize(w(i).v.size());
+				for (j=0; j<w(i).v.size(); j++) {
+					(*result_psa)(i).v(j) = w(i).v(j).v;
+				}
+			}
+		}
 	}
 
 	psa< autodif< interval<T> > >::mode() = save_mode;
