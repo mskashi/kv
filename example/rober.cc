@@ -1,5 +1,4 @@
 #include <iostream>
-#include <kv/ode-maffine0.hpp>
 #include <kv/ode-maffine.hpp>
 #include <kv/ode-maffine2.hpp>
 
@@ -62,7 +61,6 @@ int main()
 	std::cout.precision(17);
 
 	end = 1.;
-	// odelong_maffine0: slow
 	// odelong_maffine: fast
 	// odelong_maffine2: very fast but cannot calculate derivative w.r.t initial value
 	r = kv::odelong_maffine(Rober(), ix, itv(0.), end, p.set_verbose(0).set_restart_max(10).set_order(24));

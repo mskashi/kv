@@ -2,7 +2,6 @@
 #include <limits>
 
 #include <kv/ode-maffine.hpp>
-#include <kv/ode-maffine0.hpp>
 #include <kv/ode-maffine2.hpp>
 #include <kv/ode-affine.hpp>
 #include <kv/ode-qr.hpp>
@@ -88,16 +87,6 @@ int main()
 	ix = x;
 	end = 0.125;
 	r = kv::odelong_maffine(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
-	if (!r) {
-		std::cout << "No Solution\n";
-	} else {
-		std::cout << ix << "\n";
-		std::cout << end << "\n";
-	}
-
-	ix = x;
-	end = 0.125;
-	r = kv::odelong_maffine0(Lorenz(), ix, itv(0.), end, kv::ode_param<double>(), kv::ode_callback_sample<double>());
 	if (!r) {
 		std::cout << "No Solution\n";
 	} else {

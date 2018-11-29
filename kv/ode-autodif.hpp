@@ -7,19 +7,156 @@
 
 // ODE (input and output : autodif type)
 
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <kv/interval.hpp>
-#include <kv/rdouble.hpp>
-#include <kv/interval-vector.hpp>
-#include <kv/make-candidate.hpp>
-#include <kv/psa.hpp>
+#include <kv/ode.hpp>
 #include <kv/autodif.hpp>
-#include <kv/ode-param.hpp>
+
+
+#ifndef ODE_AUTODIF_NEW
+#define ODE_AUTODIF_NEW 1
+#endif
+
+
+namespace kv {
+
+namespace ub = boost::numeric::ublas;
+
+
+#if ODE_AUTODIF_NEW == 1
+
+template <class F, class T> struct MakeVariationalEq {
+	F f;
+	ub::vector< psa<T> > solution;
+	int s, s2;
+
+	MakeVariationalEq(F f, ub::vector< psa<T> > solution) : f(f), solution(solution) {
+		s = solution.size();
+		s2 = s * s;
+	}
+
+	ub::vector< psa<T> > operator() (const ub::vector< psa<T> >& x, const psa<T>& t){
+		ub::matrix< psa<T> > x2(s, s);
+		ub::vector< psa<T> > y(s2);
+
+		ub::vector< psa<T> > solution2(s);
+		psa<T> t2;
+
+		ub::vector< psa<T> > rv;
+		ub::matrix< psa<T> > rm;
+
+		int i, j, k;
+		int order, tmp;
+
+		order = 0;
+		k = 0;
+		for (i=0; i<s; i++) {
+			for (j=0; j<s; j++) {
+				tmp = x(k).v.size() - 1;
+				if (tmp > order) order = tmp;
+				x2(i, j) = x(k);
+				k++;
+			}
+		}
+
+		for (i=0; i<s; i++) {
+			solution2(i) = setorder(solution(i), order);
+		}
+		t2 = setorder(t, order);
+
+		autodif< psa<T> >::split(f(autodif< psa<T> >::init(solution2), autodif< psa<T> >(t2)), rv, rm);
+
+		rm = prod(rm, x2);
+
+		k = 0;
+		for (i=0; i<s; i++) {
+			for (j=0; j<s; j++) {
+				y(k++) = rm(i, j);
+			}
+		}
+
+		return y;
+	}
+};
+
+template <class T, class F>
+int
+ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, interval<T>& end, ode_param<T> p = ode_param<T>(), ub::vector< psa< interval<T> > >* result_psa = NULL) {
+	int n = init.size();
+	int i, j, k;
+	int r, ret_val;
+
+	ub::vector< autodif< interval<T> > > result;
+
+	ub::vector< interval<T> > Iv, Fv;
+	ub::matrix< interval<T> > Id, Fd;
+	ub::matrix< interval<T> > fdI;
+	ub::vector< interval<T> > fdI_tmp;
+	ub::vector< psa< interval<T> > > result_tmp;
+
+	interval<T> end2 = end;
+
+	kv::autodif< interval<T> >::split(init, Iv, Id);
+
+	Fv = Iv;
+	r = ode(f, Fv, start, end2, p, &result_tmp);
+	if (r == 0) return 0;
+	ret_val = r;
+
+	if (result_psa != NULL) {
+		*result_psa = result_tmp;
+	}
+
+	MakeVariationalEq< F, interval<T> > g(f, result_tmp);
+
+	fdI_tmp.resize(n * n);
+	k = 0;
+	for (i=0; i<n; i++) {
+		for (j=0; j<n; j++) {
+			if (i == j) fdI_tmp(k) = 1.;
+			else fdI_tmp(k) = 0.;
+			k++;
+		}
+	}
+
+	ode_param<T> p2 = p;
+
+	p2.set_autostep(true);
+	p2.set_epsilon(std::numeric_limits<T>::infinity());
+
+	r = ode(g, fdI_tmp, start, end2, p2);
+	if (r == 0) return 0;
+	if (r == 1) {
+		if (p.autostep == false) return 0;
+		ret_val = 1;
+	}
+
+	fdI.resize(n, n);
+	k = 0;
+	for (i=0; i<n; i++) {
+		for (j=0; j<n; j++) {
+			fdI(i, j) = fdI_tmp(k++);
+		}
+	}
+
+	Fd = prod(fdI, Id);
+
+	result.resize(n);
+	int s2 = Fd.size2();
+	for (i=0; i<n; i++) {
+		result(i).v = Fv(i);
+		result(i).d.resize(s2);
+		for (j=0; j<s2; j++) {
+			result(i).d(j) = Fd(i, j);
+		}
+	}
+
+	init = result;
+	if (ret_val == 1) end = end2;
+
+	return ret_val;
+}
+
+
+#else // ODE_AUTODIF_NEW != 1
 
 
 #ifndef ODE_FAST
@@ -33,12 +170,6 @@
 #ifndef ODE_COEF_MID
 #define ODE_CORF_MID 0
 #endif
-
-
-
-namespace kv {
-
-namespace ub = boost::numeric::ublas;
 
 
 template <class T, class F>
@@ -340,6 +471,8 @@ ode(F f, ub::vector< autodif< interval<T> > >& init, const interval<T>& start, i
 
 	return ret_val;
 }
+
+#endif
 
 
 template <class T, class F>
