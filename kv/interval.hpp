@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -286,21 +286,11 @@ template <class T> class interval {
 		rop<T>::begin();
 		if (x.inf >= 0.) {
 			if (x.sup == 0.) {
-				if (abs(y.inf) == std::numeric_limits<T>::infinity()
-				 || abs(y.sup) == std::numeric_limits<T>::infinity()) {
-					r = whole();
-				} else {
-					r = interval(0., 0.);
-				} 
+				r = interval(0., 0.);
 			} else {
 				if (y.inf >= 0.) {
 					if (y.sup == 0.) {
-						if (abs(x.inf) == std::numeric_limits<T>::infinity()
-						 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
-							r = whole();
-						} else {
-							r = interval(0., 0.);
-						} 
+						r = interval(0., 0.);
 					} else {
 						r.inf = rop<T>::mul_down(x.inf, y.inf);
 						r.sup = rop<T>::mul_up(x.sup, y.sup);
@@ -316,12 +306,7 @@ template <class T> class interval {
 		} else if (x.sup <= 0.) {
 			if (y.inf >= 0.) {
 				if (y.sup == 0.) {
-					if (abs(x.inf) == std::numeric_limits<T>::infinity()
-					 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
-						r = whole();
-					} else {
-						r = interval(0., 0.);
-					} 
+					r = interval(0., 0.);
 				} else {
 					r.inf = rop<T>::mul_down(x.inf, y.sup);
 					r.sup = rop<T>::mul_up(x.sup, y.inf);
@@ -336,12 +321,7 @@ template <class T> class interval {
 		} else {
 			if (y.inf >= 0.) {
 				if (y.sup == 0.) {
-					if (abs(x.inf) == std::numeric_limits<T>::infinity()
-					 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
-						r = whole();
-					} else {
-						r = interval(0., 0.);
-					} 
+					r = interval(0., 0.);
 				} else {
 					r.inf = rop<T>::mul_down(x.inf, y.sup);
 					r.sup = rop<T>::mul_up(x.sup, y.sup);
@@ -376,12 +356,7 @@ template <class T> class interval {
 			r.inf = rop<T>::mul_down(x.sup, T(y));
 			r.sup = rop<T>::mul_up(x.inf, T(y));
 		} else {
-			if (abs(x.inf) == std::numeric_limits<T>::infinity()
-			 || abs(x.sup) == std::numeric_limits<T>::infinity()) {
-				r = whole();
-			} else {
-				r = interval(0., 0.);
-			} 
+			r = interval(0., 0.);
 		}
 		rop<T>::end();
 
@@ -405,12 +380,7 @@ template <class T> class interval {
 			r.inf = rop<T>::mul_down(T(x), y.sup);
 			r.sup = rop<T>::mul_up(T(x), y.inf);
 		} else {
-			if (abs(y.inf) == std::numeric_limits<T>::infinity()
-			 || abs(y.sup) == std::numeric_limits<T>::infinity()) {
-				r = whole();
-			} else {
-				r = interval(0., 0.);
-			} 
+			r = interval(0., 0.);
 		}
 		rop<T>::end();
 

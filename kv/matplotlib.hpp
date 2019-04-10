@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2017-2018 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef MATPLOTLIB_HPP
@@ -63,9 +63,9 @@ class matplotlib {
 	void rect(double x1, double y1, double x2, double y2, const char *edgecolor = "blue", const char *facecolor = NULL, const char *opt = "") const {
 		
 		if (facecolor == NULL) {
-			fprintf(p, "ax.draw_artist(ax.add_patch(patches.Rectangle(xy=(%.17f,%.17f), width=%.17f, height=%.17f, fill=False, edgecolor='%s', %s)))\n", (x1+x2)/2, (y1+y2)/2, x2-x1, y2-y1, edgecolor, opt);
+			fprintf(p, "ax.draw_artist(ax.add_patch(patches.Rectangle(xy=(%.17f,%.17f), width=%.17f, height=%.17f, fill=False, edgecolor='%s', %s)))\n", x1, y1, x2-x1, y2-y1, edgecolor, opt);
 		} else {
-			fprintf(p, "ax.draw_artist(ax.add_patch(patches.Rectangle(xy=(%.17f,%.17f), width=%.17f, height=%.17f, fill=True, edgecolor='%s', facecolor='%s', %s)))\n", (x1+x2)/2, (y1+y2)/2, x2-x1, y2-y1, edgecolor, facecolor, opt);
+			fprintf(p, "ax.draw_artist(ax.add_patch(patches.Rectangle(xy=(%.17f,%.17f), width=%.17f, height=%.17f, fill=True, edgecolor='%s', facecolor='%s', %s)))\n", x1, y1, x2-x1, y2-y1, edgecolor, facecolor, opt);
 		}
 		fprintf(p, "fig.canvas.blit(ax.bbox)\n");
 		fprintf(p, "fig.canvas.flush_events()\n");

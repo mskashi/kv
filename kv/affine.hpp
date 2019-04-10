@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -1796,6 +1796,41 @@ template <class T> inline void epsilon_reduce(ub::vector< affine<T> >& x, int n,
 
 	x = r;
 	affine<T>::maxnum() = n;
+}
+
+
+
+// simple version of epsilon_reduce
+// keep ep_1...ep_n and "intervalize" epsilons newer than ep_n
+
+template <class T> inline void epsilon_reduce2(ub::vector< affine<T> >& x, int n) {
+	int s = x.size();
+	int i, j;
+	T tmp;
+
+	for (i=0; i<s; i++) {
+		tmp = 0.;
+		rop<T>::begin();
+		for (j=n+1; j<x(i).a.size(); j++) {
+			using std::abs;
+			tmp = rop<T>::add_up(tmp, abs(x(i).a(j)));
+		}
+		#if AFFINE_SIMPLE >= 1
+		tmp = rop<T>::add_up(tmp, x(i).er);
+		#endif
+		rop<T>::end();
+
+		x(i).a.resize(n+1+i+1, true);
+		for (j=0; j<i; j++) {
+			x(i).a(n+1+j) = 0.;
+		}
+		x(i).a(n+1+i) = tmp;
+		#if AFFINE_SIMPLE >= 1
+		x(i).er = 0.;
+		#endif
+	}
+
+	affine<T>::maxnum() = n + s;
 }
 
 

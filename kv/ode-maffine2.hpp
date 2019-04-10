@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE2_HPP
@@ -166,11 +166,6 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 
 	int maxnum_save;
 
-	affine<T> s1, s2;
-	interval<T> s2i;
-	ub::vector< affine<T> > s1_save;
-	ub::vector< interval<T> > s2i_save;
-
 	interval<T> deltat_n;
 	ub::vector< psa< interval<T> > > psa_result;
 
@@ -217,20 +212,7 @@ ode_maffine2(F f, ub::vector< affine<T> >& init, const interval<T>& start, inter
 	result = I2 + fc + prod(result_d, init - c);
 
 	if (p.ep_reduce == 0) {
-		s1_save.resize(n);
-		s2i_save.resize(n);
-		for (i=0; i<n; i++) {
-			split(result(i), maxnum_save, s1, s2);
-			s2i = to_interval(s2);
-			s1_save(i) = s1;
-			s2i_save(i) = s2i;
-		}
-
-		affine<T>::maxnum() = maxnum_save;
-		for (i=0; i<n; i++) {
-			s1_save(i).resize();
-			result(i) = append(s1_save(i), (affine<T>)s2i_save(i));
-		}
+		epsilon_reduce2(result, maxnum_save);
 	} else {
 		epsilon_reduce(result, p.ep_reduce, p.ep_reduce_limit);
 	}
