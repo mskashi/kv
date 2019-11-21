@@ -137,7 +137,7 @@ template <class F1, class F2> class Defint_log_func {
 
 template <class T, class F1, class F2>
 interval<T>
-defint_power3(F1 f, F2 g, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1) {
+defint_power3(F1 f, F2 g, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1) {
 	int i;
 	interval<T> step, result, tx, tp;
 	psa< interval<T> > x, y;
@@ -159,12 +159,12 @@ defint_power3(F1 f, F2 g, interval<T> start, interval<T> end, int order, interva
 	x.v(1) = 1;
 	x = setorder(x, order);
 
-	y = pow(div_tn(f(x), singularity_order), power) * g(x);
+	y = pow(div_tn(f(x), multiplicity), power) * g(x);
 	// set order preparing for constant function
 	y = setorder(y, order);
 
 	result = 0.;
-	tp = power * singularity_order + 1.;
+	tp = power * multiplicity + 1.;
 	tx = pow(step, tp);
 	for (i=0; i<y.v.size(); i++) {
 		result += y.v(i) * tx / tp;
@@ -196,8 +196,8 @@ defint_power(F f, interval<T> start, interval<T> end, int order, interval<T> pow
 
 template <class T, class F>
 interval<T>
-defint_power2(F f, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1) {
-	return defint_power3(f, Defint_1(), start, end, order, power, singularity_order);
+defint_power2(F f, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1) {
+	return defint_power3(f, Defint_1(), start, end, order, power, multiplicity);
 }
 
 
@@ -209,7 +209,7 @@ defint_power2(F f, interval<T> start, interval<T> end, int order, interval<T> po
 
 template <class T, class F1, class F2>
 interval<T>
-defint_log3(F1 f, F2 g, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
+defint_log3(F1 f, F2 g, interval<T> start, interval<T> end, int order, int multiplicity = 1) {
 	int i;
 	interval<T> step, result;
 	interval<T> xn, logx;
@@ -232,16 +232,16 @@ defint_log3(F1 f, F2 g, interval<T> start, interval<T> end, int order, int singu
 	x.v.resize(2);
 	x.v(0) = start;
 	x.v(1) = 1;
-	x = setorder(x, order + singularity_order);
+	x = setorder(x, order + multiplicity);
 
 	y = f(x);
 	// set order preparing for constant function
-	y = setorder(y, order + singularity_order);
+	y = setorder(y, order + multiplicity);
 
-	result = eval(integrate(log(div_tn(y, singularity_order)) * g(x)), step);
+	result = eval(integrate(log(div_tn(y, multiplicity)) * g(x)), step);
 
 	x = setorder(x, order);
-	y = singularity_order * g(x);
+	y = multiplicity * g(x);
 	// set order preparing for constant function
 	y = setorder(y, order);
 
@@ -279,8 +279,8 @@ defint_log(F f, interval<T> start, interval<T> end, int order) {
 
 template <class T, class F>
 interval<T>
-defint_log2(F f, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
-	return defint_log3(f, Defint_1(), start, end, order, singularity_order);
+defint_log2(F f, interval<T> start, interval<T> end, int order, int multiplicity = 1) {
+	return defint_log3(f, Defint_1(), start, end, order, multiplicity);
 }
 
 
@@ -329,7 +329,7 @@ defint_singular(F f, interval<T> start, interval<T> end, int order) {
 
 template <class T, class F1, class F2, class F3>
 interval<T>
-defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
 	interval<T> t1, step, result, tx, tp;
 	psa< interval<T> > x, y;
 	int i;
@@ -359,7 +359,7 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 	psa< interval<T> >::history().clear();
 	#endif
 
-	y = pow(div_tn(f(x), singularity_order), power) * g(x);
+	y = pow(div_tn(f(x), multiplicity), power) * g(x);
 	// set order preparing for constant function
 	y = setorder(y, order);
 
@@ -407,7 +407,7 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 		psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 		try {
-			y = pow(div_tn(f(x), singularity_order), power) * g(x);
+			y = pow(div_tn(f(x), multiplicity), power) * g(x);
 		}
 		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
@@ -421,7 +421,7 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 		}
 
 		result = 0.;
-		tp = power * singularity_order + 1.;
+		tp = power * multiplicity + 1.;
 		tx = pow(step, tp);
 		for (i=0; i<y.v.size(); i++) {
 			result += y.v(i) * tx / tp;
@@ -461,15 +461,15 @@ defint_power_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int orde
 
 template <class T, class F1, class F2>
 interval<T>
-defint_power2_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_power3_autostep(f1, f2, Defint_1(), start, end, order, power, singularity_order, epsilon);
+defint_power2_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_power3_autostep(f1, f2, Defint_1(), start, end, order, power, multiplicity, epsilon);
 }
 
 
 
 template <class T, class F1, class F2, class F3>
 interval<T>
-defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
 	interval<T> t1, step, result;
 	interval<T> xn, logx;
 	psa< interval<T> > x, y, y2;
@@ -499,14 +499,14 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 	psa< interval<T> >::history().clear();
 	#endif
 
-	x = setorder(x, order + singularity_order);
+	x = setorder(x, order + multiplicity);
 	y = f(x);
 	// set order preparing for constant function
-	y = setorder(y, order + singularity_order);
-	y = integrate(log(div_tn(y, singularity_order)) * g(x));
+	y = setorder(y, order + multiplicity);
+	y = integrate(log(div_tn(y, multiplicity)) * g(x));
 
 	x = setorder(x, order);
-	y2 = singularity_order * g(x);
+	y2 = multiplicity * g(x);
 	// set order preparing for constant function
 	y2 = setorder(y2, order);
 
@@ -556,11 +556,11 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 		psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 		try {
-			x = setorder(x, order + singularity_order);
+			x = setorder(x, order + multiplicity);
 			y = f(x);
-			result = eval(integrate(log(div_tn(y, singularity_order)) * g(x)), step);
+			result = eval(integrate(log(div_tn(y, multiplicity)) * g(x)), step);
 			x = setorder(x, order);
-			y = singularity_order * g(x);
+			y = multiplicity * g(x);
 		}
 		catch (std::domain_error& e) {
 			if (restart < RESTART_MAX) {
@@ -612,8 +612,8 @@ defint_log_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order,
 
 template <class T, class F1, class F2>
 interval<T>
-defint_log2_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_log3_autostep(f1, f2, Defint_1(), start, end, order, singularity_order, epsilon);
+defint_log2_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_log3_autostep(f1, f2, Defint_1(), start, end, order, multiplicity, epsilon);
 }
 
 
@@ -744,8 +744,8 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 
 template <class T, class F1, class F2>
 interval<T>
-defint_power3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1) {
-	return defint_power3(Defint_Reverse<F1>(f), Defint_Reverse<F2>(g), -end, -start, order, power, singularity_order);
+defint_power3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1) {
+	return defint_power3(Defint_Reverse<F1>(f), Defint_Reverse<F2>(g), -end, -start, order, power, multiplicity);
 }
 
 template <class T, class F>
@@ -756,14 +756,14 @@ defint_power_r(F f, interval<T> start, interval<T> end, int order, interval<T> p
 
 template <class T, class F>
 interval<T>
-defint_power2_r(F f, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1) {
-	return defint_power3(Defint_Reverse<F>(f), Defint_1(), -end, -start, order, power, singularity_order);
+defint_power2_r(F f, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1) {
+	return defint_power3(Defint_Reverse<F>(f), Defint_1(), -end, -start, order, power, multiplicity);
 }
 
 template <class T, class F1, class F2>
 interval<T>
-defint_log3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
-	return defint_log3(Defint_Reverse<F1>(f), Defint_Reverse<F2>(g), -end, -start, order, singularity_order);
+defint_log3_r(F1 f, F2 g, interval<T> start, interval<T> end, int order, int multiplicity = 1) {
+	return defint_log3(Defint_Reverse<F1>(f), Defint_Reverse<F2>(g), -end, -start, order, multiplicity);
 }
 
 template <class T, class F>
@@ -774,8 +774,8 @@ defint_log_r(F f, interval<T> start, interval<T> end, int order) {
 
 template <class T, class F>
 interval<T>
-defint_log2_r(F f, interval<T> start, interval<T> end, int order, int singularity_order = 1) {
-	return defint_log3(Defint_Reverse<F>(f), Defint_1(), -end, -start, order, singularity_order);
+defint_log2_r(F f, interval<T> start, interval<T> end, int order, int multiplicity = 1) {
+	return defint_log3(Defint_Reverse<F>(f), Defint_1(), -end, -start, order, multiplicity);
 }
 
 template <class T, class F>
@@ -786,8 +786,8 @@ defint_singular_r(F f, interval<T> start, interval<T> end, int order) {
 
 template <class T, class F1, class F2, class F3>
 interval<T>
-defint_power3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_power3_autostep(Defint_Reverse<F1>(h), Defint_Reverse<F2>(f), Defint_Reverse<F3>(g), -end, -start, order, power, singularity_order, epsilon);
+defint_power3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_power3_autostep(Defint_Reverse<F1>(h), Defint_Reverse<F2>(f), Defint_Reverse<F3>(g), -end, -start, order, power, multiplicity, epsilon);
 }
 
 template <class T, class F1, class F2>
@@ -798,14 +798,14 @@ defint_power_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int or
 
 template <class T, class F1, class F2>
 interval<T>
-defint_power2_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, interval<T> power, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_power3_autostep(Defint_Reverse<F1>(f1), Defint_Reverse<F2>(f2), Defint_1(), -end, -start, order, power, singularity_order, epsilon);
+defint_power2_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, interval<T> power, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_power3_autostep(Defint_Reverse<F1>(f1), Defint_Reverse<F2>(f2), Defint_1(), -end, -start, order, power, multiplicity, epsilon);
 }
 
 template <class T, class F1, class F2, class F3>
 interval<T>
-defint_log3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_log3_autostep(Defint_Reverse<F1>(h), Defint_Reverse<F2>(f), Defint_Reverse<F3>(g), -end, -start, order, singularity_order, epsilon);
+defint_log3_autostep_r(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int order, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_log3_autostep(Defint_Reverse<F1>(h), Defint_Reverse<F2>(f), Defint_Reverse<F3>(g), -end, -start, order, multiplicity, epsilon);
 }
 
 template <class T, class F1, class F2>
@@ -816,8 +816,8 @@ defint_log_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int orde
 
 template <class T, class F1, class F2>
 interval<T>
-defint_log2_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, int singularity_order = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
-	return defint_log3_autostep(Defint_Reverse<F1>(f1), Defint_Reverse<F2>(f2), Defint_1(), -end, -start, order, singularity_order, epsilon);
+defint_log2_autostep_r(F1 f1, F2 f2, interval<T> start, interval<T> end, int order, int multiplicity = 1, T epsilon = std::numeric_limits<T>::epsilon()) {
+	return defint_log3_autostep(Defint_Reverse<F1>(f1), Defint_Reverse<F2>(f2), Defint_1(), -end, -start, order, multiplicity, epsilon);
 }
 
 template <class T, class F1, class F2>
