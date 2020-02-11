@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2020 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -1160,6 +1160,11 @@ template <class T> class interval {
 
 		using std::frexp;
 		x2 = frexp(x, &p_i);
+
+		// re-calculate x2 for the T with broken frexp such as dd
+		if (round == -1) x2 = (x * pow(interval<T>(2.), -p_i)).lower();
+		else x2 = (x * pow(interval<T>(2.), -p_i)).upper();
+		
 		p = (T)p_i;
 
 		while (x2 > 4. * std::sqrt(2.) - 4.) {

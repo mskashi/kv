@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2020 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -700,10 +700,12 @@ class dd {
 	friend dd frexp(const dd& x, int* m) {
 		double z1, z2;
 		z1 = std::frexp(x.a1, m);
-		if (*m == 0) {
-			return x;
-		}
 		z2 = std::ldexp(x.a2, -(*m));
+		if ((z1 == 0.5 && z2 < 0) || (z1 == -0.5 && z2 > 0)) {
+			z1 *= 2;
+			z2 *= 2;
+			(*m)--;
+		}
 		return dd(z1, z2);
 	}
 
@@ -1000,11 +1002,14 @@ class dd {
 		return r;
 	}
 
-	friend dd sin(const dd& I) {
+	friend dd sin(dd I) {
 		const dd p = pi();
+		int n;
 
-		if (I >= p) {
-			return sin(I - p * 2.);
+		if (I <= -p || I >= p) {
+			using std::floor;
+			n = floor(I / (p * 2.) + 0.5);
+			I -= n * p * 2.;
 		}
 
 		if (I <= -p * 3. / 4.) {
@@ -1031,11 +1036,14 @@ class dd {
 		return sin_origin(p - I);
 	}
 
-	friend dd cos(const dd& I) {
+	friend dd cos(dd I) {
 		const dd p = pi();
+		int n;
 
-		if (I >= p) {
-			return cos(I - p * 2.);
+		if (I <= -p || I >= p) {
+			using std::floor;
+			n = floor(I / (p * 2.) + 0.5);
+			I -= n * p * 2.;
 		}
 
 		if (I <= -p * 3. / 4.) {
