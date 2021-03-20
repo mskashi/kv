@@ -672,6 +672,16 @@ template <class T> class interval {
 		return interval(z1, z2);
 	}
 
+	friend interval floor(const interval& x) {
+		using std::floor;
+		return interval(floor(x.inf), floor(x.sup));
+	}
+
+	friend interval ceil(const interval& x) {
+		using std::ceil;
+		return interval(ceil(x.inf), ceil(x.sup));
+	}
+
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, bool >::type in(const C& a, const interval& x) {
 		return x.inf <= a && a <= x.sup;
 	}

@@ -194,7 +194,7 @@ int main()
 	v1.resize(20);
 	for (i=0; i<20; i++) v1(i) = i + 2.;
 	va1 = kv::autodif<double>::init(v1);
-	// use only a few variables from many variables
+	// use only a few of the many variables
 	va2.resize(2);
 	va2(0) = va1(10);
 	va2(1) = va1(11);

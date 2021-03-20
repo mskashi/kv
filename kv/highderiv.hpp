@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2015-2020 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef HIGHDERIV_HPP
@@ -37,6 +37,7 @@ ub::vector<T> highderiv(F f, const T& x, int n, bool divfact = false) {
 	p.v(1) = 1;
 	p = setorder(p, n);
 	p = f(p);
+	p = setorder(p, n);
 
 	if (!divfact) {
 		fact = 1.;

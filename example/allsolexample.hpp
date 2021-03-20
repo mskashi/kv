@@ -19,7 +19,7 @@ struct Matsu1 {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-8., 8.);
+			x(i) = kv::interval<T>(-8., 8.);
 		}
 	}
 };
@@ -40,7 +40,7 @@ struct Matsu2 {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-8., 8.);
+			x(i) = kv::interval<T>(-8., 8.);
 		}
 	}
 };
@@ -67,7 +67,7 @@ struct NoSol {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-10., 10.);
+			x(i) = kv::interval<T>(-10., 10.);
 		}
 	}
 };
@@ -94,7 +94,7 @@ struct BadCond {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-10., 10.);
+			x(i) = kv::interval<T>(-10., 10.);
 		}
 	}
 };
@@ -114,7 +114,7 @@ struct Hansen1 {
 
 		x.resize(1);
 		for (i=0; i<1; i++) {
-			x(i).assign(-1e20, 1e20);
+			x(i) = kv::interval<T>(-1e20, 1e20);
 		}
 	}
 };
@@ -135,7 +135,7 @@ struct Burden {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(0., 1e10);
+			x(i) = kv::interval<T>(0., 1e10);
 		}
 	}
 };
@@ -156,7 +156,7 @@ struct GE1 {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(0.01, 100.);
+			x(i) = kv::interval<T>(0.01, 100.);
 		}
 	}
 };
@@ -186,7 +186,7 @@ struct Shinohara1 {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-5., 5.);
+			x(i) = kv::interval<T>(-5., 5.);
 		}
 	}
 };
@@ -218,7 +218,7 @@ struct Shinohara2 {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-3., 3.);
+			x(i) = kv::interval<T>(-3., 3.);
 		}
 	}
 };
@@ -250,11 +250,11 @@ struct Shinohara3 {
 		int i;
 
 		x.resize(5);
-		x(0).assign(-1.5, 2.);
-		x(1).assign(-0.6, 3.);
-		x(2).assign(-1.5, 2.5);
-		x(3).assign(-0.5, 1.9);
-		x(4).assign(-1, 1.);
+		x(0) = kv::interval<T>(-1.5, 2.);
+		x(1) = kv::interval<T>(-0.6, 3.);
+		x(2) = kv::interval<T>(-1.5, 2.5);
+		x(3) = kv::interval<T>(-0.5, 1.9);
+		x(4) = kv::interval<T>(-1, 1.);
 	}
 };
 
@@ -285,7 +285,7 @@ struct ModifiedHimmelblau {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-1e8, 1e8);
+			x(i) = kv::interval<T>(-1e8, 1e8);
 		}
 	}
 };
@@ -310,7 +310,7 @@ struct Heihachiro {
 
 		x.resize(2);
 		for (i=0; i<2; i++) {
-			x(i).assign(-1000., 1000.);
+			x(i) = kv::interval<T>(-1000., 1000.);
 		}
 	}
 };
@@ -341,7 +341,54 @@ struct Yamamura2 {
 
 		x.resize(n);
 		for (i=0; i<n; i++) {
-			x(i).assign(-2.5, 2.5);
+			x(i) = kv::interval<T>(-2.5, 2.5);
+		}
+	}
+};
+
+
+//
+// K. Meintjes and A. P. Morgan:
+// Chemical Equilibrium Systems as Numerical Test Problmes,
+// ACM Transactions on Mathematical Software, 16(2):143, 1990.
+//
+
+struct HydroCarbon {
+	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
+		ub::vector<T> y(5);
+		// phisical constants
+		static T K5 = kv::constants<T>::str("1.930e-1");
+		static T K6 = kv::constants<T>::str("2.597e-3");
+		static T K7 = kv::constants<T>::str("3.448e-3");
+		static T K8 = kv::constants<T>::str("1.799e-5");
+		static T K9 = kv::constants<T>::str("2.155e-4");
+		static T K10 = kv::constants<T>::str("3.846e-5");
+		// parameters
+		static T R = T(10);
+		static T p = T(40);
+		// constants
+		static T R5 = K5;
+		static T R6 = K6 * pow(p, -0.5);
+		static T R7 = K7 * pow(p, -0.5);
+		static T R8 = K8 * pow(p, -1);
+		static T R9 = K9 * pow(p, -0.5);
+		static T R10 = K10 * pow(p, -1);
+
+		y(0) = x(0) * x(1) + x(0) - 3 * x(4);
+		y(1) = 2 * x(0) * x(1) + x(0) + 2 * R10 * pow(x(1), 2) + x(1) * pow(x(2), 2) + R7 * x(1) * x(2) + R9 * x(1) * x(3) + R8 * x(1) - R * x(4);
+		y(2) = 2 * x(1) * pow(x(2), 2) + R7 * x(1) * x(2) + 2 * R5 * pow(x(2), 2) + R6 * x(2) - 8 * x(4);
+		y(3) = R9 * x(1) * x(3) + 2 * pow(x(3), 2) - 4 * R * x(4);
+		y(4) = x(0) * x(1) + x(0) + R10 * pow(x(1), 2) + x(1) * pow(x(2), 2) + R7 * x(1) * x(2) + R9 * x(1) * x(3) + R8 * x(1) + R5 * pow(x(2), 2) + R6 * x(2) + pow(x(3), 2) - 1;
+
+		return y;
+	}
+
+	template<class T>
+	void range(ub::vector< kv::interval<T> >& x) {
+		x.resize(5);
+		int i;
+		for (i=0; i<5; i++) {
+			x(i) = kv::interval<T>(-100, 100);
 		}
 	}
 };

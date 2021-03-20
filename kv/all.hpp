@@ -15,9 +15,11 @@
 #include <kv/dd.hpp>
 #include <kv/defint.hpp>
 #include <kv/defint-singular.hpp>
+#include <kv/defint-newtoncotes.hpp>
 #include <kv/dka.hpp>
 #include <kv/doubleintegral.hpp>
-#include <kv/doubleint-singular.hpp>
+#include <kv/double-newtoncotes.hpp>
+#include <kv/doubleint-curvededge.hpp>
 #include <kv/eig.hpp>
 #include <kv/fpu53.hpp>
 #include <kv/gamma.hpp>

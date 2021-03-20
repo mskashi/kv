@@ -85,4 +85,10 @@ int main()
 	t.restart();
 	allsol(Yamamura2(), I);
 	cout << t.elapsed() << " sec\n";
+
+	HydroCarbon().range(I);
+	std::cout << "HydroCarbon\n";
+	t.restart();
+	allsol(HydroCarbon(), I);
+	cout << t.elapsed() << " sec\n";
 }

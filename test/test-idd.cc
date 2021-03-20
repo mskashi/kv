@@ -72,6 +72,8 @@ int main()
 	std::cout << mig(itv(2., 3.)) << "\n";
 	std::cout << max(itv(2., 4.), itv(3., 5.)) << "\n";
 	std::cout << min(itv(2., 4.), itv(3., 5.)) << "\n";
+	std::cout << floor(itv(2.5, 3.5)) << "\n";
+	std::cout << ceil(itv(2.5, 3.5)) << "\n";
 
 	// test for midrad
 	std::cout << "test for midrad\n";
