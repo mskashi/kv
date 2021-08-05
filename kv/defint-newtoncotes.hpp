@@ -74,13 +74,14 @@ interval<T> defint_newtoncotes(F f, interval<T> start, interval<T> end, int n, i
 			if (i == 0 || i == m) k = coeff[n][0];
 			else if (i % n == 0) k = coeff[n][n];
 			else k = coeff[n][i % n];
-			r += mid(k) * f(x);
+			r += mid(k) * f(tx);
 		}
 		r *= th;
 		// error is estimated as a*m + b/m^p
 		a = width(r) / tm;
+		using std::pow;
 		tmp = hd * w * pow(th, errord[n]) * errterm[n];
-		b = width(tmp) * pow(tm, errord[n]);
+		b = width(tmp) * pow(T(tm), errord[n]);
                 // add small value to avoid error
 		a += std::numeric_limits<T>::epsilon();
 		b += std::numeric_limits<T>::epsilon();

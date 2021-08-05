@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_HPP
@@ -158,6 +158,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			if (subset(step, interval<T>(-radius, radius))) {
 				flag = true;
 				t1 = end;
+				radius = mid(t1 - t);
 			} else {
 				flag = false;
 				if (step.lower() > 0.) {

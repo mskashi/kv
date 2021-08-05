@@ -1,16 +1,13 @@
 #include <kv/allsol-simple.hpp>
 #include <kv/interval.hpp>
 #include <kv/rdouble.hpp>
-#include <boost/timer.hpp>
+#include <chrono>
 #ifdef TEST_DD
 #include <kv/dd.hpp>
 #include <kv/rdd.hpp>
 #endif
 
-using namespace std;
-
 namespace ub = boost::numeric::ublas;
-
 
 struct Func {
 	template <class T> ub::vector<T> operator() (const ub::vector<T>& x){
@@ -22,7 +19,6 @@ struct Func {
 		return y;
 	}
 };
-
 
 struct Yamamura {
 	template <class T> T g(const T& x){
@@ -61,7 +57,7 @@ int main()
 #endif
 
 	int i;
-	boost::timer t;
+	std::chrono::system_clock::time_point t;
 	ub::vector< itv > I;
 
 	Func f1;
@@ -69,9 +65,9 @@ int main()
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol_simple(f1, I, 1);
-	cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 
 	Yamamura f2;
@@ -79,7 +75,7 @@ int main()
 	I.resize(5);
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol_simple(f2, I, 1);
-	cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 }

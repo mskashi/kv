@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef GAMMA_HPP
@@ -217,44 +217,160 @@ interval<T> lgamma(const interval<T>& x) {
 
 // digamma function
 
-template <class TT> struct Digamma_0 {
+/*
+ *  DIGAMMA_ALGO=0:
+ *   use shift digamma(x+1) = digamma(x) + 1/x
+ *   use digamma(x) = \int_0^\infty e^(-t)/t - e^(-xt)/(1-e^(-t)) dt
+ *  DIGAMMA_ALGO=1: 
+ *   don't use shift
+ *   use digamma(x) = digamma(1-x) - pi/tan(pi x) for negative x
+ *  DIGAMMA_ALGO=2: 
+ *   use digamma(x) = log(x) + \int_0^\infty (1/t - 1/(1-e^(-t)))e^(-tx) dt
+ *  DIGAMMA_ALGO=3: 
+ *   use digamma(x) = log(x) - 1/(2x)
+ *                   -2 \int_0^\infty t/(t^2+x^2)/(e^(2 pi t)-1) dt
+ *  DIGAMMA_ALGO=4: 
+ *   use ALGO2 for small x and use ALGO3 for large x
+ */
+
+#if !defined(DIGAMMA_ALGO)
+#define DIGAMMA_ALGO 4
+#endif
+
+#if !defined(DIGAMMA_ORDER)
+#define DIGAMMA_ORDER 16
+#endif
+
+
+#if DIGAMMA_ALGO <= 1
+template <class TT> struct Digamma0r {
 	TT x;
-	Digamma_0(TT x) : x(x) {}
+	Digamma0r(TT x) : x(x) {}
 	template <class T> T operator() (const T& t) {
 		return div_tn(exp(-t) - exp(-x * t) / div_tn(1-exp(-t), 1), 1);
 	}
 };
 
-template <class TT> struct Digamma {
+template <class TT> struct Digamma0 {
 	TT x;
-	Digamma(TT x) : x(x) {}
+	Digamma0(TT x) : x(x) {}
 	template <class T> T operator() (const T& t) {
 		return (exp(-t) - exp(-x * t) / ((1-exp(-t)) / t)) / t;
 	}
 };
+#endif
 
-// #define DIGAMMA_TH1 0.125
-// #define DIGAMMA_TH2 35
-#if !defined(DIGAMMA_ORDER)
-#define DIGAMMA_ORDER 16
+#if DIGAMMA_ALGO == 2 || DIGAMMA_ALGO == 4
+template <class TT> struct Digamma2r {
+	TT x;
+	Digamma2r(TT x) : x(x) {}
+	template <class T> T operator() (const T& t) {
+		return div_tn(1 - 1 / div_tn(1-exp(-t), 1), 1) * exp(-x * t);
+	}
+};
+
+template <class TT> struct Digamma2 {
+	TT x;
+	Digamma2(TT x) : x(x) {}
+	template <class T> T operator() (const T& t) {
+		return (1 - 1 / ((1-exp(-t)) / t)) / t * exp(-x * t);
+	}
+};
+#endif
+
+#if DIGAMMA_ALGO == 3 || DIGAMMA_ALGO == 4
+template <class TT> struct Digamma3r {
+	TT x;
+	Digamma3r(TT x) : x(x) {}
+	template <class T> T operator() (const T& t) {
+		static const T pi = constants<T>::pi();
+		return 1 / (t*t + x*x) / div_tn(exp(2 * pi * t) - 1, 1);
+		// return div_reduce(t, exp(2 * pi * t) - 1, 1) / (t*t + x*x);
+	}
+};
+
+template <class TT> struct Digamma3 {
+	TT x;
+	Digamma3(TT x) : x(x) {}
+	template <class T> T operator() (const T& t) {
+		static const T pi = constants<T>::pi();
+		return 1 / (t*t + x*x) / ((exp(2 * pi * t) - 1) / t);
+		// return t / (exp(2 * pi * t) - 1) / (t*t + x*x);
+	}
+};
+
+struct Digamma3r_easy {
+	template <class T> T operator() (const T& t) {
+		static const T pi = constants<T>::pi();
+		return 1 / div_tn(exp(2 * pi * t) - 1, 1);
+	}
+};
+
+struct Digamma3_easy {
+	template <class T> T operator() (const T& t) {
+		static const T pi = constants<T>::pi();
+		return t / (exp(2 * pi * t) - 1);
+	}
+};
 #endif
 
 // work for x > 0
-// return high precision output if x is in [1,2]
 template <class T> interval<T> digamma_plus(const interval<T>& x) {
 	interval<T> result, tmp;
-	interval<T> th(std::numeric_limits<T>::digits * std::log(2.));
+
+	#if DIGAMMA_ALGO <= 1
+	const interval<T> th(std::numeric_limits<T>::digits * std::log(2.));
+	#endif
+	#if DIGAMMA_ALGO == 2 || DIGAMMA_ALGO == 4
+	const interval<T> th2(std::numeric_limits<T>::digits * std::log(2.) / x);
+	#endif
+	#if DIGAMMA_ALGO == 3 || DIGAMMA_ALGO == 4
+	const interval<T> pi = constants< interval<T> >::pi();
+	const interval<T> th3(std::numeric_limits<T>::digits * std::log(2.) / (2 * mid(pi)));
+	static const interval<T> digamma3_cache = defint_singular_autostep(Digamma3_easy(), Digamma3r_easy(), interval<T>(0.), th3, DIGAMMA_ORDER);
+	#endif
 	
-	/*
-	result = defint_singular(Digamma_0< interval<T> >(x), (interval<T>)0., (interval<T>)DIGAMMA_TH1, DIGAMMA_ORDER);
-
-	result += defint_autostep(Digamma< interval<T> >(x), (interval<T>)DIGAMMA_TH1, (interval<T>)DIGAMMA_TH2, DIGAMMA_ORDER);
-	*/
-
-	result = defint_singular_autostep(Digamma< interval<T> >(x), Digamma_0< interval<T> >(x), interval<T>(0.), th, DIGAMMA_ORDER);
-
+	#if DIGAMMA_ALGO <= 1
+	result = defint_singular_autostep(Digamma0< interval<T> >(x), Digamma0r< interval<T> >(x), interval<T>(0.), th, DIGAMMA_ORDER);
 	tmp = exp(-th);
 	result += interval<T>::hull(- 1. / ((1. - tmp) * x) * exp(- x * th), tmp / th);
+	#endif
+
+	#if DIGAMMA_ALGO == 2
+	result = defint_singular_autostep(Digamma2< interval<T> >(x), Digamma2r< interval<T> >(x), interval<T>(0.), th2, DIGAMMA_ORDER);
+	result += log(x);
+	tmp = exp(-x * th2);
+	result += interval<T>::hull(- 1. / ((1. - exp(-th2)) * x) * tmp, tmp / (x * th2));
+	#endif
+	
+	#if DIGAMMA_ALGO == 3
+	if (x > std::pow(2., std::numeric_limits<T>::digits * 0.25) * sqrt(th3)) {
+		result = digamma3_cache;
+		result /= x * x + pow(interval<T>::hull(0., th3), 2);
+	} else {
+		result = defint_singular_autostep(Digamma3< interval<T> >(x), Digamma3r< interval<T> >(x), interval<T>(0.), th3, DIGAMMA_ORDER);
+	}
+
+	tmp = exp(-2 * pi * th3);
+	result = log(x) - 1 / (2 * x)
+		 - 2 * (result + 2 * interval<T>::hull(0, tmp / (4 * pi * x) / (1 - tmp)));
+	#endif
+
+	#if DIGAMMA_ALGO == 4
+	if (x > std::pow(2., std::numeric_limits<T>::digits * 0.25) * sqrt(th3)) {
+		result = digamma3_cache;
+		result /= x * x + pow(interval<T>::hull(0., th3), 2);
+		tmp = exp(-2 * pi * th3);
+		result = log(x) - 1 / (2 * x)
+			 - 2 * (result + 2 * interval<T>::hull(0, tmp / (4 * pi * x) / (1 - tmp)));
+	} else {
+		result = defint_singular_autostep(Digamma2< interval<T> >(x), Digamma2r< interval<T> >(x), interval<T>(0.), th2, DIGAMMA_ORDER);
+		result += log(x);
+		tmp = exp(-x * th2);
+		result += interval<T>::hull(- 1. / ((1. - exp(-th2)) * x) * tmp, tmp / (x * th2));
+	}
+
+	#endif
 
 	return result;
 }
@@ -266,10 +382,13 @@ template <class T> interval<T> digamma_plus(const interval<T>& x) {
 
 template <class T> interval<T> digamma_point(const interval<T>& x) {
 	T y;
-	int i;
 	interval<T> r;
 
 	y = floor(x.lower());
+
+	#if DIGAMMA_ALGO == 0
+
+	int i;
 
 	if (y == 1.) {
 		return digamma_plus(x);
@@ -288,6 +407,26 @@ template <class T> interval<T> digamma_point(const interval<T>& x) {
 	}
 
 	return r;
+
+	#else // DIGAMMA_ALGO == 0
+
+	if (y >= 1.) {
+		return digamma_plus(x);
+	} 
+
+	if (y == 0) {
+		return digamma_plus(x + 1.) - 1. / x;
+	}
+
+	static const interval<T> pi = constants< interval<T> >::pi();
+	interval<T> pix;
+	pix = pi * x;
+
+	// prevent 0-division at x = -0.5, -1.5, -2.5, ...
+	return digamma_plus(1. - x) - pi * cos(pix) / sin(pix);
+	// return digamma_plus(1. - x) - pi / tan(pix);
+
+	#endif // DIGAMMA_ALGO == 0
 }
 
 template <class T> interval<T> digamma(const interval<T>& x) {

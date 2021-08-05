@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef OPTIMIZE_HPP
@@ -28,6 +28,10 @@
 
 #ifndef OPTIMIZE_ZERODIVIDE
 #define OPTIMIZE_ZERODIVIDE 2
+#endif
+
+#ifndef OPTIMIZE_USESLOPE
+#define OPTIMIZE_USESLOPE 1
 #endif
 
 
@@ -60,16 +64,8 @@ template <class T, class F>
 std::list< ub::vector< interval<T> > >
 optimize(const ub::vector< interval<T> >& init, F f, T limit, bool unify = true, int verbose = 0)
 {
-	std::list< ub::vector< interval<T> > > targets;
-	targets.push_back(init);
-	return optimize_list(targets, f, limit, unify, verbose);
-}
-
-template <class T, class F>
-std::list< ub::vector< interval<T> > >
-optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool unify = true, int verbose = 0)
-{
-	int s = (targets.front()).size();
+	std::list< ub::vector< interval<T> > > targets{init};
+	int s = init.size();
 	ub::vector< interval<T> > I, C, I1, I2, IR, fdi, C2;
 	interval<T> fc, fi, mvf, fc2; 
 	T tmp, tmp2;
@@ -118,6 +114,18 @@ optimize_list(std::list< ub::vector< interval<T> > > targets, F f, T limit, bool
 		if (mvf.lower() > delta) {
 			continue;
 		}
+
+#if OPTIMIZE_USESLOPE == 1
+		flag = false;
+		for (i=0; i<s; i++) {
+			if (fdi(i) > 0 && I(i).lower() != init(i).lower()) {
+				flag = true; break;
+			} else if (fdi(i) < 0 && I(i).upper() != init(i).upper()) {
+				flag = true; break;
+			}
+		}
+		if (flag) continue;
+#endif // OPTIMiZE_USESLOPE
 
 		// update delta at C
 		tmp = fc.upper();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -92,7 +92,9 @@ template <class T> class affine {
 
 	static int& maxnum() {
 		static int m = 0;
+		#ifdef _OPENMP
 		#pragma omp threadprivate(m)
+		#endif
 		return m;
 	}
 

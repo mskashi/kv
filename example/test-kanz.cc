@@ -1,5 +1,5 @@
-#include <boost/timer.hpp>
 #include <kv/allsol.hpp>
+#include <chrono>
 
 /*
  * Examples taken from:
@@ -138,8 +138,8 @@ struct Kanz6 {
 int main()
 {
 	int i, n;
-	boost::timer t;
 	ub::vector< kv::interval<double> > I;
+	std::chrono::system_clock::time_point t;
 
 	std::cout.precision(17);
 
@@ -147,45 +147,45 @@ int main()
 	I.resize(3);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-5., 5.);
 
-	t.restart();
-	allsol(Kanz1(), I);
-	std::cout << t.elapsed() << " sec\n";
+	t = std::chrono::system_clock::now();
+	kv::allsol(Kanz1(), I);
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	I.resize(4);
 	for (i=0; i<2; i++) I(i) = kv::interval<double>(-3., 3.);
 	for (i=2; i<4; i++) I(i) = kv::interval<double>(-0.3, 0.3);
 
-	t.restart();
-	allsol(Kanz2(), I);
-	std::cout << t.elapsed() << " sec\n";
+	t = std::chrono::system_clock::now();
+	kv::allsol(Kanz2(), I);
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-1., 1.);
 
-	t.restart();
-	allsol(Kanz3(), I);
-	std::cout << t.elapsed() << " sec\n";
+	t = std::chrono::system_clock::now();
+	kv::allsol(Kanz3(), I);
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	I.resize(2);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-5., 5.);
 
-	t.restart();
-	allsol(Kanz4(), I);
-	std::cout << t.elapsed() << " sec\n";
+	t = std::chrono::system_clock::now();
+	kv::allsol(Kanz4(), I);
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	for (n=3; n<=6; n++) {
 		I.resize(n);
 		for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(-2., 2.);
 
-		t.restart();
-		allsol(Kanz5(n), I);
-		std::cout << t.elapsed() << " sec\n";
+		t = std::chrono::system_clock::now();
+		kv::allsol(Kanz5(n), I);
+		std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 	}
 
 	I.resize(3);
 	for (i=0; i<I.size(); i++) I(i) = kv::interval<double>(0., 1.);
 
-	t.restart();
-	allsol(Kanz6(), I);
-	std::cout << t.elapsed() << " sec\n";
+	t = std::chrono::system_clock::now();
+	kv::allsol(Kanz6(), I);
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 }

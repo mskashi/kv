@@ -1,5 +1,5 @@
-#include <boost/timer.hpp>
 #include <kv/allsol.hpp>
+#include <chrono>
 
 namespace ub = boost::numeric::ublas;
 
@@ -19,20 +19,20 @@ struct Func {
 int main()
 {
 	int i;
-	boost::timer t;
 	ub::vector<itv> I;
+	std::chrono::system_clock::time_point t;
 
 	std::cout.precision(17);
 
 	I.resize(2);
 
 	for (i=0; i<I.size(); i++) I(i) = itv(-10, 10);
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol(Func(), I, 2);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	for (i=0; i<I.size(); i++) I(i) = itv::whole();
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol(Func(), I, 2);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 }

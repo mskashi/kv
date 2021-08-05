@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2014-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_SINGULAR_HPP
@@ -393,6 +393,7 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
+			radius = mid(t1 - start);
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {
@@ -542,6 +543,7 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
+			radius = mid(t1 - start);
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {
@@ -683,6 +685,7 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
+			radius = mid(t1 - start);
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {

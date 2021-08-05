@@ -102,16 +102,17 @@ interval<T> double_newtoncotes(F f, interval<T> start1, interval<T> end1, interv
 				if (j == 0 || j == m2) k2 = coeff[n][0];
 				else if (j % n == 0) k2 = coeff[n][n];
 				else k2 = coeff[n][j % n];
-				r += mid(k1 * k2) * f(x, y);
+				r += mid(k1 * k2) * f(tx, ty);
 			}
 		}
 		r *= th1 * th2;
 		// error is estimated as a*m1*m2 + b1/m1^p + b2/m2^p
 		a = width(r) / (tm1 * tm2);
+		using std::pow;
 		tmp = hd_x * w1 * w2 * pow(th1, errord[n]) * errterm[n];
-		b1 = width(tmp) * pow(tm1, errord[n]);
+		b1 = width(tmp) * pow(T(tm1), errord[n]);
 		tmp = hd_y * w1 * w2 * pow(th2, errord[n]) * errterm[n];
-		b2 = width(tmp) * pow(tm2, errord[n]);
+		b2 = width(tmp) * pow(T(tm2), errord[n]);
 		// add small value to avoid error
 		a += std::numeric_limits<T>::epsilon();
 		b1 += std::numeric_limits<T>::epsilon();

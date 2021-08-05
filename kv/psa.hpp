@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -40,7 +40,9 @@ template <class T> class psa {
 
 	static int& mode() {
 		static int m = 1;
+		#ifdef _OPENMP
 		#pragma omp threadprivate (m)
+		#endif
 		return m;
 	}
 
@@ -75,13 +77,17 @@ template <class T> class psa {
 
 	static bool& record_history() {
 		static bool rh = false;
+		#ifdef _OPENMP
 		#pragma omp threadprivate (rh)
+		#endif
 		return rh;
 	}
 
 	static bool& use_history() {
 		static bool uh = false;
+		#ifdef _OPENMP
 		#pragma omp threadprivate (uh)
+		#endif
 		return uh;
 	}
 
@@ -480,14 +486,20 @@ template <class T> class psa {
 					record_history() = false;
 					recover_rh = true;
 				}
-				hn *= h;
-				xn2 = -xn2 / range;
+				// scaling: hn->hn/a^i, xn->xn*a^i
+				// hn *= h;
+				hn *= h / a;
+				// xn2 = -xn2 / range;
+				xn2 = -xn2 / range * a;
 				r += xn2 * hn;
 			} else {
-				hn *= h;
-				xn = -xn / a;
+				// hn *= h;
+				hn *= h / a;
+				// xn = -xn / a;
+				xn = -xn;
 				if (mode() == 2) {
-					xn2 = -xn2 / range;
+					// xn2 = -xn2 / range;
+					xn2 = -xn2 / range * a;
 				}
 				r += xn * hn;
 			}

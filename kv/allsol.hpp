@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ALLSOL_HPP
@@ -450,7 +450,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 	int count_ex = 0;
 	int count_giveup = 0;
 
+	#ifdef _OPENMP
 	#pragma omp parallel
+	#endif
 	{
 
 	ub::vector< interval<T> > I, fc, fi, C, CK, K, mvf, I1, I2, IR, Iorg, g;
@@ -473,7 +475,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 	while (true) {
 		if (verbose >= 2) {
+			#ifdef _OPENMP
 			#pragma omp critical (cout)
+			#endif
 			{
 			std::cout << "ne_test: " << count_ne_test << ", ex_test: " << count_ex_test << ", unknown: " << count_unknown << ", ne: " << count_ne << ", ex: " << count_ex << ", giveup: " << count_giveup << "    \r" << std::flush;
 			}
@@ -509,7 +513,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 		// non-existence test
 
+		#ifdef _OPENMP
 		#pragma omp atomic
+		#endif
 		count_ne_test++;
 
 #if USE_FI == 1
@@ -521,15 +527,19 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 		}
 
 		if (!zero_in(fi)) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
 			continue;
 		}
-#endif
+#endif // USE_FI == 1
 
 		try {
 			autodif< interval<T> >::split(f(autodif< interval<T> >::init(I)), fi, fdi);
@@ -540,15 +550,19 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 #if USE_FI != 1
 		if (!zero_in(fi)) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
 			continue;
 		}
-#endif
+#endif // USE_FI != 1
 
 #if ENABLE_INFINITY == 1
 		C = allsol_sub::mid_infinity(I);
@@ -564,9 +578,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 		mvf = fc + prod(fdi, I - C);
 		if (!zero_in(mvf)) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -668,7 +686,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 							I2(j) = intersect(IR(j), J2);
 							allsol_sub::recovery_inflation(I1, Iorg, (T)RECOVER_RATIO);
 							allsol_sub::recovery_inflation(I2, Iorg, (T)RECOVER_RATIO);
+							#ifdef _OPENMP
 							#pragma omp critical (targets)
+							#endif
 							{
 							targets.push_back(I1);
 							targets.push_back(I2);
@@ -725,9 +745,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 		// non-existence in I turns out
 		if (flag == true) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -743,13 +767,15 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 			// shrinking again.
 			mi = allsol_sub::search_maxwidth(I);
 			if (rad(IR(mi)) <= 0.5 * rad(I(mi))) {
+				#ifdef _OPENMP
 				#pragma omp critical (targets)
+				#endif
 				{
 				targets.push_back(IR);
 				}
 				continue;
 			}
-#endif
+#endif // USE_MULTITRIM == 1
 
 			// renew I, C and f(C)
 			// do not renew f'(I) because of calculation cost
@@ -765,9 +791,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 			// re-check mvf
 			mvf = fc + prod(fdi, I - C);
 			if (!zero_in(mvf)) {
+				#ifdef _OPENMP
 				#pragma omp atomic
+				#endif
 				count_ne++;
+				#ifdef _OPENMP
 				#pragma omp critical (targets)
+				#endif
 				{
 				count_unknown--;
 				}
@@ -786,9 +816,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 		I1 = fc + prod(fdi - L2, I - C);
 		I2 = prod(g, L2);
 		if (inner_prod(mag(g), mig(I1)) - inner_prod(mag(I2), rad(I)) > 0.) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -836,7 +870,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 		if (flag == false) goto label;
 #endif
 
+		#ifdef _OPENMP
 		#pragma omp atomic
+		#endif
 		count_ex_test++;
 
 		r = invert(L, R);
@@ -847,9 +883,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 		CK = C - prod(R, fc);
 		K = CK +  prod(M, I - C);
 		if (!overlap(K, I)) {
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_ne++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -867,7 +907,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 #endif
 
 		if (proper_subset(K, I) && allsol_sub::widthratio_max(K, I) < EXISTENCE_RATIO ) {
+			#ifdef _OPENMP
 			#pragma omp critical (solutions)
+			#endif
 			{
 			// check whether the solution is already found or not
 			flag = true;
@@ -905,7 +947,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 			}
 			if (flag) { // new solution found
 				if (verbose >= 1) {
+					#ifdef _OPENMP
 					#pragma omp critical (cout)
+					#endif
 					{
 					std::cout << I << "(ex)\n";
 					}
@@ -929,14 +973,18 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 				solutions.push_back(K);
 				count_ex++;
 				if (verbose >= 1) {
+					#ifdef _OPENMP
 					#pragma omp critical (cout)
+					#endif
 					{
 					std::cout << K << "(ex:improved)\n";
 					}
 				}
 			}
 			} // pragma omp critical (solutions)
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -952,7 +1000,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 #endif
 		{
 			allsol_sub::recovery_inflation2(K, Iorg, (T)RECOVER_RATIO);
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			targets.push_back(K);
 			}
@@ -979,13 +1029,15 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 		if (allsol_sub::widthratio_max(I, Iorg) <= 0.5)
 #endif
 		{
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			targets.push_back(I);
 			}
 			continue;
 		}
-#endif
+#endif // USE_SLOWDIVIDE == 1
 
 #ifdef USE_SLOWDIVIDE_OLD
 		
@@ -995,19 +1047,21 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 
 		mi = allsol_sub::search_maxwidth(Iorg);
 		if (rad(I(mi)) <= 0.5 * rad(Iorg(mi))) {
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			targets.push_back(I);
 			}
 			continue;
 		}
-#else
+#else // USE_SLOWDIVIDE_OLD
 #if ENABLE_INFINITY == 1
 		mi = allsol_sub::search_maxwidth_infinity(I);
 #else
 		mi = allsol_sub::search_maxwidth(I);
 #endif
-#endif
+#endif // USE_SLOWDIVIDE_OLD
 
 #if ENABLE_INFINITY == 1
 		tmp = allsol_sub::mid_infinity(I(mi));
@@ -1019,7 +1073,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 				std::cout << "too small interval (may be multiple root?):\n" << I << "\n";
 			}
 			if (rest != NULL) {
+				#ifdef _OPENMP
 				#pragma omp critical (rest)
+				#endif
 				{
 				#if UNIFY_REST == 1
 				I1 = I;
@@ -1045,9 +1101,13 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 				#endif // UNIFY_REST == 1
 				}
 			}
+			#ifdef _OPENMP
 			#pragma omp atomic
+			#endif
 			count_giveup++;
+			#ifdef _OPENMP
 			#pragma omp critical (targets)
+			#endif
 			{
 			count_unknown--;
 			}
@@ -1067,7 +1127,9 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 				tmp = mid(I1(mi2));
 				I1(mi2).assign(I1(mi2).lower(), tmp);
 				I3(mi2).assign(tmp, I3(mi2).upper());
+				#ifdef _OPENMP
 				#pragma omp critical (targets)
+				#endif
 				{
 				targets.push_back(I3);
 				count_unknown += 1;
@@ -1081,15 +1143,19 @@ std::list< ub::vector < interval<T> > >* rest = NULL
 				tmp = mid(I2(mi2));
 				I2(mi2).assign(I2(mi2).lower(), tmp);
 				I3(mi2).assign(tmp, I3(mi2).upper());
+				#ifdef _OPENMP
 				#pragma omp critical (targets)
+				#endif
 				{
 				targets.push_back(I3);
 				count_unknown += 1;
 				}
 			}
 		}
-#endif
+#endif // ENABLE_INFINITY == 1
+		#ifdef _OPENMP
 		#pragma omp critical (targets)
+		#endif
 		{
 		targets.push_back(I1);
 		targets.push_back(I2);

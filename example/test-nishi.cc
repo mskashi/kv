@@ -1,5 +1,5 @@
-#include <boost/timer.hpp>
 #include <kv/allsol.hpp>
+#include <chrono>
 #ifdef TEST_DD
 #include <kv/dd.hpp>
 #include <kv/rdd.hpp>
@@ -99,8 +99,8 @@ struct Nishi {
 int main()
 {
 	int i;
-	boost::timer t;
 	ub::vector<itv> I;
+	std::chrono::system_clock::time_point t;
 
 	#ifdef TEST_DD
 	std::cout.precision(34);
@@ -111,7 +111,7 @@ int main()
 	I.resize(4);
 	for (i=0; i<I.size(); i++) I(i) = itv(-10., 10.);
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol(Nishi(), I);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 }

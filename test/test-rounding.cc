@@ -142,8 +142,21 @@ bool check_sqrt_down()
 	return result;
 }
 
-void check(bool (*f)(), const char *str) {
-	if (f()) {
+bool check_flush_to_zero()
+{
+	bool result = true;
+	double c1 = pow(2., -537);
+
+	kv::rop<double>::begin();
+	result = result && (kv::rop<double>::div_up(kv::rop<double>::mul_up(c1, c1), c1) == c1);
+	kv::rop<double>::end();
+	return result;
+}
+
+void check(bool (*f)(), bool& result, const char *str) {
+	bool tmp = f();
+	result = result && tmp;
+	if (tmp) {
 		std::cout << str << ": OK\n";
 	} else {
 		std::cout << str << ": NG\n";
@@ -152,14 +165,21 @@ void check(bool (*f)(), const char *str) {
 
 int main()
 {
-	check(check_add_up, "add_up");
-	check(check_add_down, "add_down");
-	check(check_sub_up, "sub_up");
-	check(check_sub_down, "sub_down");
-	check(check_mul_up, "mul_up");
-	check(check_mul_down, "mul_down");
-	check(check_div_up, "div_up");
-	check(check_div_down, "div_down");
-	check(check_sqrt_up, "sqrt_up");
-	check(check_sqrt_down, "sqrt_down");
+	bool result = true;
+	check(check_add_up, result, "add_up");
+	check(check_add_down, result, "add_down");
+	check(check_sub_up, result, "sub_up");
+	check(check_sub_down, result, "sub_down");
+	check(check_mul_up, result, "mul_up");
+	check(check_mul_down, result, "mul_down");
+	check(check_div_up, result, "div_up");
+	check(check_div_down, result, "div_down");
+	check(check_sqrt_up, result, "sqrt_up");
+	check(check_sqrt_down, result, "sqrt_down");
+	check(check_flush_to_zero, result, "no flush_to_zero");
+	if (result) {
+		std::cout << "\nall tests passed\n";
+	} else {
+		std::cout << "\nsome tests failed\n";
+	}
 }

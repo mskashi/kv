@@ -5,7 +5,7 @@
 
 #include <boost/random.hpp>
 #include <ctime>
-#include <boost/timer.hpp>
+#include <chrono>
 
 #include <kv/matrix-inversion.hpp>
 
@@ -14,7 +14,7 @@ int main()
 	boost::numeric::ublas::matrix<double> a(2, 2);
 	boost::numeric::ublas::matrix<double> b;
 
-	boost::timer t;
+	std::chrono::system_clock::time_point t;
 
 	a(0, 0) = 1.; a(0, 1) = 2.;
 	a(1, 0) = 3.; a(1, 1) = 4.;
@@ -37,17 +37,17 @@ int main()
 		}
 	}
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::invert(c, b);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	boost::numeric::ublas::vector<double> d(n);
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::linear_equation(c, d, d);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::mm_mult(c, b, b);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 }

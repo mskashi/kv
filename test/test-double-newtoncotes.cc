@@ -1,7 +1,7 @@
 #include <iostream>
 #include <kv/double-newtoncotes.hpp>
 #ifdef BENCH
-#include <boost/timer.hpp>
+#include <chrono>
 #endif
 
 typedef kv::interval<double> itv;
@@ -19,17 +19,17 @@ int main() {
 	int i;
 	itv r;
 	#ifdef BENCH
-	boost::timer t;
+	std::chrono::system_clock::time_point t;
 	#endif
 
 	for (i=1; i<=7; i++) {
 		std::cout << "[i=" << i << "]\n";
 		#ifdef BENCH
-		t.restart();
+		t = std::chrono::system_clock::now();
 		#endif
 		r = kv::double_newtoncotes(Func(), itv(-1), itv(1), itv(-1), itv(1), i, 0, 0);
 		#ifdef BENCH
-		std::cout << "time: " << t.elapsed() << "\n";
+		std::cout << "time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 		#endif
 		std::cout << "width: " << width(r) << "\n";
 		std::cout << r << "\n";

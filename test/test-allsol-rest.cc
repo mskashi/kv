@@ -6,7 +6,7 @@
  */
 
 #include <kv/allsol.hpp>
-#include <boost/timer.hpp>
+#include <chrono>
 
 namespace ub = boost::numeric::ublas;
 typedef kv::interval<double> itv;
@@ -45,19 +45,19 @@ struct Shinohara2 {
 
 int main()
 {
-	boost::timer t;
 	ub::vector<itv> I;
 	std::list< ub::vector<itv> > rest;
 	std::list< ub::vector<itv> >::iterator p;
+	std::chrono::system_clock::time_point t;
 
 	std::cout.precision(17);
 
 	// (2,0) seems to be multiple root
 	Shinohara2().range(I);
 	std::cout << "Shinohara2\n";
-	t.restart();
+	t = std::chrono::system_clock::now();
 	kv::allsol(Shinohara2(), I, 1, 1e-8, &rest);
-	std::cout << t.elapsed() << " sec\n";
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - t).count() / 1e9 << " sec\n";
 
 	p = rest.begin();
 	while (p != rest.end()) {

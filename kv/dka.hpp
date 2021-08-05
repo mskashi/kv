@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DKA_HPP
@@ -77,9 +77,10 @@ bool dka(const ub::vector< kv::complex<T> >& p, ub::vector< kv::complex<T> >& x,
 	// initial guess for b(r) = 0
 	r = 0.;
 	for (i=0; i<n-1; i++) {
-		tmp = pow(n * abs(b[i]/b[n]), 1.0/(n-i));
+		tmp = pow(abs(b[i]/b[n]), 1.0/(n-i));
 		if (tmp > r) r = tmp;
 	}
+	r *= 2;
 
 	// db(r) = b'(r)
 	db.resize(n);
