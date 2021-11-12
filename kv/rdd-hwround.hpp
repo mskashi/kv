@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_HWROUND_HPP
@@ -556,7 +556,11 @@ template <> struct rop <dd> {
 			tmp = std::sqrt(v5 + v6) + v1;
 			hwround::roundup();
 		} else {
-			tmp = std::sqrt(v5 + v6) + v1;
+			if (v5 == (std::numeric_limits<double>::max)()) {
+				tmp = std::sqrt(v5*0.25 + v6*0.25)*2 + v1;
+			} else {
+				tmp = std::sqrt(v5 + v6) + v1;
+			}
 		}
 		v2 /= tmp;
 		z2 = v2;
@@ -590,7 +594,11 @@ template <> struct rop <dd> {
 		v2 = (v3 + v5) + v6 + v4;
 		if (v2 > 0.) {
 			hwround::roundup();
-			tmp = std::sqrt(v5 + v6) + v1;
+			if (v5 == (std::numeric_limits<double>::max)()) {
+				tmp = std::sqrt(v5*0.25 + v6*0.25)*2 + v1;
+			} else {
+				tmp = std::sqrt(v5 + v6) + v1;
+			}
 			hwround::rounddown();
 		} else {
 			tmp = std::sqrt(v5 + v6) + v1;

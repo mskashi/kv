@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_NOHWROUND_HPP
@@ -433,7 +433,11 @@ template <> struct rop <dd> {
 		if (z2 > 0.) {
 			tmp = rop<double>::add_down(rop<double>::sqrt_down(rop<double>::add_down(x.a1, x.a2)), z1);
 		} else {
-			tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+			if (x.a1 == (std::numeric_limits<double>::max)()) {
+				tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1*0.25, rop<double>::mul_up(x.a2, 0.25)))*2, z1);
+			} else {
+				tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+			}
 		}
 		z2 = rop<double>::div_up(z2, tmp);
 		dd::twosum(z1, z2, z3, z4);
@@ -461,7 +465,11 @@ template <> struct rop <dd> {
 		// z2 = ((z3 + x.a1) + x.a2 + z4) / (sqrt(x.a1 + x.a2) + z1);
 		z2 = rop<double>::add_down(rop<double>::add_down(rop<double>::add_down(z3, x.a1), x.a2), z4);
 		if (z2 > 0.) {
-			tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+			if (x.a1 == (std::numeric_limits<double>::max)()) {
+				tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1*0.25, rop<double>::mul_up(x.a2, 0.25)))*2, z1);
+			} else {
+				tmp = rop<double>::add_up(rop<double>::sqrt_up(rop<double>::add_up(x.a1, x.a2)), z1);
+			}
 		} else {
 			tmp = rop<double>::add_down(rop<double>::sqrt_down(rop<double>::add_down(x.a1, x.a2)), z1);
 		}

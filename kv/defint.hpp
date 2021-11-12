@@ -158,7 +158,9 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			if (subset(step, interval<T>(-radius, radius))) {
 				flag = true;
 				t1 = end;
-				radius = mid(t1 - t);
+				radius = mag(step);
+				// hack for the case that "end" is wide interval
+				resized = true;
 			} else {
 				flag = false;
 				if (step.lower() > 0.) {
@@ -169,7 +171,6 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 				step = t1 - t;
 			}
 
-			// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
 			psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 			try {
@@ -201,7 +202,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			}
 		}
 		#ifdef DEFINT_SHOW_STEPSIZE
-		std::cout << "stepsize: " << step << "\n";
+		std::cout << "t,t1,stepsize: " << t << "," << t1 << "," << step << "\n";
 		#endif
 
 		result += z;

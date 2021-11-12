@@ -23,5 +23,6 @@ int main() {
 	std::cout << kv::defint(Func(), (itv)3., (itv)1., 10, 10) << "\n";
 	std::cout << kv::defint_autostep(Func(), (itv)1., (itv)3., 12) << "\n";
 	std::cout << kv::defint_autostep(Func(), (itv)3., (itv)1., 12) << "\n";
+	std::cout << kv::defint_autostep(Func(), itv(1.), itv(2., 2.001), 12) << "\n";
 	std::cout << kv::defint(Kahaner10(), (itv)0., (itv)1., 10, 10) << "\n";
 }

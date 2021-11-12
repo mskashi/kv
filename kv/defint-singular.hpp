@@ -393,7 +393,9 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
-			radius = mid(t1 - start);
+			radius = mag(step);
+			// hack for the case that "end" is wide interval
+			resized = true;
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {
@@ -404,7 +406,6 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 			step = t1 - start;
 		}
 
-		// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
 		psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 		try {
@@ -442,7 +443,7 @@ defint_power3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int
 	}
 
 	#ifdef DEFINT_SHOW_STEPSIZE
-	std::cout << "stepsize: " << step << "\n";
+	std::cout << "t,t1,stepsize: " << start << "," << t1 << "," << step << "\n";
 	#endif
 
 	psa< interval<T> >::mode() = save_mode;
@@ -543,7 +544,9 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
-			radius = mid(t1 - start);
+			radius = mag(step);
+			// hack for the case that "end" is wide interval
+			resized = true;
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {
@@ -554,7 +557,6 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 			step = t1 - start;
 		}
 
-		// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
 		psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 		try {
@@ -594,7 +596,7 @@ defint_log3_autostep(F1 h, F2 f, F3 g, interval<T> start, interval<T> end, int o
 	}
 
 	#ifdef DEFINT_SHOW_STEPSIZE
-	std::cout << "stepsize: " << step << "\n";
+	std::cout << "t,t1,stepsize: " << start << "," << t1 << "," << step << "\n";
 	#endif
 
 	psa< interval<T> >::mode() = save_mode;
@@ -685,7 +687,9 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 		if (subset(step, interval<T>(-radius, radius))) {
 			flag = true;
 			t1 = end;
-			radius = mid(t1 - start);
+			radius = mag(step);
+			// hack for the case that "end" is wide interval
+			resized = true;
 		} else {
 			flag = false;
 			if (step.lower() > 0.) {
@@ -696,7 +700,6 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 			step = t1 - start;
 		}
 
-		// psa< interval<T> >::domain() = interval<T,P>(0., step.upper());
 		psa< interval<T> >::domain() = interval<T>::hull(0., step);
 
 		try {
@@ -729,7 +732,7 @@ defint_singular_autostep(F1 f1, F2 f2, interval<T> start, interval<T> end, int o
 	}
 
 	#ifdef DEFINT_SHOW_STEPSIZE
-	std::cout << "stepsize: " << step << "\n";
+	std::cout << "t,t1,stepsize: " << start << "," << t1 << "," << step << "\n";
 	#endif
 
 	psa< interval<T> >::mode() = save_mode;

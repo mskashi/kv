@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2017-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_AVX512_HPP
@@ -452,7 +452,7 @@ template <> struct rop <dd> {
 #if DD_NEW_SQRT == 1
 	static dd sqrt_up(const dd& x) {
 		double z1, z2, z3, z4;
-		volatile __m128d mz1, mz2, mz3, mz4, mxa1, mxa2, mtmp;
+		volatile __m128d mz1, mz2, mz3, mz4, mxa1, mxa2, mtmp, mtmp2, mc025, mc2;
 
 		#if 0
 		if (x < 0.) {
@@ -479,14 +479,25 @@ template <> struct rop <dd> {
 		mz2 = _mm_add_round_sd(mz2, mxa2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 		mz2 = _mm_add_round_sd(mz2, mz4, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 		_mm_store_sd(&z2, mz2);
+
+		// tmp = std::sqrt(x.a1 + x.a2) + z1;
 		if (z2 > 0.) {
-			// tmp = std::sqrt(x.a1 + x.a2) + z1;
 			mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
 			mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
 			mtmp = _mm_add_round_sd(mtmp, mz1, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
 		} else {
-			mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-			mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			if (x.a1 == (std::numeric_limits<double>::max)()) {
+				mc025 = _mm_set_sd(0.25);
+				mc2 = _mm_set_sd(2.0);
+				mtmp = _mm_mul_round_sd(mxa1, mc025, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp2 = _mm_mul_round_sd(mxa2, mc025, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_add_round_sd(mtmp, mtmp2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_mul_round_sd(mtmp, mc2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			} else {
+				mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			}
 			mtmp = _mm_add_round_sd(mtmp, mz1, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 		}
 		mz2 = _mm_div_round_sd(mz2, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
@@ -498,7 +509,7 @@ template <> struct rop <dd> {
 
 	static dd sqrt_down(const dd& x) {
 		double z1, z2, z3, z4;
-		volatile __m128d mz1, mz2, mz3, mz4, mxa1, mxa2, mtmp;
+		volatile __m128d mz1, mz2, mz3, mz4, mxa1, mxa2, mtmp, mtmp2, mc025, mc2;
 
 		#if 0
 		if (x < 0.) {
@@ -525,10 +536,21 @@ template <> struct rop <dd> {
 		mz2 = _mm_add_round_sd(mz2, mxa2, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
 		mz2 = _mm_add_round_sd(mz2, mz4, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
 		_mm_store_sd(&z2, mz2);
+
+		// tmp = std::sqrt(x.a1 + x.a2) + z1;
 		if (z2 > 0.) {
-			// tmp = std::sqrt(x.a1 + x.a2) + z1;
-			mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
-			mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			if (x.a1 == (std::numeric_limits<double>::max)()) {
+				mc025 = _mm_set_sd(0.25);
+				mc2 = _mm_set_sd(2.0);
+				mtmp = _mm_mul_round_sd(mxa1, mc025, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp2 = _mm_mul_round_sd(mxa2, mc025, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_add_round_sd(mtmp, mtmp2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_mul_round_sd(mtmp, mc2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			} else {
+				mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+				mtmp = _mm_sqrt_round_sd(mtmp, mtmp, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
+			}
 			mtmp = _mm_add_round_sd(mtmp, mz1, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC);
 		} else {
 			mtmp = _mm_add_round_sd(mxa1, mxa2, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC);
