@@ -1,17 +1,20 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDOUBLE_NOHWROUND_HPP
 #define RDOUBLE_NOHWROUND_HPP
+
+#include <cfloat>
+#if !defined(FLT_EVAL_METHOD) || FLT_EVAL_METHOD != 0
+#error "rounding emulation of double is not available on this system. If you are using i386 system, try -msse2 -mfpmath=sse compile option."
+#endif
 
 #include <iostream>
 #include <string>
 #include <limits>
 #include <cmath>
 #include <kv/conv-double.hpp>
-#include <kv/fpu53.hpp>
-
 
 #ifndef KV_USE_TPFMA
 #define KV_USE_TPFMA 0

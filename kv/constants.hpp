@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONSTANTS_HPP
@@ -162,6 +162,26 @@ template <> struct constants<double> {
 		return r;
 	}
 };
+
+#if __HAVE_FLOAT64X
+template <> struct constants<_Float64x> {
+	static _Float64x pi() {
+		return 3.1415926535897932384626433832795028841971693993751L;
+	}
+	static _Float64x e() {
+		return 2.7182818284590452353602874713526624977572470937000L;
+	}
+	static _Float64x ln2() {
+		return 0.69314718055994530941723212145817656807550013436026L;
+	}
+	static _Float64x str(const std::string& s) {
+		std::istringstream is(s);
+		_Float64x r;
+		is >> r;
+		return r;
+	}
+};
+#endif
 
 } // namespace kv
 

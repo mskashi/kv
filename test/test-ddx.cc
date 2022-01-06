@@ -1,11 +1,11 @@
-#include <kv/dd.hpp>
+#include <kv/ddx.hpp>
 
-typedef kv::dd dd;
+typedef kv::ddx ddx;
 
 int main()
 {
-	std::cout.precision(32);
-	dd x, y, z;
+	std::cout.precision(38);
+	ddx x, y, z;
 
 	x = 1.;
 	y = 3.;
@@ -47,21 +47,21 @@ int main()
 	std::cout << (z < 0.2) << "\n";
 	std::cout << (z < "0.100001") << "\n";
 
-	std::cout << kv::constants<dd>::pi() << "\n";
-	std::cout << kv::constants<dd>::e() << "\n";
-	std::cout << kv::constants<dd>::ln2() << "\n";
-	std::cout << kv::constants<dd>::str("0.1") << "\n";
+	std::cout << kv::constants<ddx>::pi() << "\n";
+	std::cout << kv::constants<ddx>::e() << "\n";
+	std::cout << kv::constants<ddx>::ln2() << "\n";
+	std::cout << kv::constants<ddx>::str("0.1") << "\n";
 
-	std::cout << std::numeric_limits<dd>::epsilon() << "\n";
-	std::cout << std::numeric_limits<dd>::infinity() << "\n";
-	std::cout << std::numeric_limits<dd>::max() << "\n";
-	std::cout << std::numeric_limits<dd>::min() << "\n";
+	std::cout << std::numeric_limits<ddx>::epsilon() << "\n";
+	std::cout << std::numeric_limits<ddx>::infinity() << "\n";
+	std::cout << std::numeric_limits<ddx>::max() << "\n";
+	std::cout << std::numeric_limits<ddx>::min() << "\n";
 
-	std::cout << std::numeric_limits<dd>::digits << "\n";
-	std::cout << std::numeric_limits<dd>::digits10 << "\n";
-	std::cout << std::numeric_limits<dd>::radix << "\n";
-	std::cout << std::numeric_limits<dd>::min_exponent << "\n";
-	std::cout << std::numeric_limits<dd>::min_exponent10 << "\n";
-	std::cout << std::numeric_limits<dd>::max_exponent << "\n";
-	std::cout << std::numeric_limits<dd>::max_exponent10 << "\n";
+	std::cout << std::numeric_limits<ddx>::digits << "\n";
+	std::cout << std::numeric_limits<ddx>::digits10 << "\n";
+	std::cout << std::numeric_limits<ddx>::radix << "\n";
+	std::cout << std::numeric_limits<ddx>::min_exponent << "\n";
+	std::cout << std::numeric_limits<ddx>::min_exponent10 << "\n";
+	std::cout << std::numeric_limits<ddx>::max_exponent << "\n";
+	std::cout << std::numeric_limits<ddx>::max_exponent10 << "\n";
 }

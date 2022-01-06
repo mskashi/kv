@@ -1,9 +1,14 @@
 /*
- * Copyright (c) 2013-2020 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
 #define DD_HPP
+
+#include <cfloat>
+#if !defined(FLT_EVAL_METHOD) || FLT_EVAL_METHOD != 0
+#error "double double is not available on this system. If you are using i386 system, try -msse2 -mfpmath=sse compile option."
+#endif
 
 #include <iostream>
 #include <limits>
@@ -14,7 +19,6 @@
 #include <kv/convert.hpp>
 #include <kv/constants.hpp>
 #include <kv/conv-dd.hpp>
-#include <kv/fpu53.hpp>
 
 
 #ifndef DD_FASTMULT

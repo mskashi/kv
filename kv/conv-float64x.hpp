@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
-#ifndef CONV_DOUBLE_HPP
-#define CONV_DOUBLE_HPP
+#ifndef CONV_FLOAT64X_HPP
+#define CONV_FLOAT64X_HPP
 
 #include <cstdio>
 #include <iostream>
@@ -20,9 +20,9 @@
 
 namespace kv {
 
-struct conv_double {
+struct conv_float64x {
 
-	static int get_sign_double(double x) {
+	static int get_sign_float64x(_Float64x x) {
 		if (x == 0.) {
 			x = 1. / x;
 		}
@@ -31,18 +31,18 @@ struct conv_double {
 		else return -1;
 	}
 
-	static int get_exponent(double x) {
+	static int get_exponent(_Float64x x) {
 		int i;
 
-		if (x >= std::ldexp(1., 1023)) return 1023;
-		if (x < std::ldexp(1., -1074)) return -1075;
+		if (x >= std::ldexp((_Float64x)1., 16383)) return 16383;
+		if (x < std::ldexp((_Float64x)1., -16445)) return -16446;
 
 		std::frexp(x, &i);
 
 		return i - 1;
 	}
 
-	// convert double number to string
+	// convert _Float64x number to string
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
@@ -51,14 +51,14 @@ struct conv_double {
 	// format == 'g' : like %g of printf
 	// format == 'a' : print all digits with no rounding
 
-	static std::string dtostring(double x, int precision = 17, char format = 'g', int mode = 0) {
+	static std::string float64xtostring(_Float64x x, int precision = 20, char format = 'g', int mode = 0) {
 		int i, j;
 		int sign, ex;
-		double absx;
+		_Float64x absx;
 
 		if (x != x) return "nan";
 
-		sign = get_sign_double(x);
+		sign = get_sign_float64x(x);
 		absx = std::fabs(x);
 
 		if (absx == 0.) {
@@ -69,7 +69,7 @@ struct conv_double {
 			}
 		}
 
-		if (absx == std::numeric_limits<double>::infinity()) {
+		if (absx == std::numeric_limits<_Float64x>::infinity()) {
 			if (sign == -1) {
 				return "-inf";
 			} else {
@@ -79,15 +79,15 @@ struct conv_double {
 
 		ex = get_exponent(absx);
 
-		bool buf[1023 - (-1074) + 1];
-		int offset = 1074;
+		bool buf[16383 - (-16445) + 1];
+		int offset = 16445;
 		int emax, emin;
-		double dtmp, dtmp2;
+		_Float64x dtmp, dtmp2;
 
 		dtmp = absx;
-		dtmp2 = std::ldexp(1., ex);
+		dtmp2 = std::ldexp((_Float64x)1., ex);
 
-		for (i=0; i<=52; i++) {
+		for (i=0; i<=63; i++) {
 			if (dtmp >= dtmp2) {
 				buf[offset + ex - i] = 1;
 				dtmp -= dtmp2;
@@ -384,12 +384,12 @@ struct conv_double {
 		return r;
 	}
 
-	// convert string to double number
+	// convert string to _Float64x number
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
 
-	static double stringtod(std::string s, int mode = 0) {
+	static _Float64x stringtofloat64x(std::string s, int mode = 0) {
 		int i, j, tmp;
 		bool flag;
 		int sign, e10, esign;
@@ -575,54 +575,54 @@ struct conv_double {
 		}
 		#endif
 
-		// convert binary to double number
+		// convert binary to _Float64x number
 
-		double dtmp;
+		_Float64x dtmp;
 
-		if (result_max > 1023) {
+		if (result_max > 16383) {
 			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {
-                        	return sign * (std::numeric_limits<double>::max)();
+                        	return sign * (std::numeric_limits<_Float64x>::max)();
 			}
 
-			return sign * std::numeric_limits<double>::infinity();
+			return sign * std::numeric_limits<_Float64x>::infinity();
 		}
 
-		if (result_max < -1075) {
+		if (result_max < -16446) {
 			if ((sign == 1 && mode == 1) || (sign == -1 && mode == -1)) {
-				return sign * std::numeric_limits<double>::denorm_min();
+				return sign * std::numeric_limits<_Float64x>::denorm_min();
 			}
 			return sign * 0.;
 		}
 
-		double r;
+		_Float64x r;
 
 		r = 0.;
 		for (i=result_max; i >= result_min; i--) {
-			if (result_max - i == 53 || i == -1075) {
+			if (result_max - i == 64 || i == -16446) {
 				if (sign == 1) {
 					if (mode == -1) {
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += std::ldexp(1., i+1);
+							r += std::ldexp((_Float64x)1., i+1);
 						}
 					} else {
-						r += std::ldexp(1., i+1);
+						r += std::ldexp((_Float64x)1., i+1);
 					}
 				} else {
 					if (mode == -1) {
-						r += std::ldexp(1., i+1);
+						r += std::ldexp((_Float64x)1., i+1);
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += std::ldexp(1., i+1);
+							r += std::ldexp((_Float64x)1., i+1);
 						}
 					} else {
 					}
 				}
 				break;
 			}
-			r += std::ldexp((double)result[offset2 + i], i);
+			r += std::ldexp((_Float64x)result[offset2 + i], i);
 		}
 
 		return sign * r;
@@ -631,4 +631,4 @@ struct conv_double {
 
 } // namespace kv
 
-#endif // CONV_DOUBLE_HPP
+#endif // CONV_FLOAT64X_HPP

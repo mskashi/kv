@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -144,6 +144,13 @@ template <class T> class interval {
 	template <class C> typename boost::enable_if_c< acceptable_s<C, interval>::value, interval& >::type operator=(const C& x) {
 		inf = rop<T>::fromstring_down(x);
 		sup = rop<T>::fromstring_up(x);
+		return *this;
+	}
+
+	template <class TT> typename boost::disable_if_c< boost::is_same<T, TT>::value, interval& >::type operator=(const interval<TT>& x) {
+		// rounded_converter(x.lower(), inf, -1);
+		// rounded_converter(x.upper(), sup, 1);
+		interval_converter(x, *this);
 		return *this;
 	}
 
