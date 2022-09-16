@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DOUBLE_HPP
@@ -515,7 +515,7 @@ struct conv_double {
 		result_min = 0;
 
 		while (table_min < 0) {
-			tmp = 106 - (result_max - result_min);
+			tmp = 53 - (result_max - result_min);
 			if (flag && tmp <= 0) break;
 			if (!flag) {
 				m = 16;
@@ -576,8 +576,6 @@ struct conv_double {
 		#endif
 
 		// convert binary to double number
-
-		double dtmp;
 
 		if (result_max > 1023) {
 			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {

@@ -515,7 +515,7 @@ struct conv_float64x {
 		result_min = 0;
 
 		while (table_min < 0) {
-			tmp = 106 - (result_max - result_min);
+			tmp = 64 - (result_max - result_min);
 			if (flag && tmp <= 0) break;
 			if (!flag) {
 				m = 16;
@@ -576,8 +576,6 @@ struct conv_float64x {
 		#endif
 
 		// convert binary to _Float64x number
-
-		_Float64x dtmp;
 
 		if (result_max > 16383) {
 			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {

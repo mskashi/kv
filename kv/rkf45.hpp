@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RKF45_HPP
@@ -32,6 +32,11 @@ rkf45(F f, ub::vector<T>& init, T start, T end, ode_param<T> p = ode_param<T>())
 	T err, scale;
 
 	x = init;
+
+	if (p.verbose == 1) {
+		std::cout << "t: " << t << "\n";
+		std::cout << x << "\n";
+	}
 
 	while (true) {
 		if (t + h >= end) {

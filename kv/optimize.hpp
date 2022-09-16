@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef OPTIMIZE_HPP
@@ -64,7 +64,11 @@ template <class T, class F>
 std::list< ub::vector< interval<T> > >
 optimize(const ub::vector< interval<T> >& init, F f, T limit, bool unify = true, int verbose = 0)
 {
-	std::list< ub::vector< interval<T> > > targets{init};
+	// valid in C++11
+	// std::list< ub::vector< interval<T> > > targets{init};
+	std::list< ub::vector< interval<T> > > targets;
+	targets.push_back(init);
+
 	int s = init.size();
 	ub::vector< interval<T> > I, C, I1, I2, IR, fdi, C2;
 	interval<T> fc, fi, mvf, fc2; 

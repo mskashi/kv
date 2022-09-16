@@ -5,6 +5,7 @@
  * written	Jun. 4, 2015	A. Takayasu
  * modified	by Masahide Kashiwagi
  * modified Oct. 11, 2015 A. Takayasu
+ * modified Jan. 9, 2022 Masahide Kashiwagi
  */
 
 #ifndef EIG_HPP
@@ -174,7 +175,7 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 		if (abs(H(p-1,q-1)) < tol*(abs(H(q-1,q-1) + abs(H(p-1,p-1))))) {
 			H(p-1,q-1) = (T) 0;
 			p--;
-		} else if (abs(H(p-2,q-2)) < tol*(abs(H(q-2,q-2)) + fabs(H(q-1,q-1)))){
+		} else if (abs(H(p-2,q-2)) < tol*(abs(H(q-2,q-2)) + abs(H(q-1,q-1)))){
 			H(p-2,q-2) = (T) 0;
 			p-=2;
 		}

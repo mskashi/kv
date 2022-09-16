@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2019-2022 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DOUBLEINT_SINGULAR_HPP
@@ -227,7 +227,7 @@ doubleintegral_singular_point
 
 		r += doubleintegral_power3(
 			Func_f_for_singular_point(),
-			Func_g_for_singular_point<F1,F2,interval<T>>(f, g, x0, y0, x1, y1, x2, y2, power, multiplicity),
+			Func_g_for_singular_point<F1, F2, interval<T> >(f, g, x0, y0, x1, y1, x2, y2, power, multiplicity),
 			interval<T>(0.),
 			interval<T>(1.),
 			interval<T>(1. / div * i),
