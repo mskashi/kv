@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef OPTIMIZE_HPP
@@ -527,6 +527,318 @@ maximize_value(const interval<T>& x, F f, int n = 1000, int verbose = 0) {
 	ub::vector< interval<T> > v(1);
 	v(0) = x;
 	return maximize_value(v, g, n, verbose);
+}
+
+
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+optimize_nd(const ub::vector< interval<T> >& init, F f, T limit, bool unify = true, int verbose = 0)
+{
+	// valid in C++11
+	// std::list< ub::vector< interval<T> > > targets{init};
+	std::list< ub::vector< interval<T> > > targets;
+	targets.push_back(init);
+
+	int s = init.size();
+	ub::vector< interval<T> > I, C, I1, I2, IR, fdi, C2;
+	interval<T> fc, fi, mvf, fc2; 
+	T tmp, tmp2;
+	std::list< ub::vector< interval<T> > > solutions;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	int i, j, k, mi;
+	bool flag, errflag;
+
+	T delta = std::numeric_limits<T>::max();
+
+	while (!targets.empty()) {
+		I = targets.front();
+		targets.pop_front();
+		errflag = false; // evaluation error occurs or not
+
+		try {
+			fi = f(I);
+		}
+		catch (std::domain_error& e) {
+			errflag = true;
+			goto label;
+		}
+
+		if (fi.lower() > delta) {
+			continue;
+		}
+
+		C = mid(I);
+		try {
+			fc = f(C);
+		}
+		catch (std::domain_error& e) {
+			// errflag = true;
+			goto label;
+		}
+
+		// update delta at C
+		tmp = fc.upper();
+		if (tmp < delta) delta = tmp;
+
+		label:;
+
+		tmp2 = 0.;
+		for (i=0; i<s; i++) {
+			tmp = width(I(i));
+			if (tmp > tmp2) {
+				tmp2 = tmp; mi = i;
+			}
+		}
+
+		if (tmp2 < limit && errflag == false) {
+			if (verbose >= 1) {
+				std::cout << I << "\n";
+			}
+			if (unify) {
+				while (true) {
+					flag = false;
+                                        p = solutions.begin();
+					while (p != solutions.end()) {
+						if (overlap(*p, I)) {
+							I = hull(I, *p);
+							p = solutions.erase(p);
+							flag = true;
+							continue;
+						}
+						p++;
+					}
+					if (flag == false) break;
+				}
+			}
+			solutions.push_back(I);
+			continue;
+		}
+
+		tmp = mid(I(mi));
+		I1 = I; I2 = I;
+		I1(mi).assign(I1(mi).lower(), tmp);
+		I2(mi).assign(tmp, I2(mi).upper());
+		targets.push_back(I1);
+		targets.push_back(I2);
+	}
+
+	if (verbose >= 1) {
+		std::cout << delta << "\n";
+	}
+
+	return solutions;
+}
+
+// rename of optimize
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+minimize_nd(const ub::vector< interval<T> >& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+        return optimize_nd(x, f, limit, unify, verbose);
+}
+
+// specify maximum number of subdivision instead of width limit
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+minimize_nd(const ub::vector< interval<T> >& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	int i;
+	T tmp;
+	tmp = 1.;
+	for (i=0; i<x.size(); i++) {
+		tmp *= width(x(i));
+	}
+	T limit = (T)std::pow(tmp / n, 1.0/x.size());
+        return minimize_nd(x, f, limit, unify, verbose);
+}
+
+// return only mininum value
+template <class T, class F>
+interval<T>
+minimize_nd_value(const ub::vector< interval<T> >& x, F f, T limit, int verbose = 0) {
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	T ret_l, ret_u;
+	interval<T> tmp;
+
+	ret_l = std::numeric_limits<T>::infinity();
+	ret_u = std::numeric_limits<T>::infinity();
+
+	result = minimize_nd(x, f, limit, false, verbose); // disable unify
+	p = result.begin();
+	while (p != result.end()) {
+		tmp = f(*p);
+		ret_u = std::min(ret_u, tmp.upper());
+		ret_l = std::min(ret_l, tmp.lower());
+		p++;
+	}
+
+	return kv::interval<T>(ret_l, ret_u);
+}
+
+// return only mininum value
+// specify maximum number of subdivision instead of width limit
+template <class T, class F>
+interval<T>
+minimize_nd_value(const ub::vector< interval<T> >& x, F f, int n = 1000, int verbose = 0) {
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	T ret_l, ret_u;
+	interval<T> tmp;
+
+	ret_l = std::numeric_limits<T>::infinity();
+	ret_u = std::numeric_limits<T>::infinity();
+
+	result = minimize_nd(x, f, n, false, verbose); // disable unify
+	p = result.begin();
+	while (p != result.end()) {
+		tmp = f(*p);
+		ret_u = std::min(ret_u, tmp.upper());
+		ret_l = std::min(ret_l, tmp.lower());
+		p++;
+	}
+
+	return kv::interval<T>(ret_l, ret_u);
+}
+
+// maximize/maximize_value
+
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+maximize_nd(const ub::vector< interval<T> >& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+        return minimize_nd(x, Opt_MakeMinus<F>(f), limit, unify, verbose);
+}
+
+template <class T, class F>
+std::list< ub::vector< interval<T> > >
+maximize_nd(const ub::vector< interval<T> >& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+        return minimize_nd(x, Opt_MakeMinus<F>(f), n, unify, verbose);
+}
+
+template <class T, class F>
+interval<T>
+maximize_nd_value(const ub::vector< interval<T> >& x, F f, T limit, int verbose = 0) {
+	return -minimize_nd_value(x, Opt_MakeMinus<F>(f), limit, verbose);
+}
+
+template <class T, class F>
+interval<T>
+maximize_nd_value(const ub::vector< interval<T> >& x, F f, int n = 1000, int verbose = 0) {
+	return -minimize_nd_value(x, Opt_MakeMinus<F>(f), n, verbose);
+}
+
+// one dimensional version of minimize/minimize_value
+
+template <class T, class F>
+std::list< interval<T> >
+minimize_nd(const interval<T>& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = minimize_nd(v, g, limit, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+std::list< interval<T> >
+minimize_nd(const interval<T>& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = minimize_nd(v, g, n, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+interval<T>
+minimize_nd_value(const interval<T>& x, F f, T limit, int verbose = 0) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return minimize_nd_value(v, g, limit, verbose);
+}
+
+template <class T, class F>
+interval<T>
+minimize_nd_value(const interval<T>& x, F f, int n = 1000, int verbose = 0) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return minimize_nd_value(v, g, n, verbose);
+}
+
+// one dimensional version of maximize/maximize_value
+
+template <class T, class F>
+std::list< interval<T> >
+maximize_nd(const interval<T>& x, F f, T limit, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = maximize_nd(v, g, limit, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+std::list< interval<T> >
+maximize_nd(const interval<T>& x, F f, int n = 1000, bool unify = true, int verbose = 0)
+{
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	std::list< ub::vector< interval<T> > > result;
+	typename std::list< ub::vector< interval<T> > >::iterator p;
+	std::list< interval<T> > result2;
+	v(0) = x;
+        result = maximize_nd(v, g, n, unify, verbose);
+	p = result.begin();
+	while (p != result.end()) {
+		result2.push_back((*(p++))(0));
+	}
+	return result2;
+}
+
+template <class T, class F>
+interval<T>
+maximize_nd_value(const interval<T>& x, F f, T limit, int verbose = 0) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return maximize_nd_value(v, g, limit, verbose);
+}
+
+template <class T, class F>
+interval<T>
+maximize_nd_value(const interval<T>& x, F f, int n = 1000, int verbose = 0) {
+	Opt_MakeVec<F> g(f);
+	ub::vector< interval<T> > v(1);
+	v(0) = x;
+	return maximize_nd_value(v, g, n, verbose);
 }
 
 } // namespace kv

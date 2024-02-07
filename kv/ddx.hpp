@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DDX_HPP
@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-#ifndef __HAVE_FLOAT64X
+#if !defined(__HAVE_FLOAT64X) || __GNUC__ >= 13
 #error "_Float64x is not available on this compiler"
 #endif
 

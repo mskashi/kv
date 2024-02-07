@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONSTANTS_HPP
@@ -163,7 +163,7 @@ template <> struct constants<double> {
 	}
 };
 
-#if __HAVE_FLOAT64X
+#if defined(__HAVE_FLOAT64X) && __GNUC__ < 13
 template <> struct constants<_Float64x> {
 	static _Float64x pi() {
 		return 3.1415926535897932384626433832795028841971693993751L;

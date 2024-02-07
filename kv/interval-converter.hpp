@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2022-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_CONVERTER_HPP
@@ -146,7 +146,7 @@ void rounded_converter(const mpfr<N>& x, mpfr<M>& y, int rnd = 0)
 
 #include <cmath>
 
-#ifdef __HAVE_FLOAT64X
+#if defined(__HAVE_FLOAT64X) && __GNUC__ < 13
 
 #include <kv/rfloat64x.hpp>
 #include <kv/ddx.hpp>

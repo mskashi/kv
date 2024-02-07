@@ -81,7 +81,7 @@ int main()
 	kv::rounded_converter(m1, n1, 1);
 	std::cout << n1 << "\n";
 
-#ifdef __HAVE_FLOAT64X
+#if defined(__HAVE_FLOAT64X) && __GNUC__ < 13
 
 	_Float64x dx1;
 	kv::ddx ddx1;
@@ -267,7 +267,7 @@ int main()
 	m2 = m2;
 	std::cout << n2 << "\n";
 
-#ifdef __HAVE_FLOAT64X
+#if defined(__HAVE_FLOAT64X) && __GNUC__ < 13
 
 	kv::interval<_Float64x> dx2;
 	kv::interval<kv::ddx> ddx2;
