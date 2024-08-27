@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_MAFFINE_HPP
@@ -124,12 +124,14 @@ odelong_maffine(
 
 	int s = init.size();
 	ub::vector< affine<T> > x, x1;
+	ub::vector< interval<T> > ix, ix1;
 	interval<T> t, t1;
 	int ret_ode;
-	ub::matrix< interval<T> > M, M_tmp;
+	ub::matrix< interval<T> > M, M_tmp, M_old;
 	ub::matrix< interval<T> >* M_p;
 	int ret_val = 0;
 	bool ret_callback;
+	int i, j;
 
 	ub::vector< psa< interval<T> > > result_tmp;
 
@@ -138,7 +140,8 @@ odelong_maffine(
 		M_p = NULL;
 	} else {
 		M_p = &M_tmp;
-		M = ub::identity_matrix< interval<T> >(s);
+		// M = ub::identity_matrix< interval<T> >(s);
+		M = *mat;
 	}
 
 	x = init;
@@ -159,7 +162,10 @@ odelong_maffine(
 			return ret_val;
 		}
 		ret_val = 1;
-		if (mat != NULL) M = prod(M_tmp, M);
+		if (mat != NULL) {
+			M_old = M;
+			M = prod(M_tmp, M);
+		}
 		#if 0
 		if (result_psa != NULL) {
 			(*result_psa).push_back(boost::make_tuple(t, t1, result_tmp));
@@ -170,7 +176,22 @@ odelong_maffine(
 			std::cout << to_interval(x1) << "\n";
 		}
 
-		ret_callback = callback(t, t1, to_interval(x), to_interval(x1), result_tmp);
+		
+		ix = to_interval(x);
+		ix1 = to_interval(x1);
+		// dirty hack
+		if (mat != NULL) {
+			ix.resize(s + s*s);
+			ix1.resize(s + s*s);
+			for (i=0; i<s; i++) {
+				for (j=0; j<s; j++) {
+					ix(s + i*s + j) = M_old(i, j);
+					ix1(s + i*s + j) = M(i, j);
+				}
+			}
+			
+		}
+		ret_callback = callback(t, t1, ix, ix1, result_tmp);
 
 		if (ret_callback == false) {
 			init = x1;
@@ -236,7 +257,7 @@ odelong_maffine(
 	int i, j;
 	ub::vector< interval<T> > xi;
 	ub::vector< affine<T> > x;
-	ub::matrix< interval<T> > M, M_tmp;
+	ub::matrix< interval<T> > M;
 	int maxnum_save;
 	int r;
 
@@ -248,13 +269,11 @@ odelong_maffine(
 
 	x = xi;
 
-	r = odelong_maffine(f, x, start, end, p, callback, &M_tmp);
+	r = odelong_maffine(f, x, start, end, p, callback, &M);
 
 	affine<T>::maxnum() = maxnum_save;
 
 	if (r == 0) return 0;
-
-	M = prod(M_tmp, M);
 
 	for (i=0; i<s; i++) {
 		init(i).v = to_interval(x(i));

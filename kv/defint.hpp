@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_HPP
@@ -107,7 +107,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 	x.v.resize(2);
 	// x.v(0) = 0.;
 	x.v(1) = 1.;
-	x = setorder(x, order-1);
+	x = setorder(x, order);
 
 	t = start;
 	result = 0.;
@@ -125,11 +125,11 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 		y = integrate(f(x));
 
 		// set order preparing for constant function
-		y = setorder(y, order);
+		y = setorder(y, order + 1);
 
 		radius = 0.;
 		n_rad = 0;
-		for (i=order; i>=1; i--) {
+		for (i=order+1; i>=1; i--) {
 			#ifdef DEFINT_STEPSIZE_MAG
 			m = mag(y.v(i));
 			#else
@@ -141,7 +141,7 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			n_rad++;
 			if (n_rad == 2) break;
 		}
-		radius = std::pow((double)tolerance, 1./order) / radius;
+		radius = std::pow((double)tolerance, 1./(order + 1)) / radius;
 
 		// x.v(0) = t;
 		psa< interval<T> >::mode() = 2;
@@ -196,9 +196,9 @@ defint_autostep(F f, interval<T> start, interval<T> end, int order, T epsilon = 
 			resized = true;
 			m = rad(z) / tolerance;
 			if (restart > 0) {
-				radius /= std::max(1., std::pow((double)m, 1. / order));
+				radius /= std::max(1., std::pow((double)m, 1. / (order + 1)));
 			} else {
-				radius /= std::pow((double)m, 1. / order);
+				radius /= std::pow((double)m, 1. / (order + 1));
 			}
 		}
 		#ifdef DEFINT_SHOW_STEPSIZE

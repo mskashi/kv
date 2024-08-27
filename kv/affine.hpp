@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -27,8 +27,8 @@
  *
  *   value of AFFINE_SIMPLE                   | 0 | 1 | 2
  *  ------------------------------------------+---+---+---
- *   add dummy epsilin on linear operation    | o | x | x
- *   add dummy epsilin on nonlinear operation | o | o | x
+ *   add dummy epsilon on linear operation    | o | x | x
+ *   add dummy epsilon on nonlinear operation | o | o | x
  *
  *  default: 1
  */
