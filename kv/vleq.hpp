@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2025 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef VLEQ_HPP
@@ -20,7 +20,7 @@ namespace ub = boost::numeric::ublas;
 
 // verified linear equation solver
 // for matrix-rhs
-// set r if you already have approximate inverse of a
+// set r if you already have an approximate inverse of a
 
 template <class T>
 bool vleq(
@@ -36,7 +36,7 @@ bool vleq(
 	ub::matrix< interval<T> > EmRA;
 	ub::vector< interval<T> > xtmp(s1), btmp(s1), rtmp(s1);
 	bool bo;
-	T norm1, norm2, norm3, err;
+	T norm1, norm3, err;
 
 	if (r == NULL) {
 		bo = invert(mid(a), R);
@@ -57,17 +57,15 @@ bool vleq(
 
 	x = prod(R, mid(b));
 
-	norm2 = max_norm(R);
-
 	for (i=0; i<s2; i++) {
 		for (j=0; j<s1; j++) {
 			xtmp(j) = x(j, i);
 			btmp(j) = b(j, i);
 		}
-		rtmp = prod(a, xtmp) - btmp;
+		rtmp = prod(R, prod(a, xtmp) - btmp);
 		norm3 = max_norm(rtmp);
 		rop<T>::begin();
-		err = rop<T>::div_up(rop<T>::mul_up(norm2, norm3), norm1);
+		err = rop<T>::div_up(norm3, norm1);
 		rop<T>::end();
 		for (j=0; j<s1; j++) {
 			x(j, i) += interval<T>(-err, err);
@@ -79,7 +77,7 @@ bool vleq(
 
 // verified linear equation solver
 // for vector-rhs
-// set r if you already have approximate inverse of a
+// set r if you already have an approximate inverse of a
 
 template <class T>
 bool vleq(

@@ -69,3 +69,4 @@
 #include <kv/rkf45.hpp>
 #include <kv/strobomap.hpp>
 #include <kv/vleq.hpp>
+#include <kv/version.hpp>

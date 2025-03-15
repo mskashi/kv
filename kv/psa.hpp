@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -1273,8 +1273,59 @@ template <class T> class psa {
 		return r * 1.;
 	}
 
-	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value && ! boost::is_integral<C>::value, psa >::type pow(const psa& a, const C& b) {
-		return pow(a, psa(b));
+	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value && ! boost::is_integral<C>::value, psa >::type pow(const psa& x, const C& y) {
+		T a, xn, xn2, pow_ay, range;
+		psa h, hn, r;
+		int i;
+		int old_size;
+		bool recover_uh = false;
+		bool recover_rh = false;
+
+		a = x.v(0);
+		// h = x - a;
+		h = x; h.v(0) = 0.;
+
+		using std::pow;
+
+		pow_ay = pow(a, y);
+
+		r = pow_ay;
+		hn = 1.;
+		xn = y * pow_ay / a;
+		if (mode() == 2) {
+			range = evalrange(x);
+			xn2 = y * pow(range, y - 1);
+		}
+		if (use_history() == true) {
+			old_size = history().front().v.size();
+		}
+		for (i=1; i<x.v.size(); i++) {
+			if (use_history() == true && i >= old_size) {
+				use_history() = false;
+				recover_uh = true;
+			}
+			if (mode() == 2 && i == x.v.size() - 1) {
+				if (record_history() == true) {
+					record_history() = false;
+					recover_rh = true;
+				}
+				hn *= h;
+				r += xn2 * hn;
+			} else {
+				hn *= h;
+				r += xn * hn;
+				xn *= (y - i) / a / (i + 1.);
+				if (mode() == 2) {
+					xn2 *= (y - i) / range / (i + 1.);
+				}
+			}
+		}
+		if (recover_uh) use_history() = true;
+		if (recover_rh) record_history() = true;
+
+		// dirty hack
+		// to ensure that history buffer will be used at least once.
+		return r * 1.;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, psa>::value, psa >::type pow(const C& a, const psa& b) {

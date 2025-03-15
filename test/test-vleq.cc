@@ -10,6 +10,8 @@ typedef kv::interval<double> itv;
 
 int main()
 {
+	std::cout.precision(17);
+
 	ub::matrix<itv> a(2, 2);
 	ub::matrix<itv> b(2, 1);
 	ub::matrix<itv> x(2, 1);
@@ -21,7 +23,7 @@ int main()
 
 	kv::vleq(a, b, x);
 
-	std::cout.precision(20);
 	std::cout << x << "\n";
+	// std::cout << rad(x) << "\n";
 	std::cout << prod(a, x) << "\n";
 }

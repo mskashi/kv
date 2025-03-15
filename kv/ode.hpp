@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_HPP
@@ -249,7 +249,26 @@ ode(F f, ub::vector< interval<T> >& init, const interval<T>& start, interval<T>&
 			}
 		}
 
-		w = f(z, t);
+		try {
+			w = f(z, t);
+		}
+		catch (std::domain_error& e) {
+			if (p.autostep && restart < p.restart_max) {
+				psa< interval<T> >::use_history() = false;
+				if (p.verbose == 1) {
+					std::cout << "ode: radius changed: " << radius;
+				}
+				radius *= 0.5;
+				if (p.verbose == 1) {
+					std::cout << " -> " << radius << "\n";
+				}
+				restart++;
+				continue;
+			} else {
+				throw std::domain_error("ode: evaluation error");
+			}
+		}
+
 		for (i=0; i<n; i++) {
 			temp = integrate(w(i));
 			w(i) = setorder(temp, p.order);
