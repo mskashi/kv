@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_HPP
@@ -1034,13 +1034,15 @@ template <class T> class interval {
 		return pow(interval(x), y);
 	}
 
-	// power by integer (i is passed by double)
-	static interval ipower(const interval& x, double i) {
-		double tmp;
+	// power by integer
+	static interval ipower(const interval& x, T i) {
+		T tmp;
 		interval xp = x;
 		interval r(1.);
 
-		if (i != i) return (interval)i; // NaN check
+		if (i != i) {
+			throw std::domain_error("interval: cannot calculate power of nan");
+		}
 
 		while (i != 0.) {
 			i *= 0.5;
@@ -1101,11 +1103,9 @@ template <class T> class interval {
 		}
 
 		if (x_i >= 0.) {
-			// r *= pow(constants<interval>::e(), (int)x_i);
-			r *= ipower(constants<interval>::e(), (double)x_i);
+			r *= ipower(constants<interval>::e(), x_i);
 		} else {
-			// r /= pow(constants<interval>::e(), -(int)x_i);
-			r /= ipower(constants<interval>::e(), -(double)x_i);
+			r /= ipower(constants<interval>::e(), -x_i);
 		}
 
 		return r;
@@ -1251,7 +1251,7 @@ template <class T> class interval {
 			xn2 = -xn2 * cinv * x;
 			tmp = xn2 / (T)(i);
 			if (mag(tmp) < std::numeric_limits<T>::epsilon()) {
-				r += xn2 / (T)(i);
+				r += tmp;
 				break;
 			} else {
 				r += xn / (T)(i);
@@ -1410,10 +1410,10 @@ template <class T> class interval {
 
 		using std::abs;
 		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
-			return hull(-1. , 1.);
+			return interval(-1. , 1.);
 		}
 		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
-			return hull(-1. , 1.);
+			return interval(-1. , 1.);
 		}
 
 		I2 = I;
@@ -1429,19 +1429,19 @@ template <class T> class interval {
 
 		r = hull(sin_point(interval(I2.lower())), sin_point(interval(I2.upper())));
 
-		if (subset(pi * 0.5, I2)) {
+		if (overlap(pi * 0.5, I2)) {
 			r = hull(r, 1.);
 		}
 
-		if (subset(pi * 2.5, I2)) {
+		if (overlap(pi * 2.5, I2)) {
 			r = hull(r, 1.);
 		}
 
-		if (subset(-pi * 0.5, I2)) {
+		if (overlap(-pi * 0.5, I2)) {
 			r = hull(r, -1.);
 		}
 
-		if (subset(pi * 1.5, I2)) {
+		if (overlap(pi * 1.5, I2)) {
 			r = hull(r, -1.);
 		}
 
@@ -1457,10 +1457,10 @@ template <class T> class interval {
 
 		using std::abs;
 		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
-			return hull(-1. , 1.);
+			return interval(-1. , 1.);
 		}
 		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
-			return hull(-1. , 1.);
+			return interval(-1. , 1.);
 		}
 
 		I2 = I;
@@ -1480,19 +1480,19 @@ template <class T> class interval {
 			r = hull(r, 1.);
 		}
 
-		if (subset(pi2, I2)) {
+		if (overlap(pi2, I2)) {
 			r = hull(r, 1.);
 		}
 
-		if (subset(-pi, I2)) {
+		if (overlap(-pi, I2)) {
 			r = hull(r, -1.);
 		}
 
-		if (subset(pi, I2)) {
+		if (overlap(pi, I2)) {
 			r = hull(r, -1.);
 		}
 
-		if (subset(pi * 3., I2)) {
+		if (overlap(pi * 3., I2)) {
 			r = hull(r, -1.);
 		}
 
@@ -1512,10 +1512,10 @@ template <class T> class interval {
 
 		using std::abs;
 		if (abs(I.lower()) == std::numeric_limits<T>::infinity()) {
-			return hull(-std::numeric_limits<T>::infinity(), std::numeric_limits<T>::infinity());
+			return whole();
 		}
 		if (abs(I.upper()) == std::numeric_limits<T>::infinity()) {
-			return hull(-std::numeric_limits<T>::infinity(), std::numeric_limits<T>::infinity());
+			return whole();
 		}
 
 		I2 = I;

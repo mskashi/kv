@@ -6,6 +6,8 @@
  * modified	by Masahide Kashiwagi
  * modified Oct. 11, 2015 A. Takayasu
  * modified Jan. 9, 2022 Masahide Kashiwagi
+ * modified Mar. 11, 2026 Codex CLI using gpt-5.4 :)
+ * modified Mar. 15, 2026 Masahide Kashiwagi
  */
 
 #ifndef EIG_HPP
@@ -118,15 +120,41 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 	int n = H.size1();
 	// % p indicates the 'active' matrix size
 	int p = n, q, r;
-	T s,t,x,y,z,beta;
+	int iter = 0;
+	T s,t,x,y,z,beta, mu, shift_scale;
 	ub::matrix<T> v, mat_tmp, mat_tmp2, mat_T;
 	mat_tmp.resize(3,1);
 	mat_tmp2.resize(2,1);
+	using std::abs;
 
 	while (p > 2) {
 		q = p-1;
+		if (abs(H(p-1,q-1)) < tol*(abs(H(q-1,q-1)) + abs(H(p-1,p-1)))) {
+			H(p-1,q-1) = (T) 0;
+			p--;
+			iter = 0;
+			continue;
+		}
+		if (abs(H(p-2,q-2)) < tol*(abs(H(q-2,q-2)) + abs(H(q-1,q-1)))) {
+			H(p-2,q-2) = (T) 0;
+			p-=2;
+			iter = 0;
+			continue;
+		}
+
+		q = p-1;
 		s = H(q-1,q-1) + H(p-1,p-1);
 		t = H(q-1,q-1)*H(p-1,p-1) - H(q-1,p-1)*H(p-1,q-1);
+		iter++;
+		if (iter % 16 == 0) {
+			shift_scale = abs(H(p-1,q-1));
+			if (p > 2) {
+				shift_scale += abs(H(q-1,q-2));
+			}
+			mu = H(p-1,p-1) + shift_scale;
+			s = 2 * mu;
+			t = mu * mu;
+		}
 		// % compute first 3 elements of first column of M
 		x = H(0,0)*H(0,0)+H(0,1)*H(1,0)-s*H(0,0)+t;
 		y = H(1,0)*(H(0,0)+H(1,1)-s);
@@ -137,12 +165,12 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 			mat_tmp(2,0) = z;
 			// [v,beta] = house([x,y,z].');
 			house(mat_tmp,v,beta);
-			r = fmax(1,k); // r = max(1,k); Need math.h???
+			r = std::max(1,k);
 			// T = eye(3) - beta*v*(v');
 			mat_T = ub::identity_matrix<T>(3) - beta*prod(v,trans(v));
 			// H(k+1:k+3,r:n) = T*H(k+1:k+3,r:n);
 			ub::project(H,ub::range(k,k+3),ub::range(r-1,n)) = prod(mat_T,ub::project(H,ub::range(k,k+3),ub::range(r-1,n)));
-			r = fmin(k+4,p);
+			r = std::min(k+4,p);
 			// H(1:r,k+1:k+3) = H(1:r,k+1:k+3)*T;
 			ub::project(H,ub::range(0,r),ub::range(k,k+3)) = prod(ub::project(H,ub::range(0,r),ub::range(k,k+3)),mat_T);
 			// Q(:,k+1:k+3) = Q(:,k+1:k+3)*T;
@@ -171,13 +199,14 @@ template <class T> bool francisQR(ub::matrix<T>& Q, ub::matrix<T>& H)
 		// check for convergence
 		// if abs(H(p,q)) < tol*(abs(H(q,q))+abs(H(p,p)))
 		// if (fabs(H(p-1,q-1)) < tol*(fabs(H(q-1,q-1) + fabs(H(p-1,p-1)))))
-		using std::abs;
-		if (abs(H(p-1,q-1)) < tol*(abs(H(q-1,q-1) + abs(H(p-1,p-1))))) {
+		if (abs(H(p-1,q-1)) < tol*(abs(H(q-1,q-1)) + abs(H(p-1,p-1)))) {
 			H(p-1,q-1) = (T) 0;
 			p--;
+			iter = 0;
 		} else if (abs(H(p-2,q-2)) < tol*(abs(H(q-2,q-2)) + abs(H(q-1,q-1)))){
 			H(p-2,q-2) = (T) 0;
 			p-=2;
+			iter = 0;
 		}
 	}
 	return true;
@@ -255,7 +284,7 @@ template <class T> bool lu_factorize_comp(ub::matrix<kv::complex<T> >& A, ub::ve
 
 template <class T> bool lu_substitute_comp(const ub::matrix<kv::complex<T> >& A, const ub::vector<int>& p, ub::vector<kv::complex<T> >& b)// Numerical recipe in C (lubksb)
 {
-  int i, ii=0, ip, j;
+  int i, ii=-1, ip, j;
   int n = A.size1();
   kv::complex<T> sum;
 
@@ -265,7 +294,7 @@ template <class T> bool lu_substitute_comp(const ub::matrix<kv::complex<T> >& A,
     ip = p(i);
     sum = b(ip);
     b(ip) = b(i);
-    if (ii==0) {
+    if (ii>=0) {
       for (j = ii; j <= i-1; j++) {
         sum -= A(i,j)*b(j);
       }
@@ -344,8 +373,8 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 		if (flag) {
 			// Compute jth element of ith eigenvector X(j,i)
 			while (j>0) {
-				k = fmin(n,j+1);
-				l = fmax(1,j-1);
+				k = std::min(n,j+1);
+				l = std::max(1,j-1);
 				if (i==j) {
 					if (A(k-1,j-1) != 0 && k!=j) {
 						// Block diagonal [A(j,j), A(j,j+1); A(j+1,j), A(j+1,j+1)] appears
@@ -382,7 +411,7 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 						// Block diagonal [A(j-1,j-1), A(j-1,j); A(j,j-1), A(j,j)] appears
 						// Real pair
 						b1=0; b2=0;
-						for (k = j+1; k <= fmin(i+1,n); k++) {
+						for (k = j+1; k <= std::min(i+1,n); k++) {
 							b1 += A(j-2,k-1)*X(k-1,i-1);
 							b2 += A(j-1,k-1)*X(k-1,i-1);
 						}
@@ -405,7 +434,7 @@ template <class T> bool eig2by2(const ub::matrix<T>& P, const ub::matrix<T>& A, 
 						j -= 2;
 					} else {
 						// A(i,i) is eigen value
-						for (k = j+1; k <= fmin(i+1,n); k++) {
+						for (k = j+1; k <= std::min(i+1,n); k++) {
 							X(j-1,i-1) = X(j-1,i-1) + A(j-1,k-1)*X(k-1,i-1);
 						}
 						// X(j-1,i-1) = -X(j-1,i-1)/(D(j-1,j-1)-D(i-1,i-1));

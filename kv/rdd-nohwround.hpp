@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDD_NOHWROUND_HPP
@@ -88,8 +88,7 @@ template <> struct rop <dd> {
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			z1 = -(std::numeric_limits<dd>::max)().a1;
-			z2 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a2 + y.a2;
@@ -100,8 +99,7 @@ template <> struct rop <dd> {
 		if (z3 == std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == -std::numeric_limits<double>::infinity()) {
-			z3 = -(std::numeric_limits<dd>::max)().a1;
-			z4 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -119,8 +117,7 @@ template <> struct rop <dd> {
 		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == std::numeric_limits<double>::infinity()) {
-			z1 = (std::numeric_limits<dd>::max)().a1;
-			z2 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a2 + y.a2;
@@ -130,8 +127,7 @@ template <> struct rop <dd> {
 		if (z3 == -std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == std::numeric_limits<double>::infinity()) {
-			z3 = (std::numeric_limits<dd>::max)().a1;
-			z4 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -149,8 +145,7 @@ template <> struct rop <dd> {
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			z1 = -(std::numeric_limits<dd>::max)().a1;
-			z2 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a2 - y.a2;
@@ -161,8 +156,7 @@ template <> struct rop <dd> {
 		if (z3 == std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == -std::numeric_limits<double>::infinity()) {
-			z3 = -(std::numeric_limits<dd>::max)().a1;
-			z4 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -180,8 +174,7 @@ template <> struct rop <dd> {
 		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == std::numeric_limits<double>::infinity()) {
-			z1 = (std::numeric_limits<dd>::max)().a1;
-			z2 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a2 - y.a2;
@@ -191,8 +184,7 @@ template <> struct rop <dd> {
 		if (z3 == -std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == std::numeric_limits<double>::infinity()) {
-			z3 = (std::numeric_limits<dd>::max)().a1;
-			z4 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -210,8 +202,7 @@ template <> struct rop <dd> {
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			z1 = -(std::numeric_limits<dd>::max)().a1;
-			z2 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
@@ -222,8 +213,7 @@ template <> struct rop <dd> {
 		if (z3 == std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == -std::numeric_limits<double>::infinity()) {
-			z3 = -(std::numeric_limits<dd>::max)().a1;
-			z4 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -241,8 +231,7 @@ template <> struct rop <dd> {
 		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == std::numeric_limits<double>::infinity()) {
-			z1 = (std::numeric_limits<dd>::max)().a1;
-			z2 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		// z2 += x.a1 * y.a2 + x.a2 * y.a1 + x.a2 * y.a2;
@@ -253,8 +242,7 @@ template <> struct rop <dd> {
 		if (z3 == -std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == std::numeric_limits<double>::infinity()) {
-			z3 = (std::numeric_limits<dd>::max)().a1;
-			z4 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -273,8 +261,7 @@ template <> struct rop <dd> {
 		if (z1 == std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == -std::numeric_limits<double>::infinity()) {
-			z1 = -(std::numeric_limits<dd>::max)().a1;
-			z2 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		if (y.a1 >= 0.) {
@@ -328,8 +315,7 @@ template <> struct rop <dd> {
 		if (z3 == std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == -std::numeric_limits<double>::infinity()) {
-			z3 = -(std::numeric_limits<dd>::max)().a1;
-			z4 = -(std::numeric_limits<dd>::max)().a2;
+			return -(std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);
@@ -348,8 +334,7 @@ template <> struct rop <dd> {
 		if (z1 == -std::numeric_limits<double>::infinity()) {
 			return dd(z1, 0.);
 		} else if (z1 == std::numeric_limits<double>::infinity()) {
-			z1 = (std::numeric_limits<dd>::max)().a1;
-			z2 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		if (y.a1 >= 0.) {
@@ -403,8 +388,7 @@ template <> struct rop <dd> {
 		if (z3 == -std::numeric_limits<double>::infinity()) {
 			return dd(z3, 0.);
 		} else if (z3 == std::numeric_limits<double>::infinity()) {
-			z3 = (std::numeric_limits<dd>::max)().a1;
-			z4 = (std::numeric_limits<dd>::max)().a2;
+			return (std::numeric_limits<dd>::max)();
 		}
 
 		return dd(z3, z4);

@@ -24,6 +24,4 @@ int main()
 	std::cout.precision(17);
 
 	kv::rkf45(Lorenz(), x, 0., 1., kv::ode_param<double>().set_verbose(1));
-
-	std::cout << x << "\n";
 }

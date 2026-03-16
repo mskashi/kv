@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2022-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef RDDX_HPP
@@ -118,8 +118,7 @@ template <> struct rop <ddx> {
 		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
-			z1 = -(std::numeric_limits<ddx>::max)().a1;
-			z2 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::roundup();
@@ -133,8 +132,7 @@ template <> struct rop <ddx> {
 		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
-			z3 = -(std::numeric_limits<ddx>::max)().a1;
-			z4 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -153,8 +151,7 @@ template <> struct rop <ddx> {
 		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
-			z1 = (std::numeric_limits<ddx>::max)().a1;
-			z2 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::rounddown();
@@ -168,8 +165,7 @@ template <> struct rop <ddx> {
 		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
-			z3 = (std::numeric_limits<ddx>::max)().a1;
-			z4 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -188,8 +184,7 @@ template <> struct rop <ddx> {
 		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
-			z1 = -(std::numeric_limits<ddx>::max)().a1;
-			z2 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::roundup();
@@ -203,8 +198,7 @@ template <> struct rop <ddx> {
 		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
-			z3 = -(std::numeric_limits<ddx>::max)().a1;
-			z4 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -223,8 +217,7 @@ template <> struct rop <ddx> {
 		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
-			z1 = (std::numeric_limits<ddx>::max)().a1;
-			z2 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::rounddown();
@@ -238,8 +231,7 @@ template <> struct rop <ddx> {
 		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
-			z3 = (std::numeric_limits<ddx>::max)().a1;
-			z4 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -258,8 +250,7 @@ template <> struct rop <ddx> {
 		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
-			z1 = -(std::numeric_limits<ddx>::max)().a1;
-			z2 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::roundup();
@@ -273,8 +264,7 @@ template <> struct rop <ddx> {
 		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
-			z3 = -(std::numeric_limits<ddx>::max)().a1;
-			z4 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -293,8 +283,7 @@ template <> struct rop <ddx> {
 		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
-			z1 = (std::numeric_limits<ddx>::max)().a1;
-			z2 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		hwround::rounddown();
@@ -308,8 +297,7 @@ template <> struct rop <ddx> {
 		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
-			z3 = (std::numeric_limits<ddx>::max)().a1;
-			z4 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -329,8 +317,7 @@ template <> struct rop <ddx> {
 		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
-			z1 = -(std::numeric_limits<ddx>::max)().a1;
-			z2 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		if (y.a1 >= 0.) {
@@ -404,8 +391,7 @@ template <> struct rop <ddx> {
 		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
-			z3 = -(std::numeric_limits<ddx>::max)().a1;
-			z4 = -(std::numeric_limits<ddx>::max)().a2;
+			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);
@@ -425,8 +411,7 @@ template <> struct rop <ddx> {
 		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z1, 0.);
 		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
-			z1 = (std::numeric_limits<ddx>::max)().a1;
-			z2 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		if (y.a1 >= 0.) {
@@ -499,8 +484,7 @@ template <> struct rop <ddx> {
 		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
 			return ddx(z3, 0.);
 		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
-			z3 = (std::numeric_limits<ddx>::max)().a1;
-			z4 = (std::numeric_limits<ddx>::max)().a2;
+			return (std::numeric_limits<ddx>::max)();
 		}
 
 		return ddx(z3, z4);

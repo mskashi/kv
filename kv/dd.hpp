@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2025 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -456,6 +456,7 @@ class dd {
 
 		twoproduct(-z1, y.a1, z3, z4);
 		if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
+			twoproduct(-z1, y.a1 * 0.5, z3, z4);
 			z2 = (((z3 + (x * 0.5)) - z1 * (y.a2 * 0.5)) + z4) / (y.a1 * 0.5);
 		} else {
 			z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
@@ -795,13 +796,15 @@ class dd {
                 return pow(dd(x), y);
         }
 
-	// power by integer (i is passed by double)
-	static dd ipower(const dd& x, double i) {
-		double tmp;
+	// power by integer
+	static dd ipower(const dd& x, dd i) {
+		dd tmp;
 		dd xp = x;
 		dd r(1.);
 
-		if (i != i) return (dd)i; // NaN check
+		if (i != i) {
+			throw std::domain_error("dd: cannot calculate power of nan");
+		}
 
 		while (i != 0.) {
 			i *= 0.5;
@@ -854,11 +857,9 @@ class dd {
 		}
 
 		if (x_i >= 0.) {
-			// r *= pow(constants<dd>::e(), (int)x_i);
-			r *= ipower(e(), (double)x_i);
+			r *= ipower(e(), x_i);
 		} else {
-			// r /= pow(constants<dd>::e(), -(int)x_i);
-			r /= ipower(e(), -(double)x_i);
+			r /= ipower(e(), -x_i);
 		}
 
 		return r;
