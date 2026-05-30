@@ -1,9 +1,10 @@
 #include <kv/ddx.hpp>
 
-typedef kv::ddx ddx;
-
 int main()
 {
+#ifdef KV_HAVE_FP80
+	typedef kv::ddx ddx;
+
 	std::cout.precision(38);
 	ddx x, y, z;
 
@@ -64,4 +65,5 @@ int main()
 	std::cout << std::numeric_limits<ddx>::min_exponent10 << "\n";
 	std::cout << std::numeric_limits<ddx>::max_exponent << "\n";
 	std::cout << std::numeric_limits<ddx>::max_exponent10 << "\n";
+#endif // KV_HAVE_FP80
 }

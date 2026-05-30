@@ -1,18 +1,17 @@
 /*
- * Copyright (c) 2021-2025 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DDX_HPP
 #define DDX_HPP
 
-#include <cmath>
+#include <kv/fp80.hpp>
 
-#if !defined(__HAVE_FLOAT64X) || __GNUC__ >= 13
-#error "_Float64x is not available on this compiler"
-#endif
+#ifdef KV_HAVE_FP80
 
 #include <iostream>
 #include <limits>
+#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -45,19 +44,19 @@ template <class C> struct acceptable_s<C, ddx> {
 class ddx {
 	public:
 
-	_Float64x a1;
-	_Float64x a2;
+	fp80 a1;
+	fp80 a2;
 
 
-	static void fasttwosum(const _Float64x& a, const _Float64x& b, _Float64x& x, _Float64x& y) {
-		_Float64x tmp;
+	static void fasttwosum(const fp80& a, const fp80& b, fp80& x, fp80& y) {
+		fp80 tmp;
 		x = a + b;
 		tmp = x - a;
 		y = b - tmp;
 	}
 
-	static void twosum(const _Float64x& a, const _Float64x& b, _Float64x& x, _Float64x& y) {
-		_Float64x tmp;
+	static void twosum(const fp80& a, const fp80& b, fp80& x, fp80& y) {
+		fp80 tmp;
 
 		x = a + b;
 		if (std::fabs(a) > std::fabs(b)) {
@@ -69,22 +68,22 @@ class ddx {
 		}
 	}
 
-	static void split(const _Float64x& a, _Float64x& x, _Float64x& y) {
-		static const _Float64x sigma = std::ldexp((_Float64x)1., 32) + 1;
-		_Float64x tmp;
+	static void split(const fp80& a, fp80& x, fp80& y) {
+		static const fp80 sigma = std::ldexp((fp80)1., 32) + 1;
+		fp80 tmp;
 
 		tmp = a * sigma;
 		x = tmp - (tmp - a);
 		y = a - x;
 	}
 
-	static void twoproduct(const _Float64x& a, const _Float64x& b, _Float64x& x, _Float64x& y) {
-		static const _Float64x th = std::ldexp((_Float64x)1., 16351);
-		static const _Float64x c1 = std::ldexp((_Float64x)1., -33);
-		static const _Float64x c2 = std::ldexp((_Float64x)1., 33);
-		static const _Float64x th2 = std::ldexp((_Float64x)1., 16383);
+	static void twoproduct(const fp80& a, const fp80& b, fp80& x, fp80& y) {
+		static const fp80 th = std::ldexp((fp80)1., 16351);
+		static const fp80 c1 = std::ldexp((fp80)1., -33);
+		static const fp80 c2 = std::ldexp((fp80)1., 33);
+		static const fp80 th2 = std::ldexp((fp80)1., 16383);
 
-		_Float64x na, nb, a1, a2, b1, b2;
+		fp80 na, nb, a1, a2, b1, b2;
 
 		x = a * b;
 		#if 0
@@ -143,15 +142,15 @@ class ddx {
 	}
 
 	friend ddx operator+(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x.a1, y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x.a2 + y.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -159,15 +158,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator+(const ddx& x, const C& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x.a1, y, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -179,15 +178,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator+(const C& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x, y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += y.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -214,15 +213,15 @@ class ddx {
 	}
 
 	friend ddx operator-(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x.a1, -y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x.a2 - y.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -230,15 +229,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator-(const ddx& x, const C& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x.a1, -y, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -250,15 +249,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator-(const C& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twosum(x, -y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 -= y.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -294,10 +293,10 @@ class ddx {
 	}
 
 	friend ddx operator*(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twoproduct(x.a1, y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 
@@ -309,7 +308,7 @@ class ddx {
 		#endif
 
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -317,15 +316,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator*(const ddx& x, const C& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twoproduct(x.a1, y, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x.a2 * y;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -337,15 +336,15 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator*(const C& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		twoproduct(x, y.a1, z1, z2);
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 		z2 += x * y.a2;
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -372,18 +371,18 @@ class ddx {
 	}
 
 	friend ddx operator/(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		z1 = x.a1 / y.a1;
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
-		if (std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 
 		twoproduct(-z1, y.a1, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			twoproduct(-z1, y.a1 * 0.5, z3, z4);
 			z2 = ((((z3 + (x.a1 * 0.5)) - z1 * (y.a2 * 0.5)) + (x.a2 * 0.5)) + z4) / (y.a1 * 0.5);
 		} else {
@@ -391,7 +390,7 @@ class ddx {
 			z2 = ((((z3 + x.a1) - z1 * y.a2) + x.a2) + z4) / y.a1;
 		}
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -399,25 +398,25 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator/(const ddx& x, const C& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		z1 = x.a1 / y;
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
-		if (std::fabs((_Float64x)y) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs((fp80)y) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 
 		twoproduct(-z1, y, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			twoproduct(-z1, y * 0.5, z3, z4);
 			z2 = (((z3 + (x.a1 * 0.5)) + (x.a2 * 0.5)) + z4) / (y * 0.5);
 		} else {
 			z2 = (((z3 + x.a1) + x.a2) + z4) / y;
 		}
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -429,25 +428,25 @@ class ddx {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, ddx>::value, ddx >::type operator/(const C& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		z1 = x / y.a1;
-		if (std::fabs(z1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
-		if (std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
 		}
 
 		twoproduct(-z1, y.a1, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			twoproduct(-z1, y.a1 * 0.5, z3, z4);
 			z2 = (((z3 + (x * 0.5)) - z1 * (y.a2 * 0.5)) + z4) / (y.a1 * 0.5);
 		} else {
 			z2 = (((z3 + x) - z1 * y.a2) + z4) / y.a1;
 		}
 		twosum(z1, z2, z3, z4);
-		if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
 		}
 
@@ -493,14 +492,14 @@ class ddx {
 	}
 
 	friend ddx sqrt(const ddx& x) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 
 		if (x < 0.) {
 			throw std::domain_error("ddx: sqrt of negative value");
                 }
 
 		if (x == 0.) return ddx(0.);
-		if (x.a1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (x.a1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1, 0.);
 		}
 
@@ -645,7 +644,7 @@ class ddx {
 	}
 
 	friend ddx floor(const ddx& x) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 		z1 = std::floor(x.a1);
 		if (z1 != x.a1) {
 			return ddx(z1, 0.);
@@ -657,7 +656,7 @@ class ddx {
 	}
 
 	friend ddx ceil(const ddx& x) {
-		_Float64x z1, z2, z3, z4;
+		fp80 z1, z2, z3, z4;
 		z1 = std::ceil(x.a1);
 		if (z1 != x.a1) {
 			return ddx(z1, 0.);
@@ -669,7 +668,7 @@ class ddx {
 	}
 
 	friend ddx frexp(const ddx& x, int* m) {
-		_Float64x z1, z2;
+		fp80 z1, z2;
 		z1 = std::frexp(x.a1, m);
 		z2 = std::ldexp(x.a2, -(*m));
 		if ((z1 == 0.5 && z2 < 0) || (z1 == -0.5 && z2 > 0)) {
@@ -681,7 +680,7 @@ class ddx {
 	}
 
 	friend ddx ldexp(const ddx& x, int m) {
-		_Float64x z1, z2;
+		fp80 z1, z2;
 		z1 = std::ldexp(x.a1, m);
 		z2 = std::ldexp(x.a2, m);
 		return ddx(z1, z2);
@@ -695,8 +694,8 @@ class ddx {
 		return (double)a1;
 	}
 
-	operator _Float64x() const {
-		return (_Float64x)a1;
+	operator fp80() const {
+		return (fp80)a1;
 	}
 
 
@@ -796,10 +795,10 @@ class ddx {
 		ddx r, y;
 		int i;
 
-		if (x == ddx(std::numeric_limits<_Float64x>::infinity(), 0.)) {
-			return ddx(std::numeric_limits<_Float64x>::infinity(), 0.);
+		if (x == ddx(std::numeric_limits<fp80>::infinity(), 0.)) {
+			return ddx(std::numeric_limits<fp80>::infinity(), 0.);
 		}
-		if (x == -ddx(std::numeric_limits<_Float64x>::infinity(), 0.)) {
+		if (x == -ddx(std::numeric_limits<fp80>::infinity(), 0.)) {
 			return (ddx)0.;
 		}
 
@@ -872,11 +871,11 @@ class ddx {
 			throw std::domain_error("ddx: log of negative value");
                 }
 
-		if (x == ddx(std::numeric_limits<_Float64x>::infinity(), 0.)) {
-			return ddx(std::numeric_limits<_Float64x>::infinity(), 0.);
+		if (x == ddx(std::numeric_limits<fp80>::infinity(), 0.)) {
+			return ddx(std::numeric_limits<fp80>::infinity(), 0.);
 		}
 		if (x == 0.) {
-			return -ddx(std::numeric_limits<_Float64x>::infinity(), 0.);
+			return -ddx(std::numeric_limits<fp80>::infinity(), 0.);
 		}
 
 		x2 = frexp(x, &p_i);
@@ -1232,8 +1231,8 @@ class ddx {
 	}
 
 	friend ddx atanh(const ddx& x) {
-		if (x == -1.) return -ddx(std::numeric_limits<_Float64x>::infinity(), 0.);
-		if (x == 1.) return ddx(std::numeric_limits<_Float64x>::infinity(), 0.);
+		if (x == -1.) return -ddx(std::numeric_limits<fp80>::infinity(), 0.);
+		if (x == 1.) return ddx(std::numeric_limits<fp80>::infinity(), 0.);
 		if (x < -0.5) {
 			return 0.5 * log((1. + x) / (1. - ddx(x)));
 		} else if (x <= 0.5) {
@@ -1251,29 +1250,29 @@ template <> class numeric_limits<kv::ddx> {
 	public:
 
 	static kv::ddx epsilon() {
-		static const kv::ddx tmp(std::ldexp((_Float64x)1., -127));
+		static const kv::ddx tmp(std::ldexp((kv::fp80)1., -127));
 		return tmp;
 	}
 	static kv::ddx infinity() {
-		static const _Float64x tmp = numeric_limits<_Float64x>::infinity();
+		static const kv::fp80 tmp = numeric_limits<kv::fp80>::infinity();
 		static const kv::ddx tmp2(tmp, 0.);
 		return tmp2;
 	}
 
 	static kv::ddx max() {
-		static const _Float64x tmp = numeric_limits<_Float64x>::max();
+		static const kv::fp80 tmp = numeric_limits<kv::fp80>::max();
 		static const kv::ddx tmp2(tmp, std::ldexp(tmp, -65));
 		return tmp2;
 	}
 
 	static kv::ddx min() {
-		static const _Float64x tmp = numeric_limits<_Float64x>::min();
+		static const kv::fp80 tmp = numeric_limits<kv::fp80>::min();
 		static const kv::ddx tmp2(tmp, 0.);
 		return tmp2;
 	}
 
 	static kv::ddx denorm_min() {
-		static const _Float64x tmp = numeric_limits<_Float64x>::denorm_min();
+		static const kv::fp80 tmp = numeric_limits<kv::fp80>::denorm_min();
 		static const kv::ddx tmp2(tmp, 0.);
 		return tmp2;
 	}
@@ -1306,7 +1305,8 @@ template <> struct constants<ddx> {
 		return ddx(s);
 	}
 };
-
 } // namespace kv
+
+#endif // KV_HAVE_FP80
 
 #endif // DDX_HPP

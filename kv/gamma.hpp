@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef GAMMA_HPP
@@ -62,6 +62,8 @@ interval<T> gamma_point(const interval<T>& x) {
 	int i;
 	interval<T> r;
 
+	using std::floor;
+
 	y = floor(x.lower());
 
 	if (y == 1.) {
@@ -89,6 +91,8 @@ interval<T> gamma(const interval<T>& x) {
 	interval<T> tmp, m;
 	// below is from http://oeis.org/A030169
 	static const interval<T> m2 = constants< interval<T> >::str("1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337255", "1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337256");
+
+	using std::floor;
 
 	if (x.lower() > 0.) {
 		m = digamma_zero(x.lower());
@@ -128,6 +132,8 @@ interval<T> lgamma_point(const interval<T>& x) {
 	int i;
 	interval<T> r;
 
+	using std::floor;
+
 	y = floor(x.lower());
 
 	if (y == 1.) {
@@ -154,6 +160,8 @@ interval<T> lgamma(const interval<T>& x) {
 	interval<T> tmp, m;
 	// below is from http://oeis.org/A030169
 	static const interval<T> m2 = constants< interval<T> >::str("1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337255", "1.4616321449683623412626595423257213284681962040064463512959884085987864403538018102430749927337256");
+
+	using std::floor;
 
 	if (x.lower() > 0.) {
 		m = digamma_zero(x.lower());
@@ -384,6 +392,8 @@ template <class T> interval<T> digamma_point(const interval<T>& x) {
 	T y;
 	interval<T> r;
 
+	using std::floor;
+
 	y = floor(x.lower());
 
 	#if DIGAMMA_ALGO == 0
@@ -430,6 +440,9 @@ template <class T> interval<T> digamma_point(const interval<T>& x) {
 }
 
 template <class T> interval<T> digamma(const interval<T>& x) {
+
+	using std::floor;
+
 	if (x.lower() > 0.) {
 		return interval<T>::hull(digamma_point(interval<T>(x.lower())), digamma_point(interval<T>(x.upper())));
 	}
@@ -496,6 +509,8 @@ template <class T> interval<T> trigamma_point(const interval<T>& x) {
 	int i;
 	interval<T> r;
 
+	using std::floor;
+
 	y = floor(x.lower());
 
 	if (y == 1.) {
@@ -518,6 +533,9 @@ template <class T> interval<T> trigamma_point(const interval<T>& x) {
 }
 
 template <class T> interval<T> trigamma(const interval<T>& x) {
+
+	using std::floor;
+
 	if (x.lower() > 0.) {
 		return interval<T>::hull(trigamma_point(interval<T>(x.upper())), trigamma_point(interval<T>(x.lower())));
 	}
@@ -544,6 +562,8 @@ template <class T> interval<T> digamma_zero(T x) {
 	double dn;
 	static bool is_calculated[DIGAMMA_ZERO_MAX + 1] = {};
 	static interval<T> cache[DIGAMMA_ZERO_MAX + 1];
+
+	using std::floor;
 
 	if (x > 0.) {
 		n = 0;

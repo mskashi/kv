@@ -12,7 +12,7 @@
 #include <kv/conv-dd.hpp>
 #include <kv/conv-ddx.hpp>
 #include <kv/conv-double.hpp>
-#include <kv/conv-float64x.hpp>
+#include <kv/conv-fp80.hpp>
 #include <kv/convert.hpp>
 #include <kv/dd.hpp>
 #include <kv/ddx.hpp>
@@ -23,10 +23,13 @@
 #include <kv/doubleintegral.hpp>
 #include <kv/double-newtoncotes.hpp>
 #include <kv/doubleint-curvededge.hpp>
+#include <kv/doubleint-singular.hpp>
 #include <kv/eig.hpp>
+#include <kv/fp80.hpp>
 #include <kv/gamma.hpp>
 #include <kv/geoseries.hpp>
 #include <kv/hypergeom.hpp>
+#include <kv/highderiv.hpp>
 #include <kv/hwround.hpp>
 #include <kv/interval.hpp>
 #include <kv/interval-vector.hpp>
@@ -63,10 +66,11 @@
 #include <kv/rdd.hpp>
 #include <kv/rddx.hpp>
 #include <kv/rdouble.hpp>
-#include <kv/rfloat64x.hpp>
+#include <kv/rfp80.hpp>
 #include <kv/rmpfr.hpp>
 #include <kv/rk.hpp>
 #include <kv/rkf45.hpp>
+#include <kv/rkf78.hpp>
 #include <kv/strobomap.hpp>
 #include <kv/vleq.hpp>
 #include <kv/version.hpp>

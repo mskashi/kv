@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef ODE_CALLBACK
@@ -31,6 +31,9 @@ template <class T> struct ode_callback_dense_print : ode_callback<T> {
 		psa< interval <T> > tmp;
 		int s = result.size();
 		y.resize(s);
+
+		using std::ceil;
+		using std::floor;
 
 		for (i = (int)ceil(((start - start_g) / step).lower()); i<=(int)floor(((end - start_g) / step).upper()); i++) {
 			t = start_g + step * i - start;
@@ -79,6 +82,9 @@ template <class T> struct ode_callback_dense_list : ode_callback<T> {
 		psa< interval <T> > tmp;
 		int s = result.size();
 		y.resize(s);
+
+		using std::ceil;
+		using std::floor;
 
 		for (i = (int)ceil(((start - start_g) / step).lower()); i<=(int)floor(((end - start_g) / step).upper()); i++) {
 			t = start_g + step * i - start;

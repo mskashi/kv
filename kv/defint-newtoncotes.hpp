@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DEFINT_NEWTONCOTES_HPP
@@ -48,6 +48,8 @@ interval<T> defint_newtoncotes(F f, interval<T> start, interval<T> end, int n, i
 		8,
 		8
 	};
+
+	using std::ceil;
 	
 	if (n < 1 || n > 7) throw std::domain_error("defint_newtoncotes: 1<=n<=7 required.");
 

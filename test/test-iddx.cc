@@ -1,14 +1,15 @@
-// sample program for dd-interval
+// sample program for ddx-interval
 // all test is same as test-interval.cc
 
 #include <kv/interval.hpp>
 #include <kv/ddx.hpp>
 #include <kv/rddx.hpp>
 
-typedef kv::interval<kv::ddx> itv;
-
 int main()
 {
+#ifdef KV_HAVE_FP80
+	typedef kv::interval<kv::ddx> itv;
+
 	itv x;
 	itv y = (itv)1.;
 	itv z(1.);
@@ -137,4 +138,5 @@ int main()
 	std::cout << kv::constants<itv::base_type>::e() << "\n";
 	std::cout << kv::constants<itv::base_type>::ln2() << "\n";
 	std::cout << kv::constants<itv::base_type>::str("0.1") << "\n";
+#endif // KV_HAVE_FP80
 }

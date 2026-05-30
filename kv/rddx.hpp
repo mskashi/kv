@@ -5,14 +5,13 @@
 #ifndef RDDX_HPP
 #define RDDX_HPP
 
-#include <cmath>
 
-#if !defined(__HAVE_FLOAT64X) || __GNUC__ >= 13
-#error "_Float64x is not available on this compiler"
-#endif
+#include <kv/fp80.hpp>
+
+#ifdef KV_HAVE_FP80
 
 #ifdef KV_FASTROUND
-#error "KV_FASTROUND is not available for rounding mode change of _Float64x"
+#error "KV_FASTROUND is not available for rounding mode change of fp80"
 #endif 
 
 #ifdef KV_NOHWROUND
@@ -20,6 +19,7 @@
 #endif 
 
 #include <limits>
+#include <cmath>
 #include <kv/hwround.hpp>
 
 
@@ -27,14 +27,14 @@ namespace kv {
 
 template <> struct rop <ddx> {
 
-	static void twoproduct_up(const _Float64x& a, const _Float64x& b, _Float64x& x, _Float64x& y) {
-		static const _Float64x th = std::ldexp((_Float64x)1., 16351);
-		static const _Float64x c1 = std::ldexp((_Float64x)1., -33);
-		static const _Float64x c2 = std::ldexp((_Float64x)1., 33);
-		static const _Float64x th2 = std::ldexp((_Float64x)1., 16383);
+	static void twoproduct_up(const fp80& a, const fp80& b, fp80& x, fp80& y) {
+		static const fp80 th = std::ldexp((fp80)1., 16351);
+		static const fp80 c1 = std::ldexp((fp80)1., -33);
+		static const fp80 c2 = std::ldexp((fp80)1., 33);
+		static const fp80 th2 = std::ldexp((fp80)1., 16383);
 
-		_Float64x na, nb, a1, a2, b1, b2;
-		volatile _Float64x v1, v2, v3, v4, v5, v6;
+		fp80 na, nb, a1, a2, b1, b2;
+		volatile fp80 v1, v2, v3, v4, v5, v6;
 
 		x = a * b;
 		#if 0
@@ -66,14 +66,14 @@ template <> struct rop <ddx> {
 		hwround::roundnear();
 	}
 
-	static void twoproduct_down(const _Float64x& a, const _Float64x& b, _Float64x& x, _Float64x& y) {
-		static const _Float64x th = std::ldexp((_Float64x)1., 16351);
-		static const _Float64x c1 = std::ldexp((_Float64x)1., -33);
-		static const _Float64x c2 = std::ldexp((_Float64x)1., 33);
-		static const _Float64x th2 = std::ldexp((_Float64x)1., 16383);
+	static void twoproduct_down(const fp80& a, const fp80& b, fp80& x, fp80& y) {
+		static const fp80 th = std::ldexp((fp80)1., 16351);
+		static const fp80 c1 = std::ldexp((fp80)1., -33);
+		static const fp80 c2 = std::ldexp((fp80)1., 33);
+		static const fp80 th2 = std::ldexp((fp80)1., 16383);
 
-		_Float64x na, nb, a1, a2, b1, b2;
-		volatile _Float64x v1, v2, v3, v4, v5, v6;
+		fp80 na, nb, a1, a2, b1, b2;
+		volatile fp80 v1, v2, v3, v4, v5, v6;
 
 		x = a * b;
 		#if 0
@@ -106,18 +106,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx add_up(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 + y.a1, 0.);
 		}
 
 		ddx::twosum(x.a1, y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -129,9 +129,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -139,18 +139,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx add_down(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 + y.a1, 0.);
 		}
 
 		ddx::twosum(x.a1, y.a1, z1, z2);
 
-		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -162,9 +162,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -172,18 +172,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx sub_up(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 - y.a1, 0.);
 		}
 
 		ddx::twosum(x.a1, -y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -195,9 +195,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -205,18 +205,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx sub_down(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 - y.a1, 0.);
 		}
 
 		ddx::twosum(x.a1, -y.a1, z1, z2);
 
-		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -228,9 +228,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -238,18 +238,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx mul_up(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 * y.a1, 0.);
 		}
 
 		twoproduct_up(x.a1, y.a1, z1, z2);
 
-		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -261,9 +261,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -271,18 +271,18 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx mul_down(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 * y.a1, 0.);
 		}
 
 		twoproduct_down(x.a1, y.a1, z1, z2);
 
-		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -294,9 +294,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -304,25 +304,25 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx div_up(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5, v6, v7, v8;
-		volatile _Float64x tmp;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5, v6, v7, v8;
+		volatile fp80 tmp;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 / y.a1, 0.);
 		}
 
 		z1 = x.a1 / y.a1;
 
-		if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
 		if (y.a1 >= 0.) {
 			twoproduct_up(-z1, y.a1, z3, z4);
-			if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+			if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
 				hwround::roundup();
 				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
@@ -354,7 +354,7 @@ template <> struct rop <ddx> {
 			}
 		} else {
 			twoproduct_down(-z1, y.a1, z3, z4);
-			if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+			if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
 				hwround::rounddown();
 				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
@@ -388,9 +388,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return -(std::numeric_limits<ddx>::max)();
 		}
 
@@ -398,25 +398,25 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx div_down(const ddx& x, const ddx& y) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5, v6, v7, v8;
-		volatile _Float64x tmp;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5, v6, v7, v8;
+		volatile fp80 tmp;
 
-		if (std::fabs(x.a1) == std::numeric_limits<_Float64x>::infinity() || std::fabs(y.a1) == std::numeric_limits<_Float64x>::infinity()) {
+		if (std::fabs(x.a1) == std::numeric_limits<fp80>::infinity() || std::fabs(y.a1) == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1 / y.a1, 0.);
 		}
 
 		z1 = x.a1 / y.a1;
 
-		if (z1 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z1 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z1, 0.);
-		} else if (z1 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z1 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
 		if (y.a1 >= 0.) {
 			twoproduct_down(-z1, y.a1, z3, z4);
-			if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+			if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
 				hwround::rounddown();
 				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
@@ -447,7 +447,7 @@ template <> struct rop <ddx> {
 			}
 		} else {
 			twoproduct_up(-z1, y.a1, z3, z4);
-			if (std::fabs(z3) == std::numeric_limits<_Float64x>::infinity()) {
+			if (std::fabs(z3) == std::numeric_limits<fp80>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
 				hwround::roundup();
 				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
@@ -481,9 +481,9 @@ template <> struct rop <ddx> {
 
 		ddx::twosum(z1, z2, z3, z4);
 
-		if (z3 == -std::numeric_limits<_Float64x>::infinity()) {
+		if (z3 == -std::numeric_limits<fp80>::infinity()) {
 			return ddx(z3, 0.);
-		} else if (z3 == std::numeric_limits<_Float64x>::infinity()) {
+		} else if (z3 == std::numeric_limits<fp80>::infinity()) {
 			return (std::numeric_limits<ddx>::max)();
 		}
 
@@ -491,9 +491,9 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx sqrt_up(const ddx& x) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5, v6;
-		volatile _Float64x tmp;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5, v6;
+		volatile fp80 tmp;
 
 		#if 0
 		if (x < 0.) {
@@ -502,7 +502,7 @@ template <> struct rop <ddx> {
 		#endif
 
 		if (x == 0.) return ddx(0.);
-		if (x.a1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (x.a1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1, 0.);
 		}
 
@@ -517,7 +517,7 @@ template <> struct rop <ddx> {
 			tmp = std::sqrt(v5 + v6) + v1;
 			hwround::roundup();
 		} else {
-			if (v5 == (std::numeric_limits<_Float64x>::max)()) {
+			if (v5 == (std::numeric_limits<fp80>::max)()) {
 				tmp = std::sqrt(v5*0.25 + v6*0.25)*2 + v1;
 			} else {
 				tmp = std::sqrt(v5 + v6) + v1;
@@ -532,9 +532,9 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx sqrt_down(const ddx& x) {
-		_Float64x z1, z2, z3, z4;
-		volatile _Float64x v1, v2, v3, v4, v5, v6;
-		volatile _Float64x tmp;
+		fp80 z1, z2, z3, z4;
+		volatile fp80 v1, v2, v3, v4, v5, v6;
+		volatile fp80 tmp;
 
 		#if 0
 		if (x < 0.) {
@@ -543,7 +543,7 @@ template <> struct rop <ddx> {
 		#endif
 
 		if (x == 0.) return ddx(0.);
-		if (x.a1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (x.a1 == std::numeric_limits<fp80>::infinity()) {
 			return ddx(x.a1, 0.);
 		}
 
@@ -555,7 +555,7 @@ template <> struct rop <ddx> {
 		v2 = (v3 + v5) + v6 + v4;
 		if (v2 > 0.) {
 			hwround::roundup();
-			if (v5 == (std::numeric_limits<_Float64x>::max)()) {
+			if (v5 == (std::numeric_limits<fp80>::max)()) {
 				tmp = std::sqrt(v5*0.25 + v6*0.25)*2 + v1;
 			} else {
 				tmp = std::sqrt(v5 + v6) + v1;
@@ -615,13 +615,13 @@ template <> struct rop <ddx> {
 	}
 
 	static ddx fromstring_up(const std::string& s) {
-		_Float64x x1, x2;
+		fp80 x1, x2;
 		conv_ddx::stringtoddx(s, x1, x2, 1);
 		return ddx(x1, x2);
 	}
 
 	static ddx fromstring_down(const std::string& s) {
-		_Float64x x1, x2;
+		fp80 x1, x2;
 		conv_ddx::stringtoddx(s, x1, x2, -1);
 		return ddx(x1, x2);
 	}
@@ -662,5 +662,7 @@ template <> struct constants< interval<ddx> > {
 };
 
 } // namespace kv
+
+#endif // KV_HAVE_FP80
 
 #endif // RDDX_HPP

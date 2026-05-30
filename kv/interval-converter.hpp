@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2022-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_CONVERTER_HPP
@@ -142,26 +142,27 @@ void rounded_converter(const mpfr<N>& x, mpfr<M>& y, int rnd = 0)
 }; // namespace kv;
 
 
-// converters for the types using __Float64x
+// converters for the types using fp80
 
-#include <cmath>
+#include <kv/fp80.hpp>
 
-#if defined(__HAVE_FLOAT64X) && __GNUC__ < 13
+#ifdef KV_HAVE_FP80
 
-#include <kv/rfloat64x.hpp>
+#include <kv/rfp80.hpp>
 #include <kv/ddx.hpp>
 #include <kv/rddx.hpp>
 
 #include <kv/hwround.hpp>
 #include <limits>
+#include <cmath>
 
 namespace kv {
 
-// _Float64x to (double, dd, mpfr)
+// fp80 to (double, dd, mpfr)
 
-void rounded_converter(const _Float64x& x, double& y, int rnd = 0)
+void rounded_converter(const fp80& x, double& y, int rnd = 0)
 {
-	volatile _Float64x x1 = x;
+	volatile fp80 x1 = x;
 	volatile double r;
 
 	if (rnd == 1) {
@@ -179,9 +180,9 @@ void rounded_converter(const _Float64x& x, double& y, int rnd = 0)
 	y = r;
 }
 
-void rounded_converter(const _Float64x& x, dd& y, int rnd = 0)
+void rounded_converter(const fp80& x, dd& y, int rnd = 0)
 {
-	_Float64x tmp;
+	fp80 tmp;
 	double z1, z2;
 
 	rounded_converter(x, z1, 0);
@@ -214,7 +215,7 @@ void rounded_converter(const _Float64x& x, dd& y, int rnd = 0)
 }
 
 template <int N>
-void rounded_converter(const _Float64x& x, mpfr<N>& y, int rnd = 0)
+void rounded_converter(const fp80& x, mpfr<N>& y, int rnd = 0)
 {
 	mp_rnd_t mode;
 
@@ -229,32 +230,32 @@ void rounded_converter(const _Float64x& x, mpfr<N>& y, int rnd = 0)
 	mpfr_set_ld(y.a, x, mode);
 }
 
-// (double, dd, mpfr) to _Float64x
+// (double, dd, mpfr) to fp80
 
-void rounded_converter(const double& x, _Float64x& y, int rnd = 0)
+void rounded_converter(const double& x, fp80& y, int rnd = 0)
 {
 	y = x;
 }
 
-void rounded_converter(const dd& x, _Float64x& y, int rnd = 0)
+void rounded_converter(const dd& x, fp80& y, int rnd = 0)
 {
-	_Float64x z1 = x.a1, z2 = x.a2;
+	fp80 z1 = x.a1, z2 = x.a2;
 
 	if (rnd == 1) {
-		rop<_Float64x>::begin();
-		y = rop<_Float64x>::add_up(z1, z2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		y = rop<fp80>::add_up(z1, z2);
+		rop<fp80>::end();
 	} else if (rnd == -1) {
-		rop<_Float64x>::begin();
-		y = rop<_Float64x>::add_down(z1, z2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		y = rop<fp80>::add_down(z1, z2);
+		rop<fp80>::end();
 	} else {
 		y = z1 + z2;
 	}
 }
 
 template <int N>
-void rounded_converter(const mpfr<N>& x, _Float64x& y, int rnd = 0)
+void rounded_converter(const mpfr<N>& x, fp80& y, int rnd = 0)
 {
 	mp_rnd_t mode;
 
@@ -269,11 +270,11 @@ void rounded_converter(const mpfr<N>& x, _Float64x& y, int rnd = 0)
 	y = mpfr_get_ld(x.a, mode);
 }
 
-// ddx to (double, dd, mpfr, _Float64x)
+// ddx to (double, dd, mpfr, fp80)
 
 void rounded_converter(const ddx& x, double& y, int rnd = 0)
 {
-	volatile _Float64x x1 = x.a1, x2 = x.a2;
+	volatile fp80 x1 = x.a1, x2 = x.a2;
 	volatile double r;
 
 	if (rnd == 1) {
@@ -293,7 +294,7 @@ void rounded_converter(const ddx& x, double& y, int rnd = 0)
 
 void rounded_converter(const ddx& x, dd& y, int rnd = 0)
 {
-	_Float64x tmp;
+	fp80 tmp;
 	double z1, z2;
 
 	rounded_converter(x.a1, z1, 0);
@@ -318,13 +319,13 @@ void rounded_converter(const ddx& x, dd& y, int rnd = 0)
 	tmp = x.a1 - z1;
 
 	if (rnd == 1) {
-		rop<_Float64x>::begin();
-		tmp = rop<_Float64x>::add_up(tmp, x.a2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		tmp = rop<fp80>::add_up(tmp, x.a2);
+		rop<fp80>::end();
 	} else if (rnd == -1) {
-		rop<_Float64x>::begin();
-		tmp = rop<_Float64x>::add_down(tmp, x.a2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		tmp = rop<fp80>::add_down(tmp, x.a2);
+		rop<fp80>::end();
 	} else {
 		tmp += x.a2;
 	}
@@ -356,22 +357,22 @@ void rounded_converter(const ddx& x, mpfr<N>& y, int rnd = 0)
 	mpfr_add(y.a, y.a, tmp.a, mode);
 }
 
-void rounded_converter(const ddx& x, _Float64x& y, int rnd = 0)
+void rounded_converter(const ddx& x, fp80& y, int rnd = 0)
 {
 	if (rnd == 1) {
-		rop<_Float64x>::begin();
-		y = rop<_Float64x>::add_up(x.a1, x.a2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		y = rop<fp80>::add_up(x.a1, x.a2);
+		rop<fp80>::end();
 	} else if (rnd == -1) {
-		rop<_Float64x>::begin();
-		y = rop<_Float64x>::add_down(x.a1, x.a2);
-		rop<_Float64x>::end();
+		rop<fp80>::begin();
+		y = rop<fp80>::add_down(x.a1, x.a2);
+		rop<fp80>::end();
 	} else {
 		y = x.a1 + x.a2;
 	}
 }
 
-// (double, dd, mpfr, _Float64x) to ddx
+// (double, dd, mpfr, fp80) to ddx
 
 void rounded_converter(const double& x, ddx& y, int rnd = 0)
 {
@@ -380,7 +381,7 @@ void rounded_converter(const double& x, ddx& y, int rnd = 0)
 
 void rounded_converter(const dd& x, ddx& y, int rnd = 0)
 {
-	_Float64x dtmp1 = x.a1, dtmp2 = x.a2;
+	fp80 dtmp1 = x.a1, dtmp2 = x.a2;
 
 	ddx::twosum(dtmp1, dtmp2, y.a1, y.a2);
 }
@@ -389,7 +390,7 @@ template <int N>
 void rounded_converter(const mpfr<N>& x, ddx& y, int rnd = 0)
 {
 	mpfr<N> mtmp1, mtmp2;
-	_Float64x dtmp1, dtmp2;
+	fp80 dtmp1, dtmp2;
 
 	rounded_converter(x, dtmp1, 0);
 	mtmp1 = x;
@@ -400,14 +401,14 @@ void rounded_converter(const mpfr<N>& x, ddx& y, int rnd = 0)
 	ddx::twosum(dtmp1, dtmp2, y.a1, y.a2);
 }
 
-void rounded_converter(const _Float64x& x, ddx& y, int rnd = 0)
+void rounded_converter(const fp80& x, ddx& y, int rnd = 0)
 {
 	y = x;
 }
 
 }; // namespace kv;
 
-#endif // __HAVE_FLOAT64X
+#endif // KV_HAVE_FP80
 
 namespace kv {
 

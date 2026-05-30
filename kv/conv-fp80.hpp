@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2021-2024 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
-#ifndef CONV_FLOAT64X_HPP
-#define CONV_FLOAT64X_HPP
+#ifndef CONV_FP80_HPP
+#define CONV_FP80_HPP
 
+#include <kv/fp80.hpp>
 
-#if ! defined(__HAVE_FLOAT64X) || __GNUC__ >= 13
-#error "_Float64x is not available on this compiler"
-#endif
+#ifdef KV_HAVE_FP80
 
 #include <cstdio>
 #include <iostream>
@@ -25,9 +24,9 @@
 
 namespace kv {
 
-struct conv_float64x {
+struct conv_fp80 {
 
-	static int get_sign_float64x(_Float64x x) {
+	static int get_sign_fp80(fp80 x) {
 		if (x == 0.) {
 			x = 1. / x;
 		}
@@ -36,18 +35,18 @@ struct conv_float64x {
 		else return -1;
 	}
 
-	static int get_exponent(_Float64x x) {
+	static int get_exponent(fp80 x) {
 		int i;
 
-		if (x >= std::ldexp((_Float64x)1., 16383)) return 16383;
-		if (x < std::ldexp((_Float64x)1., -16445)) return -16446;
+		if (x >= std::ldexp((fp80)1., 16383)) return 16383;
+		if (x < std::ldexp((fp80)1., -16445)) return -16446;
 
 		std::frexp(x, &i);
 
 		return i - 1;
 	}
 
-	// convert _Float64x number to string
+	// convert fp80 number to string
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
@@ -56,14 +55,14 @@ struct conv_float64x {
 	// format == 'g' : like %g of printf
 	// format == 'a' : print all digits with no rounding
 
-	static std::string float64xtostring(_Float64x x, int precision = 20, char format = 'g', int mode = 0) {
+	static std::string fp80tostring(fp80 x, int precision = 20, char format = 'g', int mode = 0) {
 		int i, j;
 		int sign, ex;
-		_Float64x absx;
+		fp80 absx;
 
 		if (x != x) return "nan";
 
-		sign = get_sign_float64x(x);
+		sign = get_sign_fp80(x);
 		absx = std::fabs(x);
 
 		if (absx == 0.) {
@@ -74,7 +73,7 @@ struct conv_float64x {
 			}
 		}
 
-		if (absx == std::numeric_limits<_Float64x>::infinity()) {
+		if (absx == std::numeric_limits<fp80>::infinity()) {
 			if (sign == -1) {
 				return "-inf";
 			} else {
@@ -87,10 +86,10 @@ struct conv_float64x {
 		bool buf[16383 - (-16445) + 1];
 		int offset = 16445;
 		int emax, emin;
-		_Float64x dtmp, dtmp2;
+		fp80 dtmp, dtmp2;
 
 		dtmp = absx;
-		dtmp2 = std::ldexp((_Float64x)1., ex);
+		dtmp2 = std::ldexp((fp80)1., ex);
 
 		for (i=0; i<=63; i++) {
 			if (dtmp >= dtmp2) {
@@ -389,12 +388,12 @@ struct conv_float64x {
 		return r;
 	}
 
-	// convert string to _Float64x number
+	// convert string to fp80 number
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
 
-	static _Float64x stringtofloat64x(std::string s, int mode = 0) {
+	static fp80 stringtofp80(std::string s, int mode = 0) {
 		int i, j, tmp;
 		bool flag;
 		int sign, e10, esign;
@@ -580,24 +579,24 @@ struct conv_float64x {
 		}
 		#endif
 
-		// convert binary to _Float64x number
+		// convert binary to fp80 number
 
 		if (result_max > 16383) {
 			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {
-                        	return sign * (std::numeric_limits<_Float64x>::max)();
+                        	return sign * (std::numeric_limits<fp80>::max)();
 			}
 
-			return sign * std::numeric_limits<_Float64x>::infinity();
+			return sign * std::numeric_limits<fp80>::infinity();
 		}
 
 		if (result_max < -16446) {
 			if ((sign == 1 && mode == 1) || (sign == -1 && mode == -1)) {
-				return sign * std::numeric_limits<_Float64x>::denorm_min();
+				return sign * std::numeric_limits<fp80>::denorm_min();
 			}
 			return sign * 0.;
 		}
 
-		_Float64x r;
+		fp80 r;
 
 		r = 0.;
 		for (i=result_max; i >= result_min; i--) {
@@ -607,25 +606,25 @@ struct conv_float64x {
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += std::ldexp((_Float64x)1., i+1);
+							r += std::ldexp((fp80)1., i+1);
 						}
 					} else {
-						r += std::ldexp((_Float64x)1., i+1);
+						r += std::ldexp((fp80)1., i+1);
 					}
 				} else {
 					if (mode == -1) {
-						r += std::ldexp((_Float64x)1., i+1);
+						r += std::ldexp((fp80)1., i+1);
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r += std::ldexp((_Float64x)1., i+1);
+							r += std::ldexp((fp80)1., i+1);
 						}
 					} else {
 					}
 				}
 				break;
 			}
-			r += std::ldexp((_Float64x)result[offset2 + i], i);
+			r += std::ldexp((fp80)result[offset2 + i], i);
 		}
 
 		return sign * r;
@@ -634,4 +633,6 @@ struct conv_float64x {
 
 } // namespace kv
 
-#endif // CONV_FLOAT64X_HPP
+#endif // KV_HAVE_FP80
+
+#endif // CONV_FP80_HPP

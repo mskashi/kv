@@ -1,9 +1,13 @@
 /*
- * Copyright (c) 2021-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DDX_HPP
 #define CONV_DDX_HPP
+
+#include <kv/fp80.hpp>
+
+#ifdef KV_HAVE_FP80
 
 #include <cstdio>
 #include <iostream>
@@ -23,7 +27,7 @@ namespace kv {
 
 struct conv_ddx {
 
-	static int get_sign_float64x(_Float64x x) {
+	static int get_sign_fp80(fp80 x) {
 		if (x == 0.) {
 			x = 1. / x;
 		}
@@ -32,18 +36,18 @@ struct conv_ddx {
 		else return -1;
 	}
 
-	static int get_exponent(_Float64x x) {
+	static int get_exponent(fp80 x) {
 		int i;
 
-		if (x >= std::ldexp((_Float64x)1., 16383)) return 16383;
-		if (x < std::ldexp((_Float64x)1., -16445)) return -16446;
+		if (x >= std::ldexp((fp80)1., 16383)) return 16383;
+		if (x < std::ldexp((fp80)1., -16445)) return -16446;
 
 		std::frexp(x, &i);
 
 		return i - 1;
 	}
 
-	// convert double-_Float64x number to string
+	// convert double-fp80 number to string
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
@@ -52,14 +56,14 @@ struct conv_ddx {
 	// format == 'g' : like %g of printf
 	// format == 'a' : print all digits with no rounding
 
-	static std::string ddxtostring(_Float64x x1, _Float64x x2, int precision = 34, char format = 'g', int mode = 0) {
+	static std::string ddxtostring(fp80 x1, fp80 x2, int precision = 34, char format = 'g', int mode = 0) {
 		int i, j;
 		int sign, sign2, ex1, ex2;
-		_Float64x absx1, absx2;
+		fp80 absx1, absx2;
 
 		if (x1 != x1 || x2 != x2) return "nan";
 
-		sign = get_sign_float64x(x1);
+		sign = get_sign_fp80(x1);
 		absx1 = std::fabs(x1);
 
 		if (absx1 == 0.) {
@@ -70,7 +74,7 @@ struct conv_ddx {
 			}
 		}
 
-		if (absx1 == std::numeric_limits<_Float64x>::infinity()) {
+		if (absx1 == std::numeric_limits<fp80>::infinity()) {
 			if (sign == -1) {
 				return "-inf";
 			} else {
@@ -86,10 +90,10 @@ struct conv_ddx {
 		bool buf[16383 - (-16445) + 2];
 		int offset = 16445;
 		int emax, emin;
-		_Float64x dtmp, dtmp2;
+		fp80 dtmp, dtmp2;
 
 		dtmp = absx1;
-		dtmp2 = std::ldexp((_Float64x)1., ex1);
+		dtmp2 = std::ldexp((fp80)1., ex1);
 
 		for (i=0; i<=63; i++) {
 			if (dtmp >= dtmp2) {
@@ -112,13 +116,13 @@ struct conv_ddx {
 		int emax2, emin2, s;
 		int carry, tmp;
 
-		sign2 = get_sign_float64x(x2);
+		sign2 = get_sign_fp80(x2);
 		absx2 = std::fabs(x2);
 
 		if (absx2 != 0.) {
 			ex2 = get_exponent(absx2);
 			dtmp = absx2;
-			dtmp2 = std::ldexp((_Float64x)1., ex2);
+			dtmp2 = std::ldexp((fp80)1., ex2);
 
 			for (i=0; i<=63; i++) {
 				if (dtmp >= dtmp2) {
@@ -448,7 +452,7 @@ struct conv_ddx {
 		return r;
 	}
 
-	// convert string to double-_Float64x number
+	// convert string to double-fp80 number
 	// mode == -1 : down
 	// mode ==  0 : nearest
 	// mode ==  1 : up
@@ -457,7 +461,7 @@ struct conv_ddx {
 	//  Consequently, the second part of double-double number 
 	//  may not achieve "best" precision.
 
-	static void stringtoddx(std::string s, _Float64x& x1, _Float64x& x2, int mode = 0, bool fast = false) {
+	static void stringtoddx(std::string s, fp80& x1, fp80& x2, int mode = 0, bool fast = false) {
 		int i, j, tmp;
 		bool flag;
 		int sign, e10, esign;
@@ -649,15 +653,15 @@ struct conv_ddx {
 
 		// convert binary to double double number
 
-		_Float64x dtmp;
+		fp80 dtmp;
 
 		if (result_max > 16383) {
 			if ((sign == 1 && mode == -1) || (sign == -1 && mode == 1)) {
-				x1 = sign * (std::numeric_limits<_Float64x>::max)();
+				x1 = sign * (std::numeric_limits<fp80>::max)();
 				x2 = std::ldexp(x1, -65);
 				return;
 			}
-			dtmp = sign * std::numeric_limits<_Float64x>::infinity();
+			dtmp = sign * std::numeric_limits<fp80>::infinity();
 			x1 = dtmp;
 			x2 = dtmp;
 			return;
@@ -665,7 +669,7 @@ struct conv_ddx {
 
 		if (result_max < -16446) {
 			if ((sign == 1 && mode == 1) || (sign == -1 && mode == -1)) {
-				x1 = sign * std::numeric_limits<_Float64x>::denorm_min();
+				x1 = sign * std::numeric_limits<fp80>::denorm_min();
 				x2 = sign * 0.;
 				return;
 			}
@@ -675,7 +679,7 @@ struct conv_ddx {
 			return;
 		}
 
-		_Float64x r, r2;
+		fp80 r, r2;
 		int result_max2;
 		int msb;
 
@@ -687,24 +691,24 @@ struct conv_ddx {
 				if (sign == 1) {
 					if (result[offset2 + i] == 0) {
 					} else {
-						r += std::ldexp((_Float64x)1., i+1);
+						r += std::ldexp((fp80)1., i+1);
 						flag = true;
 					}
 				} else {
 					if (result[offset2 + i] == 0) {
 					} else {
-						r += std::ldexp((_Float64x)1., i+1);
+						r += std::ldexp((fp80)1., i+1);
 						flag = true;
 					}
 				}
 				result_max2 = i;
 				break;
 			}
-			r += std::ldexp((_Float64x)result[offset2 + i], i);
+			r += std::ldexp((fp80)result[offset2 + i], i);
 		}
 
 		if (flag) {
-			r2 = - std::ldexp((_Float64x)1., result_max2 + 1);
+			r2 = - std::ldexp((fp80)1., result_max2 + 1);
 		} else {
 			r2 = 0.;
 		}
@@ -723,18 +727,18 @@ struct conv_ddx {
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r2 += std::ldexp((_Float64x)1., i+1);
+							r2 += std::ldexp((fp80)1., i+1);
 						}
 					} else {
-						r2 += std::ldexp((_Float64x)1., i+1);
+						r2 += std::ldexp((fp80)1., i+1);
 					}
 				} else {
 					if (mode == -1) {
-						r2 += std::ldexp((_Float64x)1., i+1);
+						r2 += std::ldexp((fp80)1., i+1);
 					} else if (mode == 0) {
 						if (result[offset2 + i] == 0) {
 						} else {
-							r2 += std::ldexp((_Float64x)1., i+1);
+							r2 += std::ldexp((fp80)1., i+1);
 						}
 					} else {
 					}
@@ -742,7 +746,7 @@ struct conv_ddx {
 				break;
 			}
 			tmp = result[offset2 + i];
-			r2 += std::ldexp((_Float64x)tmp, i);
+			r2 += std::ldexp((fp80)tmp, i);
 			if (msb == result_min - 1 && ((flag && tmp == 0) || (!flag && tmp == 1))) {
 				msb = i;
 			}
@@ -756,5 +760,6 @@ struct conv_ddx {
 
 } // namespace kv
 
+#endif // KV_HAVE_FP80
 
 #endif // CONV_DDX_HPP

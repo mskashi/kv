@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef LOBACHEVSKY_HPP
@@ -73,6 +73,9 @@ interval<T> lobachevsky(const interval<T>& x) {
 
 	T n;
 	interval<T> x2, r, m;
+
+	using std::floor;
+
 	m = lobachevsky_point(pi16);
 
 	x2 = x;

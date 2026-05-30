@@ -1,13 +1,14 @@
-// sample program for _Float64x-interval
+// sample program for fp80-interval
 // all test is same as test-interval.cc
 
 #include <kv/interval.hpp>
-#include <kv/rfloat64x.hpp>
-
-typedef kv::interval<_Float64x> itv;
+#include <kv/rfp80.hpp>
 
 int main()
 {
+#ifdef KV_HAVE_FP80
+	typedef kv::interval<kv::fp80> itv;
+
 	itv x;
 	itv y = (itv)1.;
 	itv z(1.);
@@ -136,4 +137,5 @@ int main()
 	std::cout << kv::constants<itv::base_type>::e() << "\n";
 	std::cout << kv::constants<itv::base_type>::ln2() << "\n";
 	std::cout << kv::constants<itv::base_type>::str("0.1") << "\n";
+#endif // KV_HAVE_FP80
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2021-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DOUBLE_NEWTONCOTES_HPP
@@ -59,6 +59,9 @@ interval<T> double_newtoncotes(F f, interval<T> start1, interval<T> end1, interv
 		8,
 		8
 	};
+
+	using std::sqrt;
+	using std::ceil;
 	
 	if (n < 1 || n > 7) throw std::domain_error("double_newtoncotes: 1<=n<=7 required.");
 
