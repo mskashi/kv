@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DOUBLE_HPP
@@ -81,7 +81,7 @@ struct conv_double {
 
 		bool buf[1023 - (-1074) + 1];
 		int offset = 1074;
-		int emax, emin;
+		int emax = 0, emin = 0; // avoid uninitialized warning
 		double dtmp, dtmp2;
 
 		dtmp = absx;
@@ -391,7 +391,7 @@ struct conv_double {
 
 	static double stringtod(std::string s, int mode = 0) {
 		int i, j, tmp;
-		bool flag;
+		bool flag, have_rest;
 		int sign, e10, esign;
 		std::string num1_s, num2_s, nume_s;
 
@@ -514,9 +514,14 @@ struct conv_double {
 
 		result_min = 0;
 
+		have_rest = false;
+
 		while (table_min < 0) {
 			tmp = 53 - (result_max - result_min);
-			if (flag && tmp <= 0) break;
+			if (flag && tmp <= 0) {
+				have_rest = true;
+				break;
+			}
 			if (!flag) {
 				m = 16;
 			} else {
@@ -597,27 +602,26 @@ struct conv_double {
 		r = 0.;
 		for (i=result_max; i >= result_min; i--) {
 			if (result_max - i == 53 || i == -1075) {
-				if (sign == 1) {
-					if (mode == -1) {
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r += std::ldexp(1., i+1);
+				if (mode * sign == -1) {
+				} else if (mode * sign == 1) {
+					if (have_rest == false) {
+						for (j=i; j >= result_min; j--) {
+							if (result[offset2 + j] != 0) {
+								have_rest = true;
+								break;
+							}
 						}
-					} else {
+					}
+					if (have_rest == true) {
 						r += std::ldexp(1., i+1);
 					}
 				} else {
-					if (mode == -1) {
-						r += std::ldexp(1., i+1);
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r += std::ldexp(1., i+1);
-						}
+					if (result[offset2 + i] == 0) {
 					} else {
+						r += std::ldexp(1., i+1);
 					}
 				}
+
 				break;
 			}
 			r += std::ldexp((double)result[offset2 + i], i);

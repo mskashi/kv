@@ -16,7 +16,7 @@ namespace kv {
 
 // dd to double
 
-void rounded_converter(const dd& x, double& y, int rnd = 0)
+inline void rounded_converter(const dd& x, double& y, int rnd = 0)
 {
 	if (rnd == 1) {
 		rop<double>::begin();
@@ -33,7 +33,7 @@ void rounded_converter(const dd& x, double& y, int rnd = 0)
 
 // double to dd
 
-void rounded_converter(const double& x, dd& y, int rnd = 0)
+inline void rounded_converter(const double& x, dd& y, int rnd = 0)
 {
 	y = x;
 }
@@ -160,7 +160,7 @@ namespace kv {
 
 // fp80 to (double, dd, mpfr)
 
-void rounded_converter(const fp80& x, double& y, int rnd = 0)
+inline void rounded_converter(const fp80& x, double& y, int rnd = 0)
 {
 	volatile fp80 x1 = x;
 	volatile double r;
@@ -180,7 +180,7 @@ void rounded_converter(const fp80& x, double& y, int rnd = 0)
 	y = r;
 }
 
-void rounded_converter(const fp80& x, dd& y, int rnd = 0)
+inline void rounded_converter(const fp80& x, dd& y, int rnd = 0)
 {
 	fp80 tmp;
 	double z1, z2;
@@ -232,12 +232,12 @@ void rounded_converter(const fp80& x, mpfr<N>& y, int rnd = 0)
 
 // (double, dd, mpfr) to fp80
 
-void rounded_converter(const double& x, fp80& y, int rnd = 0)
+inline void rounded_converter(const double& x, fp80& y, int rnd = 0)
 {
 	y = x;
 }
 
-void rounded_converter(const dd& x, fp80& y, int rnd = 0)
+inline void rounded_converter(const dd& x, fp80& y, int rnd = 0)
 {
 	fp80 z1 = x.a1, z2 = x.a2;
 
@@ -272,7 +272,7 @@ void rounded_converter(const mpfr<N>& x, fp80& y, int rnd = 0)
 
 // ddx to (double, dd, mpfr, fp80)
 
-void rounded_converter(const ddx& x, double& y, int rnd = 0)
+inline void rounded_converter(const ddx& x, double& y, int rnd = 0)
 {
 	volatile fp80 x1 = x.a1, x2 = x.a2;
 	volatile double r;
@@ -292,7 +292,7 @@ void rounded_converter(const ddx& x, double& y, int rnd = 0)
 	y = r;
 }
 
-void rounded_converter(const ddx& x, dd& y, int rnd = 0)
+inline void rounded_converter(const ddx& x, dd& y, int rnd = 0)
 {
 	fp80 tmp;
 	double z1, z2;
@@ -357,7 +357,7 @@ void rounded_converter(const ddx& x, mpfr<N>& y, int rnd = 0)
 	mpfr_add(y.a, y.a, tmp.a, mode);
 }
 
-void rounded_converter(const ddx& x, fp80& y, int rnd = 0)
+inline void rounded_converter(const ddx& x, fp80& y, int rnd = 0)
 {
 	if (rnd == 1) {
 		rop<fp80>::begin();
@@ -374,12 +374,12 @@ void rounded_converter(const ddx& x, fp80& y, int rnd = 0)
 
 // (double, dd, mpfr, fp80) to ddx
 
-void rounded_converter(const double& x, ddx& y, int rnd = 0)
+inline void rounded_converter(const double& x, ddx& y, int rnd = 0)
 {
 	y = x;
 }
 
-void rounded_converter(const dd& x, ddx& y, int rnd = 0)
+inline void rounded_converter(const dd& x, ddx& y, int rnd = 0)
 {
 	fp80 dtmp1 = x.a1, dtmp2 = x.a2;
 
@@ -401,7 +401,7 @@ void rounded_converter(const mpfr<N>& x, ddx& y, int rnd = 0)
 	ddx::twosum(dtmp1, dtmp2, y.a1, y.a2);
 }
 
-void rounded_converter(const fp80& x, ddx& y, int rnd = 0)
+inline void rounded_converter(const fp80& x, ddx& y, int rnd = 0)
 {
 	y = x;
 }

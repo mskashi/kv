@@ -288,8 +288,6 @@ template <class T> class interval {
 		interval r;
 		T tmp;
 
-		using std::abs;
-
 		rop<T>::begin();
 		if (x.inf >= 0.) {
 			if (x.sup == 0.) {
@@ -353,8 +351,6 @@ template <class T> class interval {
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, interval >::type operator*(const interval& x, const C& y) {
 		interval r;
 
-		using std::abs;
-
 		rop<T>::begin();
 		if (y > 0.) {
 			r.inf = rop<T>::mul_down(x.inf, T(y));
@@ -376,8 +372,6 @@ template <class T> class interval {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, interval>::value, interval >::type operator*(const C& x, const interval& y) {
 		interval r;
-
-		using std::abs;
 
 		rop<T>::begin();
 		if (x > 0.) {

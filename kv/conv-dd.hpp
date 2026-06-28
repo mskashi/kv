@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef CONV_DD_HPP
@@ -85,7 +85,7 @@ struct conv_dd {
 		// add 1-byte margin to add buf2
 		bool buf[1023 - (-1074) + 2];
 		int offset = 1074;
-		int emax, emin;
+		int emax = 0, emin = 0; // avoid uninitialized warning
 		double dtmp, dtmp2;
 
 		dtmp = absx1;
@@ -460,7 +460,7 @@ struct conv_dd {
 
 	static void stringtodd(std::string s, double& x1, double& x2, int mode = 0, bool fast = false) {
 		int i, j, tmp;
-		bool flag;
+		bool flag, have_rest;
 		int sign, e10, esign;
 		std::string num1_s, num2_s, nume_s;
 
@@ -583,13 +583,18 @@ struct conv_dd {
 
 		result_min = 0;
 
+		have_rest = false;
+
 		while (table_min < 0) {
 			if (fast) {
 				tmp = 106 - (result_max - result_min);
 			} else {
 				tmp = result_min + 1075;
 			}
-			if (flag && tmp <= 0) break;
+			if (flag && tmp <= 0) {
+				have_rest = true;
+				break;
+			}
 			if (!flag) {
 				m = 16;
 			} else {
@@ -719,25 +724,23 @@ struct conv_dd {
 				tmp = msb - i;
 			}
 			if (tmp == 53 || i == -1075) {
-				if (sign == 1) {
-					if (mode == -1) {
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r2 += std::ldexp(1., i+1);
+				if (mode *sign == -1) {
+				} else if (mode *sign == 1) {
+					if (have_rest == false) {
+						for (j=i; j >= result_min; j--) {
+							if (result[offset2 + j] != 0) {
+								have_rest = true;
+								break;
+							}
 						}
-					} else {
+					}
+					if (have_rest == true) {
 						r2 += std::ldexp(1., i+1);
 					}
 				} else {
-					if (mode == -1) {
-						r2 += std::ldexp(1., i+1);
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r2 += std::ldexp(1., i+1);
-						}
+					if (result[offset2 + i] == 0) {
 					} else {
+						r2 += std::ldexp(1., i+1);
 					}
 				}
 				break;

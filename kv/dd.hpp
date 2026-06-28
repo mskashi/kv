@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef DD_HPP
@@ -1307,13 +1307,13 @@ template <> class numeric_limits<kv::dd> {
 		return tmp2;
 	}
 
-	static const int digits = 106;
-	static const int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
-	static const int radix = 2;
-	static const int min_exponent = -1021;
-	static const int min_exponent10 = -307;
-	static const int max_exponent = 1024;
-	static const int max_exponent10 = 308;
+	static constexpr int digits = 106;
+	static constexpr int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
+	static constexpr int radix = 2;
+	static constexpr int min_exponent = -1021;
+	static constexpr int min_exponent10 = -307;
+	static constexpr int max_exponent = 1024;
+	static constexpr int max_exponent10 = 308;
 };
 } // namespace std
 

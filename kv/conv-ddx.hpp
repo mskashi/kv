@@ -89,7 +89,7 @@ struct conv_ddx {
 		// add 1-byte margin to add buf2
 		bool buf[16383 - (-16445) + 2];
 		int offset = 16445;
-		int emax, emin;
+		int emax = 0, emin = 0; // avoid uninitialized warning
 		fp80 dtmp, dtmp2;
 
 		dtmp = absx1;
@@ -463,7 +463,7 @@ struct conv_ddx {
 
 	static void stringtoddx(std::string s, fp80& x1, fp80& x2, int mode = 0, bool fast = false) {
 		int i, j, tmp;
-		bool flag;
+		bool flag, have_rest;
 		int sign, e10, esign;
 		std::string num1_s, num2_s, nume_s;
 
@@ -586,13 +586,18 @@ struct conv_ddx {
 
 		result_min = 0;
 
+		have_rest = false;
+
 		while (table_min < 0) {
 			if (fast) {
 				tmp = 128 - (result_max - result_min);
 			} else {
 				tmp = result_min + 16446;
 			}
-			if (flag && tmp <= 0) break;
+			if (flag && tmp <= 0) {
+				have_rest = true;
+				break;
+			}
 			if (!flag) {
 				m = 16;
 			} else {
@@ -722,25 +727,23 @@ struct conv_ddx {
 				tmp = msb - i;
 			}
 			if (tmp == 64 || i == -16446) {
-				if (sign == 1) {
-					if (mode == -1) {
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r2 += std::ldexp((fp80)1., i+1);
+				if (mode * sign == -1) {
+				} else if (mode * sign == 1) {
+					if (have_rest == false) {
+						for (j=i; j >= result_min; j--) {
+							if (result[offset2 + j] != 0) {
+								have_rest = true;
+								break;
+							}
 						}
-					} else {
+					}
+					if (have_rest == true) {
 						r2 += std::ldexp((fp80)1., i+1);
 					}
 				} else {
-					if (mode == -1) {
-						r2 += std::ldexp((fp80)1., i+1);
-					} else if (mode == 0) {
-						if (result[offset2 + i] == 0) {
-						} else {
-							r2 += std::ldexp((fp80)1., i+1);
-						}
+					if (result[offset2 + i] == 0) {
 					} else {
+						r2 += std::ldexp((fp80)1., i+1);
 					}
 				}
 				break;

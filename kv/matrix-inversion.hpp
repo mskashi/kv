@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef MATRIX_INVERSION_HPP
@@ -64,7 +64,7 @@ bool invert(const ub::matrix<T>& a, ub::matrix<T>& b) {
 // special version for double
 #if defined(USE_LAPACK) || defined(USE_ATLAS)
 template <>
-bool invert(const ub::matrix<double>& a, ub::matrix<double>& b) {
+inline bool invert(const ub::matrix<double>& a, ub::matrix<double>& b) {
 	ub::matrix<double, ub::column_major> tmp(a);
 	ub::permutation_matrix<int> pm(tmp.size1());
 
@@ -101,7 +101,7 @@ bool linear_equation(const ub::matrix<T>& a, const ub::vector<T>& b, ub::vector<
 // special version for double
 #if defined(USE_LAPACK) || defined(USE_ATLAS)
 template <>
-bool linear_equation(const ub::matrix<double>& a, const ub::vector<double>& b, ub::vector<double>& x) {
+inline bool linear_equation(const ub::matrix<double>& a, const ub::vector<double>& b, ub::vector<double>& x) {
 	ub::matrix<double, ub::column_major> tmp(a);
 	// int i;
 	// int size = tmp.size1();
@@ -133,7 +133,7 @@ void mm_mult(const ub::matrix<T>& a, const ub::matrix<T>& b, ub::matrix<T>& c) {
 // special version for double
 #if defined(USE_LAPACK) || defined(USE_ATLAS)
 template <>
-void mm_mult(const ub::matrix<double>& a, const ub::matrix<double>& b, ub::matrix<double>& c) {
+inline void mm_mult(const ub::matrix<double>& a, const ub::matrix<double>& b, ub::matrix<double>& c) {
 	ub::matrix<double, ub::column_major> ca(a);
 	ub::matrix<double, ub::column_major> cb(a);
 	ub::matrix<double, ub::column_major> cc(c);

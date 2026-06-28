@@ -1277,13 +1277,13 @@ template <> class numeric_limits<kv::ddx> {
 		return tmp2;
 	}
 
-	static const int digits = 128;
-	static const int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
-	static const int radix = 2;
-	static const int min_exponent = -16381;
-	static const int min_exponent10 = -4931;
-	static const int max_exponent = 16384;
-	static const int max_exponent10 = 4932;
+	static constexpr int digits = 128;
+	static constexpr int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
+	static constexpr int radix = 2;
+	static constexpr int min_exponent = -16381;
+	static constexpr int min_exponent10 = -4931;
+	static constexpr int max_exponent = 16384;
+	static constexpr int max_exponent10 = 4932;
 };
 } // namespace std
 

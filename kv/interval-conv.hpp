@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2015-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef INTERVAL_CONV_HPP
@@ -92,7 +92,7 @@ void mpfrtompfr(const mpfr<N>& x, mpfr<M>& y, int rnd = 0)
 	mpfr_set(y.a, x.a, mode);
 }
 
-void ddtodouble(const dd& x, double& y, int rnd = 0)
+inline void ddtodouble(const dd& x, double& y, int rnd = 0)
 {
 	if (rnd == 1) {
 		rop<double>::begin();
@@ -107,13 +107,13 @@ void ddtodouble(const dd& x, double& y, int rnd = 0)
 	}
 }
 
-void iddtoidouble(const interval<dd>& x, interval<double>& y)
+inline void iddtoidouble(const interval<dd>& x, interval<double>& y)
 {
 	ddtodouble(x.lower(), y.lower(), -1);
 	ddtodouble(x.upper(), y.upper(), 1);
 }
 
-void idoubletoidd(const interval<double>& x, interval<dd>& y)
+inline void idoubletoidd(const interval<double>& x, interval<dd>& y)
 {
 	y.lower() = x.lower();
 	y.upper() = x.upper();

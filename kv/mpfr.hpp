@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef MPFR_HPP
@@ -635,16 +635,16 @@ template <int N> class numeric_limits< kv::mpfr<N> > {
 		return min();
 	}
 
-	static const int digits = N;
-	static const int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
-	static const int radix = 2;
+	static constexpr int digits = N;
+	static constexpr int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
+	static constexpr int radix = 2;
 	// static const int min_exponent = mpfr_get_emin();
-	static const int min_exponent = MPFR_EMIN_DEFAULT;
-	static const int min_exponent10 = min_exponent*0.30103;
+	static constexpr int min_exponent = MPFR_EMIN_DEFAULT;
+	static constexpr int min_exponent10 = min_exponent*0.30103;
 	// static const int max_exponent = mpfr_get_emax();
-	static const int max_exponent = MPFR_EMAX_DEFAULT;
-	static const int max_exponent10 = max_exponent*0.30103;
-	static const float_denorm_style has_denorm = denorm_absent;
+	static constexpr int max_exponent = MPFR_EMAX_DEFAULT;
+	static constexpr int max_exponent10 = max_exponent*0.30103;
+	static constexpr float_denorm_style has_denorm = denorm_absent;
 };
 } // namespace std
 
