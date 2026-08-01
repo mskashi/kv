@@ -50,10 +50,15 @@ int main()
 	std::cout << std::numeric_limits< kv::mpfr<106> >::epsilon() << "\n";
 	std::cout << std::numeric_limits< kv::mpfr<106> >::infinity() << "\n";
 	std::cout << - std::numeric_limits< kv::mpfr<106> >::infinity() << "\n";
-	std::cout << std::numeric_limits< kv::mpfr<106> >::min() << "\n";
 	std::cout << std::numeric_limits< kv::mpfr<106> >::max() << "\n";
+	std::cout << std::numeric_limits< kv::mpfr<106> >::min() << "\n";
+	std::cout << std::numeric_limits< kv::mpfr<106> >::quiet_NaN() << "\n";
+
 	std::cout << std::numeric_limits< kv::mpfr<106> >::digits << "\n";
 	std::cout << std::numeric_limits< kv::mpfr<106> >::digits10 << "\n";
+	std::cout << std::numeric_limits< kv::mpfr<106> >::radix << "\n";
 	std::cout << std::numeric_limits< kv::mpfr<106> >::min_exponent << "\n";
+	std::cout << std::numeric_limits< kv::mpfr<106> >::min_exponent10 << "\n";
 	std::cout << std::numeric_limits< kv::mpfr<106> >::max_exponent << "\n";
+	std::cout << std::numeric_limits< kv::mpfr<106> >::max_exponent10 << "\n";
 }

@@ -260,13 +260,12 @@ template <int N = 53> class mpfr {
 	}
 
 	friend bool operator<(const mpfr& x, const mpfr& y) {
-		if (mpfr_cmp(x.a, y.a) < 0) return true;
-		else return false;
+		return mpfr_less_p(x.a, y.a) != 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator<(const mpfr& x, const C& y) {
-		if (mpfr_cmp_d(x.a, (double)y) < 0) return true;
-		else return false;
+		double tmp = (double)y;
+		return !mpfr_nan_p(x.a) && tmp == tmp && mpfr_cmp_d(x.a, tmp) < 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator<(const mpfr& x, const C& y) {
@@ -274,8 +273,8 @@ template <int N = 53> class mpfr {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator<(const C& x, const mpfr& y) {
-		if (mpfr_cmp_d(y.a, (double)x) > 0) return true;
-		else return false;
+		double tmp = (double)x;
+		return tmp == tmp && !mpfr_nan_p(y.a) && mpfr_cmp_d(y.a, tmp) > 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator<(const C& x, const mpfr& y) {
@@ -283,13 +282,12 @@ template <int N = 53> class mpfr {
 	}
 
 	friend bool operator<=(const mpfr& x, const mpfr& y) {
-		if (mpfr_cmp(x.a, y.a) <= 0) return true;
-		else return false;
+		return mpfr_lessequal_p(x.a, y.a) != 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator<=(const mpfr& x, const C& y) {
-		if (mpfr_cmp_d(x.a, (double)y) <= 0) return true;
-		else return false;
+		double tmp = (double)y;
+		return !mpfr_nan_p(x.a) && tmp == tmp && mpfr_cmp_d(x.a, tmp) <= 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator<=(const mpfr& x, const C& y) {
@@ -297,8 +295,8 @@ template <int N = 53> class mpfr {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator<=(const C& x, const mpfr& y) {
-		if (mpfr_cmp_d(y.a, (double)x) >= 0) return true;
-		else return false;
+		double tmp = (double)x;
+		return tmp == tmp && !mpfr_nan_p(y.a) && mpfr_cmp_d(y.a, tmp) >= 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator<=(const C& x, const mpfr& y) {
@@ -306,13 +304,12 @@ template <int N = 53> class mpfr {
 	}
 
 	friend bool operator>(const mpfr& x, const mpfr& y) {
-		if (mpfr_cmp(x.a, y.a) > 0) return true;
-		else return false;
+		return mpfr_greater_p(x.a, y.a) != 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator>(const mpfr& x, const C& y) {
-		if (mpfr_cmp_d(x.a, (double)y) > 0) return true;
-		else return false;
+		double tmp = (double)y;
+		return !mpfr_nan_p(x.a) && tmp == tmp && mpfr_cmp_d(x.a, tmp) > 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator>(const mpfr& x, const C& y) {
@@ -320,8 +317,8 @@ template <int N = 53> class mpfr {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator>(const C& x, const mpfr& y) {
-		if (mpfr_cmp_d(y.a, (double)x) < 0) return true;
-		else return false;
+		double tmp = (double)x;
+		return tmp == tmp && !mpfr_nan_p(y.a) && mpfr_cmp_d(y.a, tmp) < 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator>(const C& x, const mpfr& y) {
@@ -329,13 +326,12 @@ template <int N = 53> class mpfr {
 	}
 
 	friend bool operator>=(const mpfr& x, const mpfr& y) {
-		if (mpfr_cmp(x.a, y.a) >= 0) return true;
-		else return false;
+		return mpfr_greaterequal_p(x.a, y.a) != 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator>=(const mpfr& x, const C& y) {
-		if (mpfr_cmp_d(x.a, (double)y) >= 0) return true;
-		else return false;
+		double tmp = (double)y;
+		return !mpfr_nan_p(x.a) && tmp == tmp && mpfr_cmp_d(x.a, tmp) >= 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator>=(const mpfr& x, const C& y) {
@@ -343,8 +339,8 @@ template <int N = 53> class mpfr {
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator>=(const C& x, const mpfr& y) {
-		if (mpfr_cmp_d(y.a, (double)x) <= 0) return true;
-		else return false;
+		double tmp = (double)x;
+		return tmp == tmp && !mpfr_nan_p(y.a) && mpfr_cmp_d(y.a, tmp) <= 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, mpfr>::value, bool >::type operator>=(const C& x, const mpfr& y) {
@@ -352,25 +348,29 @@ template <int N = 53> class mpfr {
 	}
 
 	friend bool operator==(const mpfr& x, const mpfr& y) {
-		return (mpfr_cmp(x.a, y.a) == 0);
+		return mpfr_equal_p(x.a, y.a) != 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator==(const mpfr& x, const C& y) {
-		return (mpfr_cmp_d(x.a, (double)y) == 0);
+		double tmp = (double)y;
+		return !mpfr_nan_p(x.a) && tmp == tmp && mpfr_cmp_d(x.a, tmp) == 0;
 	}
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator==(const C& x, const mpfr& y) {
-		return (mpfr_cmp_d(y.a, (double)x) == 0);
+		double tmp = (double)x;
+		return tmp == tmp && !mpfr_nan_p(y.a) && mpfr_cmp_d(y.a, tmp) == 0;
 	}
 
 	friend bool operator!=(const mpfr& x, const mpfr& y) {
-		return (mpfr_cmp(x.a, y.a) != 0);
+		return mpfr_equal_p(x.a, y.a) == 0;
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator!=(const mpfr& x, const C& y) {
-		return (mpfr_cmp_d(x.a, (double)y) != 0);
+		double tmp = (double)y;
+		return mpfr_nan_p(x.a) || tmp != tmp || mpfr_cmp_d(x.a, tmp) != 0;
 	}
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, mpfr>::value, bool >::type operator!=(const C& x, const mpfr& y) {
-		return (mpfr_cmp_d(y.a, (double)x) != 0);
+		double tmp = (double)x;
+		return tmp != tmp || mpfr_nan_p(y.a) || mpfr_cmp_d(y.a, tmp) != 0;
 	}
 
 	friend mpfr floor(const mpfr& x) {
@@ -608,15 +608,29 @@ template <int N = 53> class mpfr {
 
 namespace std {
 template <int N> class numeric_limits< kv::mpfr<N> > {
-	public: static kv::mpfr<N> epsilon() {
+	public:
+	static constexpr bool is_specialized = true;
+
+	static kv::mpfr<N> epsilon() {
 		kv::mpfr<N> tmp;
 		mpfr_set_ui_2exp(tmp.a, 1, 1-N, MPFR_RNDN);
 		return tmp;
+	}
+	static kv::mpfr<N> round_error() {
+		return kv::mpfr<N>(0.5);
 	}
 	static kv::mpfr<N> infinity() {
 		kv::mpfr<N> tmp;
 		mpfr_set_inf(tmp.a, 1);
 		return tmp;
+	}
+	static kv::mpfr<N> quiet_NaN() {
+		kv::mpfr<N> tmp;
+		mpfr_set_nan(tmp.a);
+		return tmp;
+	}
+	static kv::mpfr<N> signaling_NaN() {
+		return kv::mpfr<N>();
 	}
 
 	static kv::mpfr<N> max() {
@@ -624,6 +638,9 @@ template <int N> class numeric_limits< kv::mpfr<N> > {
 		mpfr_set_ui_2exp(tmp.a, 1, mpfr_get_emax() - 1, MPFR_RNDN);
 		tmp2 = 2 - epsilon();
 		return tmp2 * tmp;
+	}
+	static kv::mpfr<N> lowest() {
+		return -(max)();
 	}
 
 	static kv::mpfr<N> min() {
@@ -636,15 +653,29 @@ template <int N> class numeric_limits< kv::mpfr<N> > {
 	}
 
 	static constexpr int digits = N;
-	static constexpr int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
+	static constexpr int digits10 = static_cast<int>((digits - 1) * 0.3010299956639812); // ln(2)/ln(10)
+	static constexpr int max_digits10 = 2 + static_cast<int>(digits * 0.3010299956639812);
+	static constexpr bool is_signed = true;
+	static constexpr bool is_integer = false;
+	static constexpr bool is_exact = false;
 	static constexpr int radix = 2;
 	// static const int min_exponent = mpfr_get_emin();
 	static constexpr int min_exponent = MPFR_EMIN_DEFAULT;
-	static constexpr int min_exponent10 = min_exponent*0.30103;
+	static constexpr int min_exponent10 = static_cast<int>(min_exponent * 0.3010299956639812);
 	// static const int max_exponent = mpfr_get_emax();
 	static constexpr int max_exponent = MPFR_EMAX_DEFAULT;
-	static constexpr int max_exponent10 = max_exponent*0.30103;
+	static constexpr int max_exponent10 = static_cast<int>(max_exponent * 0.3010299956639812);
+	static constexpr bool has_infinity = true;
+	static constexpr bool has_quiet_NaN = true;
+	static constexpr bool has_signaling_NaN = false;
 	static constexpr float_denorm_style has_denorm = denorm_absent;
+	static constexpr bool has_denorm_loss = false;
+	static constexpr bool is_iec559 = false;
+	static constexpr bool is_bounded = true;
+	static constexpr bool is_modulo = false;
+	static constexpr bool traps = false;
+	static constexpr bool tinyness_before = false;
+	static constexpr float_round_style round_style = round_to_nearest;
 };
 } // namespace std
 

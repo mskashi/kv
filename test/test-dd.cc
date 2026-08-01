@@ -56,6 +56,7 @@ int main()
 	std::cout << std::numeric_limits<dd>::infinity() << "\n";
 	std::cout << std::numeric_limits<dd>::max() << "\n";
 	std::cout << std::numeric_limits<dd>::min() << "\n";
+	std::cout << std::numeric_limits<dd>::quiet_NaN() << "\n";
 
 	std::cout << std::numeric_limits<dd>::digits << "\n";
 	std::cout << std::numeric_limits<dd>::digits10 << "\n";

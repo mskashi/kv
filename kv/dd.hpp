@@ -556,14 +556,16 @@ class dd {
 
 	friend bool operator<(const dd& x, const dd& y) {
 		if (x.a1 < y.a1) return true;
-		else if (x.a1 > y.a1) return false;
-		else return (x.a2 < y.a2);
+		else if (x.a1 == y.a1) {
+			return (x.a2 < y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator<(const dd& x, const C& y) {
 		if (x.a1 < y) return true;
-		else if (x.a1 > y) return false;
-		else return (x.a2 < 0.);
+		else if (x.a1 == y) {
+			return (x.a2 < 0.);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator<(const dd& x, const C& y) {
@@ -572,8 +574,9 @@ class dd {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator<(const C& x, const dd& y) {
 		if (x < y.a1) return true;
-		else if (x > y.a1) return false;
-		else return (0. < y.a2);
+		else if (x == y.a1) {
+			return (0. < y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator<(const C& x, const dd& y) {
@@ -582,14 +585,16 @@ class dd {
 
 	friend bool operator<=(const dd& x, const dd& y) {
 		if (x.a1 < y.a1) return true;
-		else if (x.a1 > y.a1) return false;
-		else return (x.a2 <= y.a2);
+		else if (x.a1 == y.a1) {
+			return (x.a2 <= y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator<=(const dd& x, const C& y) {
 		if (x.a1 < y) return true;
-		else if (x.a1 > y) return false;
-		else return (x.a2 <= 0.);
+		else if (x.a1 == y) {
+			return (x.a2 <= 0.);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator<=(const dd& x, const C& y) {
@@ -598,8 +603,9 @@ class dd {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator<=(const C& x, const dd& y) {
 		if (x < y.a1) return true;
-		else if (x > y.a1) return false;
-		else return (0. <= y.a2);
+		else if (x == y.a1) {
+			return (0. <= y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator<=(const C& x, const dd& y) {
@@ -608,14 +614,16 @@ class dd {
 
 	friend bool operator>(const dd& x, const dd& y) {
 		if (x.a1 > y.a1) return true;
-		else if (x.a1 < y.a1) return false;
-		else return (x.a2 > y.a2);
+		else if (x.a1 == y.a1) {
+			return (x.a2 > y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator>(const dd& x, const C& y) {
 		if (x.a1 > y) return true;
-		else if (x.a1 < y) return false;
-		else return (x.a2 > 0.);
+		else if (x.a1 == y) {
+			return (x.a2 > 0.);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator>(const dd& x, const C& y) {
@@ -624,8 +632,9 @@ class dd {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator>(const C& x, const dd& y) {
 		if (x > y.a1) return true;
-		else if (x < y.a1) return false;
-		else return (0. > y.a2);
+		else if (x == y.a1) {
+			return (0. > y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator>(const C& x, const dd& y) {
@@ -634,14 +643,16 @@ class dd {
 
 	friend bool operator>=(const dd& x, const dd& y) {
 		if (x.a1 > y.a1) return true;
-		else if (x.a1 < y.a1) return false;
-		else return (x.a2 >= y.a2);
+		else if (x.a1 == y.a1) {
+			return (x.a2 >= y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator>=(const dd& x, const C& y) {
 		if (x.a1 > y) return true;
-		else if (x.a1 < y) return false;
-		else return (x.a2 >= 0.);
+		else if (x.a1 == y) {
+			return (x.a2 >= 0.);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator>=(const dd& x, const C& y) {
@@ -650,8 +661,9 @@ class dd {
 
 	template <class C> friend typename boost::enable_if_c< acceptable_n<C, dd>::value, bool >::type operator>=(const C& x, const dd& y) {
 		if (x > y.a1) return true;
-		else if (x < y.a1) return false;
-		else return (0. >= y.a2);
+		else if (x == y.a1) {
+			return (0. >= y.a2);
+		} else return false; // This covers the case where a1 is NaN.
 	}
 
 	template <class C> friend typename boost::enable_if_c< acceptable_s<C, dd>::value, bool >::type operator>=(const C& x, const dd& y) {
@@ -1278,13 +1290,28 @@ class dd {
 namespace std {
 template <> class numeric_limits<kv::dd> {
 	public:
+	static constexpr bool is_specialized = true;
 
 	static kv::dd epsilon() {
-		static const kv::dd tmp(std::ldexp(1., -105));
+		// Spacing of the finest uniform grid representable on [1, 2].
+		static const kv::dd tmp(std::ldexp(1., -106));
 		return tmp;
+	}
+	static kv::dd round_error() {
+		return infinity();
 	}
 	static kv::dd infinity() {
 		static const double tmp = numeric_limits<double>::infinity();
+		static const kv::dd tmp2(tmp, 0.);
+		return tmp2;
+	}
+	static kv::dd quiet_NaN() {
+		static const double tmp = numeric_limits<double>::quiet_NaN();
+		static const kv::dd tmp2(tmp, 0.);
+		return tmp2;
+	}
+	static kv::dd signaling_NaN() {
+		static const double tmp = numeric_limits<double>::signaling_NaN();
 		static const kv::dd tmp2(tmp, 0.);
 		return tmp2;
 	}
@@ -1294,10 +1321,13 @@ template <> class numeric_limits<kv::dd> {
 		static const kv::dd tmp2(tmp, std::ldexp(tmp, -54));
 		return tmp2;
 	}
+	static kv::dd lowest() {
+		return -(max)();
+	}
 
 	static kv::dd min() {
 		static const double tmp = numeric_limits<double>::min();
-		static const kv::dd tmp2(tmp, 0.);
+		static const kv::dd tmp2(std::ldexp(tmp, 54), 0.);
 		return tmp2;
 	}
 
@@ -1307,13 +1337,28 @@ template <> class numeric_limits<kv::dd> {
 		return tmp2;
 	}
 
-	static constexpr int digits = 106;
-	static constexpr int digits10 = (digits-1)*0.30103; // ln(2)/ln(10)
+	static constexpr int digits = 107;
+	static constexpr int digits10 = static_cast<int>((digits - 1) * 0.3010299956639812); // ln(2)/ln(10)
+	static constexpr int max_digits10 = 34;
+	static constexpr bool is_signed = true;
+	static constexpr bool is_integer = false;
+	static constexpr bool is_exact = false;
 	static constexpr int radix = 2;
-	static constexpr int min_exponent = -1021;
-	static constexpr int min_exponent10 = -307;
+	static constexpr int min_exponent = -967;
+	static constexpr int min_exponent10 = -291;
 	static constexpr int max_exponent = 1024;
 	static constexpr int max_exponent10 = 308;
+	static constexpr bool has_infinity = numeric_limits<double>::has_infinity;
+	static constexpr bool has_quiet_NaN = numeric_limits<double>::has_quiet_NaN;
+	static constexpr bool has_signaling_NaN = numeric_limits<double>::has_signaling_NaN;
+	static constexpr float_denorm_style has_denorm = numeric_limits<double>::has_denorm;
+	static constexpr bool has_denorm_loss = numeric_limits<double>::has_denorm_loss;
+	static constexpr bool is_iec559 = false;
+	static constexpr bool is_bounded = true;
+	static constexpr bool is_modulo = false;
+	static constexpr bool traps = numeric_limits<double>::traps;
+	static constexpr bool tinyness_before = false;
+	static constexpr float_round_style round_style = round_indeterminate;
 };
 } // namespace std
 

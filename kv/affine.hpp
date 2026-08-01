@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef AFFINE_HPP
@@ -1499,7 +1499,7 @@ template <class T> class affine {
 		tmp = x;
 		tmp.a(0) = 0.;
 		r = atan((interval<T>)(x.a(0)));
-		r2 = 1. / sqrt(1. + pow(to_interval(x), 2));
+		r2 = 1. / (1. + pow(to_interval(x), 2));
 		m = mid(r2);
 		r += (r2 - m) * to_interval(tmp);
 		
