@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Masahide Kashiwagi (kashi@waseda.jp)
+ * Copyright (c) 2013-2026 Masahide Kashiwagi (kashi@waseda.jp)
  */
 
 #ifndef PSA_HPP
@@ -921,7 +921,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);
@@ -983,7 +983,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);
@@ -1045,7 +1045,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);
@@ -1106,7 +1106,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);
@@ -1168,7 +1168,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);
@@ -1230,7 +1230,7 @@ template <class T> class psa {
 		h = x; h.v(0) = 0.;
 
 		if (mode() == 2) {
-			domain() = evalrange(x);
+			domain() = evalrange(h);
 		}
 		taylor.v.resize(2);
 		taylor.v(0) = x.v(0);

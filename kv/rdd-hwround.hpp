@@ -347,9 +347,9 @@ template <> struct rop <dd> {
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
 				hwround::roundup();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 				v5 *= 0.5; v6 *= 0.5; v7 *= 0.5; v8 *= 0.5;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					hwround::rounddown();
 					tmp =  v7 + v8;
@@ -362,8 +362,8 @@ template <> struct rop <dd> {
 				z2 = v2;
 			} else {
 				hwround::roundup();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					hwround::rounddown();
 					tmp =  v7 + v8;
@@ -379,9 +379,9 @@ template <> struct rop <dd> {
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
 				hwround::rounddown();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 				v5 *= 0.5; v6 *= 0.5; v7 *= 0.5; v8 *= 0.5;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					tmp =  v7 + v8;
 					hwround::roundup();
@@ -393,8 +393,8 @@ template <> struct rop <dd> {
 				z2 = v2;
 			} else {
 				hwround::rounddown();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					tmp =  v7 + v8;
 					hwround::roundup();
@@ -441,9 +441,9 @@ template <> struct rop <dd> {
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_down(-z1, y.a1 * 0.5, z3, z4);
 				hwround::rounddown();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 				v5 *= 0.5; v6 *= 0.5; v7 *= 0.5; v8 *= 0.5;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					hwround::roundup();
 					tmp =  v7 + v8;
@@ -455,8 +455,8 @@ template <> struct rop <dd> {
 				z2 = v2;
 			} else {
 				hwround::rounddown();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					hwround::roundup();
 					tmp =  v7 + v8;
@@ -472,9 +472,9 @@ template <> struct rop <dd> {
 			if (std::fabs(z3) == std::numeric_limits<double>::infinity()) {
 				twoproduct_up(-z1, y.a1 * 0.5, z3, z4);
 				hwround::roundup();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
 				v5 *= 0.5; v6 *= 0.5; v7 *= 0.5; v8 *= 0.5;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					tmp =  v7 + v8;
 					hwround::rounddown();
@@ -486,8 +486,8 @@ template <> struct rop <dd> {
 				z2 = v2;
 			} else {
 				hwround::roundup();
-				v1 = z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
-				v2 = (((v3 + v5) + (-v1) * v8) + v6) + v4;
+				v1 = -z1; v3 = z3; v4 = z4; v5 = x.a1; v6 = x.a2; v7 = y.a1; v8 = y.a2;
+				v2 = (((v3 + v5) + v1 * v8) + v6) + v4;
 				if (v2 > 0.) {
 					tmp =  v7 + v8;
 					hwround::rounddown();
